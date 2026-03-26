@@ -1,0 +1,23 @@
+## .NET / C#
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.dll
+*.pdb
+*.exe
+
+## IDE
+.vs/
+.vscode/
+*.sln.docstates
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## Build
+publish/
+out/

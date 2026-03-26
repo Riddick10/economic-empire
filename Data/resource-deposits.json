@@ -1,0 +1,1460 @@
+{
+  "oil": {
+    "provinces": [
+      "Texas",
+      "Alaska",
+      "North Dakota",
+      "New Mexico",
+      "Oklahoma",
+      "California",
+      "Louisiana",
+      "Mississippi",
+      "Arkansas",
+      "Kansas",
+      "Colorado",
+      "Wyoming",
+      "Montana",
+      "Utah",
+      "Tyumen Oblast",
+      "Khanty-Mansiysk Autonomous Okrug – Ugra",
+      "Yamalo-Nenets Autonomous Okrug",
+      "Tomsk Oblast",
+      "Omsk Oblast",
+      "Tatarstan",
+      "Bashkortostan",
+      "Samara Oblast",
+      "Orenburg Oblast",
+      "Perm Krai",
+      "Sakhalin Oblast",
+      "Kaliningrad",
+      "Heilongjiang",
+      "Shandong",
+      "XinjiangUygur",
+      "Gansu",
+      "Shaanxi",
+      "Liaoning",
+      "Scotland",
+      "Nouvelle-Aquitaine",
+      "Oblast Poltawa",
+      "Oblast Charkiw",
+      "Oblast Sumy",
+      "Gujarat",
+      "Assam",
+      "Rajasthan",
+      "Chubu",
+      "Tohoku",
+      "Alberta",
+      "Saskatchewan",
+      "Region",
+      "Mangystau Region",
+      "Atyrau Region",
+      "West Kazakhstan Region",
+      "Western Australia",
+      "Northern Territory",
+      "Rio de Janeiro",
+      "Espirito Santo",
+      "Sao Paulo",
+      "Eastern Region",
+      "Khuzestan",
+      "Bushehr",
+      "Al-Basrah",
+      "Kirkuk",
+      "Kalimantan",
+      "Sumatra",
+      "Abu Dhabi",
+      "Ahmadi",
+      "Campeche",
+      "Tabasco",
+      "Tamaulipas",
+      "Veracruz",
+      "South South",
+      "Sahara",
+      "South-East",
+      "Surt",
+      "Ajdabiya",
+      "Cabinda",
+      "Zaire",
+      "Ostregion",
+      "Westregion",
+      "Neuquen",
+      "Chubut",
+      "Santa Cruz",
+      "Mendoza",
+      "Orinoquia",
+      "Red Sea Governorate",
+      "South Sinai Governorate",
+      "Suez Governorate",
+      "Qatar",
+      "Ad Dakhiliyah",
+      "Dhofar",
+      "Oriente"
+    ],
+    "deposits": [
+      {
+        "countryId": "SAU",
+        "lon": 46.7,
+        "lat": 24.7
+      },
+      {
+        "countryId": "SAU",
+        "lon": 49.5,
+        "lat": 26.3
+      },
+      {
+        "countryId": "IRN",
+        "lon": 48.5,
+        "lat": 31.0
+      },
+      {
+        "countryId": "IRN",
+        "lon": 52.0,
+        "lat": 27.5
+      },
+      {
+        "countryId": "IRQ",
+        "lon": 47.0,
+        "lat": 30.5
+      },
+      {
+        "countryId": "IRQ",
+        "lon": 44.3,
+        "lat": 35.5
+      },
+      {
+        "countryId": "KWT",
+        "lon": 47.5,
+        "lat": 29.0
+      },
+      {
+        "countryId": "ARE",
+        "lon": 54.5,
+        "lat": 24.5
+      },
+      {
+        "countryId": "QAT",
+        "lon": 51.5,
+        "lat": 25.5
+      },
+      {
+        "countryId": "OMN",
+        "lon": 55.5,
+        "lat": 22.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -114.0,
+        "lat": 56.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -111.5,
+        "lat": 57.0
+      },
+      {
+        "countryId": "MEX",
+        "lon": -94.5,
+        "lat": 18.5
+      },
+      {
+        "countryId": "MEX",
+        "lon": -97.0,
+        "lat": 22.0
+      },
+      {
+        "countryId": "VEN",
+        "lon": -71.0,
+        "lat": 9.5
+      },
+      {
+        "countryId": "VEN",
+        "lon": -64.0,
+        "lat": 8.5
+      },
+      {
+        "countryId": "BRA",
+        "lon": -40.0,
+        "lat": -22.0
+      },
+      {
+        "countryId": "BRA",
+        "lon": -39.0,
+        "lat": -13.0
+      },
+      {
+        "countryId": "COL",
+        "lon": -73.5,
+        "lat": 7.0
+      },
+      {
+        "countryId": "ECU",
+        "lon": -76.5,
+        "lat": -1.0
+      },
+      {
+        "countryId": "ARG",
+        "lon": -68.5,
+        "lat": -38.5
+      },
+      {
+        "countryId": "NGA",
+        "lon": 5.5,
+        "lat": 5.5
+      },
+      {
+        "countryId": "NGA",
+        "lon": 4.0,
+        "lat": 6.5
+      },
+      {
+        "countryId": "AGO",
+        "lon": 12.5,
+        "lat": -6.5
+      },
+      {
+        "countryId": "AGO",
+        "lon": 13.5,
+        "lat": -8.0
+      },
+      {
+        "countryId": "LBY",
+        "lon": 19.0,
+        "lat": 29.0
+      },
+      {
+        "countryId": "LBY",
+        "lon": 14.0,
+        "lat": 27.0
+      },
+      {
+        "countryId": "DZA",
+        "lon": 6.0,
+        "lat": 31.0
+      },
+      {
+        "countryId": "EGY",
+        "lon": 33.0,
+        "lat": 28.5
+      },
+      {
+        "countryId": "GAB",
+        "lon": 9.5,
+        "lat": -1.0
+      },
+      {
+        "countryId": "COG",
+        "lon": 12.0,
+        "lat": -4.5
+      },
+      {
+        "countryId": "GNQ",
+        "lon": 10.0,
+        "lat": 1.5
+      },
+      {
+        "countryId": "SDN",
+        "lon": 29.5,
+        "lat": 11.0
+      },
+      {
+        "countryId": "SSD",
+        "lon": 30.0,
+        "lat": 6.0
+      },
+      {
+        "countryId": "TCD",
+        "lon": 18.5,
+        "lat": 10.0
+      },
+      {
+        "countryId": "NOR",
+        "lon": 2.5,
+        "lat": 60.5
+      },
+      {
+        "countryId": "NOR",
+        "lon": 7.0,
+        "lat": 65.0
+      },
+      {
+        "countryId": "ROU",
+        "lon": 27.0,
+        "lat": 45.0
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 53.0,
+        "lat": 46.5
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 52.0,
+        "lat": 44.5
+      },
+      {
+        "countryId": "TKM",
+        "lon": 53.0,
+        "lat": 40.0
+      },
+      {
+        "countryId": "AZE",
+        "lon": 50.0,
+        "lat": 40.0
+      },
+      {
+        "countryId": "UZB",
+        "lon": 64.0,
+        "lat": 41.0
+      },
+      {
+        "countryId": "IDN",
+        "lon": 117.0,
+        "lat": -1.0
+      },
+      {
+        "countryId": "IDN",
+        "lon": 104.5,
+        "lat": 1.5
+      },
+      {
+        "countryId": "MYS",
+        "lon": 114.0,
+        "lat": 5.0
+      },
+      {
+        "countryId": "VNM",
+        "lon": 108.0,
+        "lat": 10.0
+      },
+      {
+        "countryId": "BRN",
+        "lon": 114.5,
+        "lat": 4.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 124.0,
+        "lat": -12.0
+      },
+      {
+        "countryId": "AUS",
+        "lon": 114.5,
+        "lat": -21.0
+      }
+    ]
+  },
+  "naturalGas": {
+    "provinces": [
+      "Texas",
+      "Louisiana",
+      "Pennsylvania",
+      "Ohio",
+      "Oklahoma",
+      "West Virginia",
+      "New Mexico",
+      "Colorado",
+      "Wyoming",
+      "Tyumen Oblast",
+      "Yamalo-Nenets Autonomous Okrug",
+      "Khanty-Mansiysk Autonomous Okrug – Ugra",
+      "Sakhalin Oblast",
+      "Astrakhan Oblast",
+      "Orenburg Oblast",
+      "Sichuan",
+      "XinjiangUygur",
+      "Shaanxi",
+      "NeiMongol",
+      "Qinghai",
+      "Gujarat",
+      "Andhra Pradesh",
+      "Assam",
+      "Niedersachsen",
+      "BritishColumbia",
+      "Alberta",
+      "Region",
+      "West Kazakhstan Region",
+      "Mangystau Region",
+      "Atyrau Region",
+      "Western Australia",
+      "Queensland",
+      "Northern Territory",
+      "Rio de Janeiro",
+      "Sao Paulo",
+      "Eastern Region",
+      "Bushehr",
+      "Fars",
+      "Khuzestan",
+      "Al-Basrah",
+      "Kirkuk",
+      "Kalimantan",
+      "Sumatra",
+      "Papua",
+      "Abu Dhabi",
+      "Tamaulipas",
+      "Veracruz",
+      "Tabasco",
+      "South South",
+      "Sahara",
+      "South-East",
+      "Ostregion",
+      "Neuquen",
+      "Tierra del Fuego",
+      "Orinoquia",
+      "Dakahlia Governorate",
+      "Port Said Governorate",
+      "Alexandria Governorate",
+      "Qatar",
+      "Ad Dakhiliyah",
+      "Dhofar",
+      "Tarija",
+      "Santa Cruz",
+      "Sindh",
+      "Balochistan",
+      "Surt"
+    ],
+    "deposits": [
+      {
+        "countryId": "IRN",
+        "lon": 52.0,
+        "lat": 27.0
+      },
+      {
+        "countryId": "IRN",
+        "lon": 48.0,
+        "lat": 30.5
+      },
+      {
+        "countryId": "QAT",
+        "lon": 51.5,
+        "lat": 26.0
+      },
+      {
+        "countryId": "SAU",
+        "lon": 50.0,
+        "lat": 25.5
+      },
+      {
+        "countryId": "SAU",
+        "lon": 49.0,
+        "lat": 28.0
+      },
+      {
+        "countryId": "ARE",
+        "lon": 54.0,
+        "lat": 25.0
+      },
+      {
+        "countryId": "OMN",
+        "lon": 55.5,
+        "lat": 21.5
+      },
+      {
+        "countryId": "IRQ",
+        "lon": 47.5,
+        "lat": 31.0
+      },
+      {
+        "countryId": "DZA",
+        "lon": 3.0,
+        "lat": 32.5
+      },
+      {
+        "countryId": "DZA",
+        "lon": 9.5,
+        "lat": 29.0
+      },
+      {
+        "countryId": "EGY",
+        "lon": 31.5,
+        "lat": 31.5
+      },
+      {
+        "countryId": "EGY",
+        "lon": 32.5,
+        "lat": 30.0
+      },
+      {
+        "countryId": "LBY",
+        "lon": 14.5,
+        "lat": 28.0
+      },
+      {
+        "countryId": "TKM",
+        "lon": 62.5,
+        "lat": 37.5
+      },
+      {
+        "countryId": "TKM",
+        "lon": 54.0,
+        "lat": 41.0
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 52.5,
+        "lat": 46.0
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 53.5,
+        "lat": 44.5
+      },
+      {
+        "countryId": "UZB",
+        "lon": 64.5,
+        "lat": 39.0
+      },
+      {
+        "countryId": "AZE",
+        "lon": 50.5,
+        "lat": 40.5
+      },
+      {
+        "countryId": "NOR",
+        "lon": 2.0,
+        "lat": 61.0
+      },
+      {
+        "countryId": "NOR",
+        "lon": 7.5,
+        "lat": 65.5
+      },
+      {
+        "countryId": "NOR",
+        "lon": 2.5,
+        "lat": 58.0
+      },
+      {
+        "countryId": "NLD",
+        "lon": 6.5,
+        "lat": 53.5
+      },
+      {
+        "countryId": "GBR",
+        "lon": 1.0,
+        "lat": 53.5
+      },
+      {
+        "countryId": "ROU",
+        "lon": 29.5,
+        "lat": 44.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -120.0,
+        "lat": 56.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -114.5,
+        "lat": 54.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -60.0,
+        "lat": 44.0
+      },
+      {
+        "countryId": "ARG",
+        "lon": -68.5,
+        "lat": -38.0
+      },
+      {
+        "countryId": "ARG",
+        "lon": -69.0,
+        "lat": -52.0
+      },
+      {
+        "countryId": "BOL",
+        "lon": -63.5,
+        "lat": -21.0
+      },
+      {
+        "countryId": "VEN",
+        "lon": -70.5,
+        "lat": 10.5
+      },
+      {
+        "countryId": "TTO",
+        "lon": -61.0,
+        "lat": 10.5
+      },
+      {
+        "countryId": "PER",
+        "lon": -75.0,
+        "lat": -14.0
+      },
+      {
+        "countryId": "BRA",
+        "lon": -40.0,
+        "lat": -22.5
+      },
+      {
+        "countryId": "NGA",
+        "lon": 5.0,
+        "lat": 5.0
+      },
+      {
+        "countryId": "NGA",
+        "lon": 4.0,
+        "lat": 4.5
+      },
+      {
+        "countryId": "MOZ",
+        "lon": 40.5,
+        "lat": -12.5
+      },
+      {
+        "countryId": "TZA",
+        "lon": 40.0,
+        "lat": -10.0
+      },
+      {
+        "countryId": "AGO",
+        "lon": 12.0,
+        "lat": -6.0
+      },
+      {
+        "countryId": "AUS",
+        "lon": 114.0,
+        "lat": -20.0
+      },
+      {
+        "countryId": "AUS",
+        "lon": 122.0,
+        "lat": -13.0
+      },
+      {
+        "countryId": "AUS",
+        "lon": 150.0,
+        "lat": -23.0
+      },
+      {
+        "countryId": "IDN",
+        "lon": 117.5,
+        "lat": 0.5
+      },
+      {
+        "countryId": "IDN",
+        "lon": 108.0,
+        "lat": -3.0
+      },
+      {
+        "countryId": "MYS",
+        "lon": 114.5,
+        "lat": 5.5
+      },
+      {
+        "countryId": "MYS",
+        "lon": 104.0,
+        "lat": 6.0
+      },
+      {
+        "countryId": "MMR",
+        "lon": 94.5,
+        "lat": 17.0
+      },
+      {
+        "countryId": "BRN",
+        "lon": 115.0,
+        "lat": 5.0
+      },
+      {
+        "countryId": "PNG",
+        "lon": 143.5,
+        "lat": -6.0
+      },
+      {
+        "countryId": "BGD",
+        "lon": 91.5,
+        "lat": 22.0
+      },
+      {
+        "countryId": "PAK",
+        "lon": 68.0,
+        "lat": 27.0
+      },
+      {
+        "countryId": "THA",
+        "lon": 101.0,
+        "lat": 8.0
+      }
+    ]
+  },
+  "coal": {
+    "provinces": [
+      "Wyoming",
+      "West Virginia",
+      "Pennsylvania",
+      "Kentucky",
+      "Illinois",
+      "Montana",
+      "Colorado",
+      "Ohio",
+      "Indiana",
+      "Virginia",
+      "Kemerovo Oblast",
+      "Krasnoyarsk Krai",
+      "Irkutsk Oblast",
+      "Sakha Republic",
+      "Novosibirsk Oblast",
+      "Shanxi",
+      "NeiMongol",
+      "Shaanxi",
+      "Shandong",
+      "Henan",
+      "Anhui",
+      "Guizhou",
+      "Hebei",
+      "Jharkhand",
+      "Orissa",
+      "Chhattisgarh",
+      "Madhya Pradesh",
+      "West Bengal",
+      "Nordrhein-Westfalen",
+      "Sachsen",
+      "Brandenburg",
+      "Sachsen-Anhalt",
+      "Wales",
+      "Oblast Donezk",
+      "Oblast Luhansk",
+      "Silesian",
+      "Lesser Poland",
+      "BritishColumbia",
+      "Alberta",
+      "Region",
+      "Karaganda Region",
+      "Pavlodar Region",
+      "Queensland",
+      "New South Wales",
+      "Victoria",
+      "Kalimantan",
+      "Sumatra",
+      "Mpumalanga",
+      "KwaZulu-Natal",
+      "Limpopo",
+      "BlackSea",
+      "CentralAnatolia",
+      "Caribe",
+      "Northeast",
+      "Sindh"
+    ],
+    "deposits": [
+      {
+        "countryId": "AUS",
+        "lon": 150.0,
+        "lat": -23.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 150.5,
+        "lat": -32.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 146.0,
+        "lat": -38.0
+      },
+      {
+        "countryId": "IDN",
+        "lon": 116.0,
+        "lat": -1.5
+      },
+      {
+        "countryId": "IDN",
+        "lon": 104.0,
+        "lat": -3.0
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 29.5,
+        "lat": -26.0
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 30.0,
+        "lat": -27.0
+      },
+      {
+        "countryId": "POL",
+        "lon": 19.0,
+        "lat": 50.3
+      },
+      {
+        "countryId": "POL",
+        "lon": 19.5,
+        "lat": 50.0
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 73.0,
+        "lat": 49.8
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 76.0,
+        "lat": 50.5
+      },
+      {
+        "countryId": "COL",
+        "lon": -72.5,
+        "lat": 11.0
+      },
+      {
+        "countryId": "COL",
+        "lon": -73.5,
+        "lat": 9.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -115.0,
+        "lat": 49.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -114.0,
+        "lat": 53.0
+      },
+      {
+        "countryId": "MOZ",
+        "lon": 34.5,
+        "lat": -16.0
+      },
+      {
+        "countryId": "MNG",
+        "lon": 108.5,
+        "lat": 43.5
+      },
+      {
+        "countryId": "VNM",
+        "lon": 107.0,
+        "lat": 21.0
+      },
+      {
+        "countryId": "TUR",
+        "lon": 32.0,
+        "lat": 40.5
+      },
+      {
+        "countryId": "TUR",
+        "lon": 30.5,
+        "lat": 39.5
+      },
+      {
+        "countryId": "SRB",
+        "lon": 21.0,
+        "lat": 44.0
+      },
+      {
+        "countryId": "CZE",
+        "lon": 13.5,
+        "lat": 50.5
+      },
+      {
+        "countryId": "GRC",
+        "lon": 21.5,
+        "lat": 40.5
+      },
+      {
+        "countryId": "BWA",
+        "lon": 27.5,
+        "lat": -22.0
+      },
+      {
+        "countryId": "ZWE",
+        "lon": 27.0,
+        "lat": -18.0
+      },
+      {
+        "countryId": "PHL",
+        "lon": 124.0,
+        "lat": 7.5
+      }
+    ]
+  },
+  "iron": {
+    "provinces": [
+      "Kursk Oblast",
+      "Belgorod Oblast",
+      "Chelyabinsk Oblast",
+      "Sverdlovsk Oblast",
+      "Liaoning",
+      "Hebei",
+      "Sichuan",
+      "Shandong",
+      "Anhui",
+      "Orissa",
+      "Jharkhand",
+      "Chhattisgarh",
+      "Karnataka",
+      "Minnesota",
+      "Michigan",
+      "Oblast Dnipropetrowsk",
+      "Niedersachsen",
+      "Québec",
+      "NewfoundlandandLabrador",
+      "Region",
+      "Kostanay Region",
+      "Western Australia",
+      "Para",
+      "Minas Gerais",
+      "Isfahan",
+      "Kerman",
+      "Nothern Cape",
+      "CentralAnatolia",
+      "EasternAnatolia",
+      "Guayana",
+      "Durango",
+      "Coahuila"
+    ],
+    "deposits": [
+      {
+        "countryId": "AUS",
+        "lon": 119.3,
+        "lat": -22.7
+      },
+      {
+        "countryId": "AUS",
+        "lon": 117.8,
+        "lat": -23.3
+      },
+      {
+        "countryId": "AUS",
+        "lon": 118.5,
+        "lat": -21.8
+      },
+      {
+        "countryId": "AUS",
+        "lon": 116.8,
+        "lat": -29.0
+      },
+      {
+        "countryId": "BRA",
+        "lon": -50.2,
+        "lat": -6.1
+      },
+      {
+        "countryId": "BRA",
+        "lon": -43.9,
+        "lat": -19.9
+      },
+      {
+        "countryId": "BRA",
+        "lon": -44.5,
+        "lat": -20.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -66.5,
+        "lat": 52.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -64.0,
+        "lat": 54.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -63.5,
+        "lat": 52.0
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 22.5,
+        "lat": -27.5
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 23.0,
+        "lat": -28.0
+      },
+      {
+        "countryId": "SWE",
+        "lon": 20.2,
+        "lat": 67.8
+      },
+      {
+        "countryId": "SWE",
+        "lon": 20.7,
+        "lat": 67.1
+      },
+      {
+        "countryId": "IRN",
+        "lon": 55.5,
+        "lat": 32.5
+      },
+      {
+        "countryId": "IRN",
+        "lon": 56.0,
+        "lat": 31.5
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 59.5,
+        "lat": 52.0
+      },
+      {
+        "countryId": "MRT",
+        "lon": -12.5,
+        "lat": 22.5
+      },
+      {
+        "countryId": "LBR",
+        "lon": -10.0,
+        "lat": 7.0
+      },
+      {
+        "countryId": "SLE",
+        "lon": -11.5,
+        "lat": 9.0
+      },
+      {
+        "countryId": "GIN",
+        "lon": -13.0,
+        "lat": 11.0
+      },
+      {
+        "countryId": "PER",
+        "lon": -76.5,
+        "lat": -13.5
+      },
+      {
+        "countryId": "CHL",
+        "lon": -70.0,
+        "lat": -27.5
+      },
+      {
+        "countryId": "VEN",
+        "lon": -63.5,
+        "lat": 7.0
+      },
+      {
+        "countryId": "MEX",
+        "lon": -103.5,
+        "lat": 25.5
+      },
+      {
+        "countryId": "DZA",
+        "lon": 8.0,
+        "lat": 34.5
+      }
+    ]
+  },
+  "copper": {
+    "provinces": [
+      "Región de Antofagasta",
+      "Región de Atacama",
+      "Región de Tarapacá",
+      "Región de Coquimbo",
+      "Región del Libertador Bernardo O'Higgins",
+      "Región de Valparaíso",
+      "Sur Costero",
+      "Sierra Sur",
+      "Centro",
+      "Arizona",
+      "Utah",
+      "New Mexico",
+      "Montana",
+      "Michigan",
+      "Sverdlovsk Oblast",
+      "Chelyabinsk Oblast",
+      "Orenburg Oblast",
+      "Jiangxi",
+      "Xizang",
+      "NeiMongol",
+      "Copperbelt",
+      "North-Western",
+      "Katanga",
+      "Lower Silesian",
+      "Sachsen-Anhalt",
+      "Region",
+      "Karaganda Region",
+      "East Kazakhstan Region",
+      "BritishColumbia",
+      "South Australia",
+      "Queensland",
+      "Para",
+      "Goias",
+      "Bahia",
+      "Papua",
+      "Kerman",
+      "East Azerbaijan",
+      "Sonora",
+      "EasternAnatolia",
+      "BlackSea",
+      "Catamarca",
+      "San Juan"
+    ],
+    "deposits": [
+      {
+        "countryId": "CHL",
+        "lon": -69.1,
+        "lat": -23.0
+      },
+      {
+        "countryId": "CHL",
+        "lon": -68.6,
+        "lat": -20.8
+      },
+      {
+        "countryId": "CHL",
+        "lon": -70.5,
+        "lat": -34.1
+      },
+      {
+        "countryId": "CHL",
+        "lon": -68.9,
+        "lat": -22.3
+      },
+      {
+        "countryId": "CHL",
+        "lon": -70.5,
+        "lat": -31.7
+      },
+      {
+        "countryId": "CHL",
+        "lon": -69.2,
+        "lat": -24.5
+      },
+      {
+        "countryId": "CHL",
+        "lon": -70.0,
+        "lat": -27.5
+      },
+      {
+        "countryId": "PER",
+        "lon": -71.6,
+        "lat": -16.5
+      },
+      {
+        "countryId": "PER",
+        "lon": -77.1,
+        "lat": -9.5
+      },
+      {
+        "countryId": "PER",
+        "lon": -72.3,
+        "lat": -14.1
+      },
+      {
+        "countryId": "PER",
+        "lon": -70.6,
+        "lat": -17.3
+      },
+      {
+        "countryId": "PER",
+        "lon": -70.3,
+        "lat": -17.1
+      },
+      {
+        "countryId": "COD",
+        "lon": 25.3,
+        "lat": -10.7
+      },
+      {
+        "countryId": "COD",
+        "lon": 26.1,
+        "lat": -10.6
+      },
+      {
+        "countryId": "COD",
+        "lon": 27.5,
+        "lat": -11.7
+      },
+      {
+        "countryId": "COD",
+        "lon": 25.5,
+        "lat": -11.0
+      },
+      {
+        "countryId": "ZMB",
+        "lon": 26.4,
+        "lat": -12.2
+      },
+      {
+        "countryId": "ZMB",
+        "lon": 25.9,
+        "lat": -12.2
+      },
+      {
+        "countryId": "ZMB",
+        "lon": 28.2,
+        "lat": -12.8
+      },
+      {
+        "countryId": "AUS",
+        "lon": 137.0,
+        "lat": -30.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 139.5,
+        "lat": -20.7
+      },
+      {
+        "countryId": "AUS",
+        "lon": 122.2,
+        "lat": -21.8
+      },
+      {
+        "countryId": "AUS",
+        "lon": 119.5,
+        "lat": -23.0
+      },
+      {
+        "countryId": "IDN",
+        "lon": 137.1,
+        "lat": -4.1
+      },
+      {
+        "countryId": "MEX",
+        "lon": -110.3,
+        "lat": 31.0
+      },
+      {
+        "countryId": "MEX",
+        "lon": -109.9,
+        "lat": 30.5
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 78.5,
+        "lat": 50.5
+      },
+      {
+        "countryId": "KAZ",
+        "lon": 46.8,
+        "lat": 50.1
+      },
+      {
+        "countryId": "MNG",
+        "lon": 106.3,
+        "lat": 43.0
+      },
+      {
+        "countryId": "RUS",
+        "lon": 117.5,
+        "lat": 56.5
+      },
+      {
+        "countryId": "RUS",
+        "lon": 88.2,
+        "lat": 69.3
+      },
+      {
+        "countryId": "PAN",
+        "lon": -80.6,
+        "lat": 9.3
+      },
+      {
+        "countryId": "CAN",
+        "lon": -121.0,
+        "lat": 52.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -63.5,
+        "lat": 46.2
+      },
+      {
+        "countryId": "CHN",
+        "lon": 100.0,
+        "lat": 31.0
+      },
+      {
+        "countryId": "PHL",
+        "lon": 125.5,
+        "lat": 7.5
+      },
+      {
+        "countryId": "BRA",
+        "lon": -50.0,
+        "lat": -6.0
+      },
+      {
+        "countryId": "BRA",
+        "lon": -49.5,
+        "lat": -6.5
+      },
+      {
+        "countryId": "ARG",
+        "lon": -69.5,
+        "lat": -27.5
+      }
+    ]
+  },
+  "uranium": {
+    "provinces": [
+      "Wyoming",
+      "Texas",
+      "New Mexico",
+      "Arizona",
+      "Colorado",
+      "Utah",
+      "Nebraska",
+      "Zabaykalsky Krai",
+      "Kurgan Oblast",
+      "Buryatia",
+      "XinjiangUygur",
+      "NeiMongol",
+      "Jiangxi",
+      "Jharkhand",
+      "Andhra Pradesh",
+      "Oblast Kirowohrad",
+      "Sachsen",
+      "Thüringen",
+      "Saskatchewan",
+      "South Kazakhstan Region",
+      "Kyzylorda Region",
+      "Akmola Region",
+      "Mangystau Region",
+      "Aktobe Region",
+      "South Australia",
+      "Northern Territory",
+      "Queensland",
+      "North West",
+      "Free State",
+      "Bahia"
+    ],
+    "deposits": [
+      {
+        "countryId": "AUS",
+        "lon": 137.0,
+        "lat": -30.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 132.9,
+        "lat": -12.7
+      },
+      {
+        "countryId": "AUS",
+        "lon": 133.4,
+        "lat": -25.5
+      },
+      {
+        "countryId": "AUS",
+        "lon": 139.5,
+        "lat": -20.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -107.5,
+        "lat": 58.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -104.5,
+        "lat": 58.5
+      },
+      {
+        "countryId": "CAN",
+        "lon": -108.0,
+        "lat": 59.0
+      },
+      {
+        "countryId": "CAN",
+        "lon": -64.5,
+        "lat": 46.0
+      },
+      {
+        "countryId": "NAM",
+        "lon": 15.0,
+        "lat": -22.5
+      },
+      {
+        "countryId": "NAM",
+        "lon": 15.3,
+        "lat": -22.8
+      },
+      {
+        "countryId": "NAM",
+        "lon": 14.8,
+        "lat": -22.3
+      },
+      {
+        "countryId": "NER",
+        "lon": 7.3,
+        "lat": 18.8
+      },
+      {
+        "countryId": "NER",
+        "lon": 8.5,
+        "lat": 19.0
+      },
+      {
+        "countryId": "UZB",
+        "lon": 64.5,
+        "lat": 41.5
+      },
+      {
+        "countryId": "UZB",
+        "lon": 65.0,
+        "lat": 40.5
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 26.7,
+        "lat": -26.9
+      },
+      {
+        "countryId": "ZAF",
+        "lon": 29.0,
+        "lat": -25.5
+      },
+      {
+        "countryId": "BRA",
+        "lon": -39.5,
+        "lat": -13.5
+      },
+      {
+        "countryId": "BRA",
+        "lon": -45.0,
+        "lat": -9.0
+      },
+      {
+        "countryId": "CZE",
+        "lon": 14.0,
+        "lat": 49.5
+      },
+      {
+        "countryId": "MWI",
+        "lon": 34.5,
+        "lat": -16.0
+      },
+      {
+        "countryId": "MNG",
+        "lon": 119.0,
+        "lat": 47.5
+      },
+      {
+        "countryId": "PAK",
+        "lon": 71.5,
+        "lat": 32.5
+      },
+      {
+        "countryId": "IRN",
+        "lon": 55.0,
+        "lat": 32.0
+      },
+      {
+        "countryId": "IRN",
+        "lon": 54.5,
+        "lat": 31.5
+      },
+      {
+        "countryId": "JOR",
+        "lon": 37.0,
+        "lat": 30.0
+      },
+      {
+        "countryId": "TZA",
+        "lon": 34.5,
+        "lat": -9.5
+      },
+      {
+        "countryId": "ARG",
+        "lon": -68.5,
+        "lat": -37.0
+      }
+    ]
+  }
+}

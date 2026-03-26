@@ -1,0 +1,258 @@
+{
+  "countryId": "DEU",
+  "positions": [
+    {
+      "id": "chancellor",
+      "name": "Bundeskanzler",
+      "nameEn": "Federal Chancellor",
+      "description": "Regierungschef der Bundesrepublik Deutschland"
+    },
+    {
+      "id": "vice_chancellor",
+      "name": "Vizekanzler",
+      "nameEn": "Vice Chancellor",
+      "description": "Stellvertreter des Bundeskanzlers"
+    },
+    {
+      "id": "foreign",
+      "name": "Aussenminister",
+      "nameEn": "Foreign Minister",
+      "description": "Leiter des Auswaertigen Amts"
+    },
+    {
+      "id": "interior",
+      "name": "Innenminister",
+      "nameEn": "Interior Minister",
+      "description": "Bundesminister des Innern"
+    },
+    {
+      "id": "finance",
+      "name": "Finanzminister",
+      "nameEn": "Finance Minister",
+      "description": "Bundesminister der Finanzen"
+    },
+    {
+      "id": "economy",
+      "name": "Wirtschaftsminister",
+      "nameEn": "Economy Minister",
+      "description": "Bundesminister fuer Wirtschaft und Energie"
+    },
+    {
+      "id": "defense",
+      "name": "Verteidigungsminister",
+      "nameEn": "Defense Minister",
+      "description": "Bundesminister der Verteidigung"
+    },
+    {
+      "id": "justice",
+      "name": "Justizminister",
+      "nameEn": "Justice Minister",
+      "description": "Bundesminister der Justiz"
+    },
+    {
+      "id": "labor",
+      "name": "Arbeitsminister",
+      "nameEn": "Labor Minister",
+      "description": "Bundesminister fuer Arbeit und Soziales"
+    },
+    {
+      "id": "health",
+      "name": "Gesundheitsminister",
+      "nameEn": "Health Minister",
+      "description": "Bundesminister fuer Gesundheit"
+    },
+    {
+      "id": "education",
+      "name": "Bildungsminister",
+      "nameEn": "Education Minister",
+      "description": "Bundesminister fuer Bildung"
+    },
+    {
+      "id": "research",
+      "name": "Forschungsminister",
+      "nameEn": "Research Minister",
+      "description": "Bundesminister fuer Forschung und Technologie"
+    }
+  ],
+  "politicians": [
+    {
+      "id": "merz_friedrich",
+      "firstName": "Friedrich",
+      "lastName": "Merz",
+      "party": "CDU",
+      "birthYear": 1955,
+      "expertise": ["economy", "finance", "foreign"],
+      "traits": ["Wirtschaftsexperte", "Jurist"],
+      "bonuses": { "gdpGrowth": 0.005, "taxEfficiency": 0.03 },
+      "description": "Vorsitzender der CDU und Bundeskanzler"
+    },
+    {
+      "id": "klingbeil_lars",
+      "firstName": "Lars",
+      "lastName": "Klingbeil",
+      "party": "SPD",
+      "birthYear": 1978,
+      "expertise": ["finance", "labor"],
+      "traits": ["Parteivorsitzender", "Digitalisierungsexperte"],
+      "bonuses": { "stability": 0.02, "publicSupport": 0.02 },
+      "description": "SPD-Vorsitzender und Vizekanzler"
+    },
+    {
+      "id": "wadephul_johann",
+      "firstName": "Johann",
+      "lastName": "Wadephul",
+      "party": "CDU",
+      "birthYear": 1963,
+      "expertise": ["foreign", "defense"],
+      "traits": ["Aussenpolitiker", "NATO-Experte"],
+      "bonuses": { "diplomacy": 0.03, "tradeEfficiency": 0.02 },
+      "description": "Bundesaussenminister"
+    },
+    {
+      "id": "dobrindt_alexander",
+      "firstName": "Alexander",
+      "lastName": "Dobrindt",
+      "party": "CSU",
+      "birthYear": 1970,
+      "expertise": ["interior", "transport"],
+      "traits": ["CSU-Landesgruppenchef", "Infrastrukturexperte"],
+      "bonuses": { "stability": 0.03, "infrastructure": 0.02 },
+      "description": "Bundesinnenminister"
+    },
+    {
+      "id": "reiche_katherina",
+      "firstName": "Katherina",
+      "lastName": "Reiche",
+      "party": "CDU",
+      "birthYear": 1973,
+      "expertise": ["economy", "energy"],
+      "traits": ["Wirtschaftsexpertin", "Energiepolitikerin"],
+      "bonuses": { "gdpGrowth": 0.004, "industrialEfficiency": 0.03 },
+      "description": "Bundeswirtschaftsministerin"
+    },
+    {
+      "id": "pistorius_boris",
+      "firstName": "Boris",
+      "lastName": "Pistorius",
+      "party": "SPD",
+      "birthYear": 1960,
+      "expertise": ["defense", "interior"],
+      "traits": ["Beliebter Minister", "Sicherheitsexperte"],
+      "bonuses": { "militaryEfficiency": 0.05, "publicSupport": 0.03 },
+      "description": "Bundesverteidigungsminister"
+    },
+    {
+      "id": "bas_baerbel",
+      "firstName": "Baerbel",
+      "lastName": "Bas",
+      "party": "SPD",
+      "birthYear": 1968,
+      "expertise": ["labor", "health"],
+      "traits": ["Sozialpolitikerin", "ehemalige Bundestagspraesidentin"],
+      "bonuses": { "publicSupport": 0.02, "socialEfficiency": 0.03 },
+      "description": "Bundesarbeitsministerin"
+    },
+    {
+      "id": "hubig_stefanie",
+      "firstName": "Stefanie",
+      "lastName": "Hubig",
+      "party": "SPD",
+      "birthYear": 1968,
+      "expertise": ["justice", "education"],
+      "traits": ["Juristin", "Bildungsexpertin"],
+      "bonuses": { "stability": 0.02, "educationEfficiency": 0.02 },
+      "description": "Bundesjustizministerin"
+    },
+    {
+      "id": "warken_nina",
+      "firstName": "Nina",
+      "lastName": "Warken",
+      "party": "CDU",
+      "birthYear": 1979,
+      "expertise": ["health"],
+      "traits": ["Gesundheitspolitikerin"],
+      "bonuses": { "healthEfficiency": 0.03, "publicSupport": 0.01 },
+      "description": "Bundesgesundheitsministerin"
+    },
+    {
+      "id": "prien_karin",
+      "firstName": "Karin",
+      "lastName": "Prien",
+      "party": "CDU",
+      "birthYear": 1965,
+      "expertise": ["education"],
+      "traits": ["Bildungsministerin SH", "Reformerin"],
+      "bonuses": { "educationEfficiency": 0.04, "researchSpeed": 0.02 },
+      "description": "Bundesbildungsministerin"
+    },
+    {
+      "id": "baer_dorothee",
+      "firstName": "Dorothee",
+      "lastName": "Baer",
+      "party": "CSU",
+      "birthYear": 1978,
+      "expertise": ["research", "digital"],
+      "traits": ["Digitalisierungsexpertin", "Technologiepolitikerin"],
+      "bonuses": { "researchSpeed": 0.04, "techEfficiency": 0.03 },
+      "description": "Bundesforschungsministerin"
+    },
+    {
+      "id": "frei_thorsten",
+      "firstName": "Thorsten",
+      "lastName": "Frei",
+      "party": "CDU",
+      "birthYear": 1973,
+      "expertise": ["interior", "chancellery"],
+      "traits": ["Kanzleramtschef", "Verwaltungsexperte"],
+      "bonuses": { "adminEfficiency": 0.03, "stability": 0.02 },
+      "description": "Chef des Bundeskanzleramts"
+    },
+    {
+      "id": "schneider_carsten",
+      "firstName": "Carsten",
+      "lastName": "Schneider",
+      "party": "SPD",
+      "birthYear": 1976,
+      "expertise": ["environment"],
+      "traits": ["Umweltpolitiker", "Klimaschutzexperte"],
+      "bonuses": { "environmentalEfficiency": 0.03, "publicSupport": 0.01 },
+      "description": "Bundesumweltminister"
+    },
+    {
+      "id": "hubertz_verena",
+      "firstName": "Verena",
+      "lastName": "Hubertz",
+      "party": "SPD",
+      "birthYear": 1988,
+      "expertise": ["housing", "economy"],
+      "traits": ["Unternehmerin", "Wohnungspolitikerin"],
+      "bonuses": { "housingEfficiency": 0.03, "infrastructureGrowth": 0.02 },
+      "description": "Bundesbauministerin"
+    },
+    {
+      "id": "alabali_radovan_reem",
+      "firstName": "Reem",
+      "lastName": "Alabali-Radovan",
+      "party": "SPD",
+      "birthYear": 1990,
+      "expertise": ["development", "foreign"],
+      "traits": ["Integrationsbeauftragte", "Entwicklungspolitikerin"],
+      "bonuses": { "diplomacy": 0.02, "foreignAid": 0.03 },
+      "description": "Bundesentwicklungsministerin"
+    }
+  ],
+  "currentCabinet": {
+    "chancellor": "merz_friedrich",
+    "vice_chancellor": "klingbeil_lars",
+    "foreign": "wadephul_johann",
+    "interior": "dobrindt_alexander",
+    "finance": "klingbeil_lars",
+    "economy": "reiche_katherina",
+    "defense": "pistorius_boris",
+    "justice": "hubig_stefanie",
+    "labor": "bas_baerbel",
+    "health": "warken_nina",
+    "education": "prien_karin",
+    "research": "baer_dorothee"
+  }
+}

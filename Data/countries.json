@@ -1,0 +1,624 @@
+{
+  "countries": [
+    {
+      "id": "USA", "name": "USA", "fullName": "Vereinigte Staaten von Amerika",
+      "population": 331000000, "gdp": 25460000, "popGrowth": 0.004, "gdpGrowth": 0.021, "unemployment": 0.037, "taxRate": 0.27
+    },
+    {
+      "id": "CAN", "name": "Kanada", "fullName": "Kanada",
+      "population": 38000000, "gdp": 2140000, "popGrowth": 0.009, "gdpGrowth": 0.032, "unemployment": 0.052, "taxRate": 0.33
+    },
+    {
+      "id": "MEX", "name": "Mexiko", "fullName": "Vereinigte Mexikanische Staaten",
+      "population": 128000000, "gdp": 1320000, "popGrowth": 0.008, "gdpGrowth": 0.031, "unemployment": 0.034, "taxRate": 0.16
+    },
+    {
+      "id": "GTM", "name": "Guatemala", "fullName": "Republik Guatemala",
+      "population": 17400000, "gdp": 95000, "popGrowth": 0.017, "gdpGrowth": 0.035, "unemployment": 0.025, "taxRate": 0.12
+    },
+    {
+      "id": "CUB", "name": "Kuba", "fullName": "Republik Kuba",
+      "population": 11300000, "gdp": 107000, "popGrowth": -0.001, "gdpGrowth": 0.015, "unemployment": 0.035, "taxRate": 0.45
+    },
+    {
+      "id": "HTI", "name": "Haiti", "fullName": "Republik Haiti",
+      "population": 11600000, "gdp": 21000, "popGrowth": 0.012, "gdpGrowth": 0.008, "unemployment": 0.145, "taxRate": 0.08
+    },
+    {
+      "id": "DOM", "name": "Dominikanische Rep.", "fullName": "Dominikanische Republik",
+      "population": 10800000, "gdp": 113000, "popGrowth": 0.010, "gdpGrowth": 0.045, "unemployment": 0.058, "taxRate": 0.14
+    },
+    {
+      "id": "HND", "name": "Honduras", "fullName": "Republik Honduras",
+      "population": 10200000, "gdp": 31000, "popGrowth": 0.014, "gdpGrowth": 0.038, "unemployment": 0.055, "taxRate": 0.15
+    },
+    {
+      "id": "NIC", "name": "Nicaragua", "fullName": "Republik Nicaragua",
+      "population": 6900000, "gdp": 15000, "popGrowth": 0.011, "gdpGrowth": 0.025, "unemployment": 0.048, "taxRate": 0.18
+    },
+    {
+      "id": "CRI", "name": "Costa Rica", "fullName": "Republik Costa Rica",
+      "population": 5200000, "gdp": 68000, "popGrowth": 0.007, "gdpGrowth": 0.042, "unemployment": 0.095, "taxRate": 0.23
+    },
+    {
+      "id": "PAN", "name": "Panama", "fullName": "Republik Panama",
+      "population": 4400000, "gdp": 77000, "popGrowth": 0.014, "gdpGrowth": 0.055, "unemployment": 0.072, "taxRate": 0.15
+    },
+    {
+      "id": "BRA", "name": "Brasilien", "fullName": "Föderative Republik Brasilien",
+      "population": 214000000, "gdp": 1920000, "popGrowth": 0.005, "gdpGrowth": 0.029, "unemployment": 0.098, "taxRate": 0.33
+    },
+    {
+      "id": "ARG", "name": "Argentinien", "fullName": "Argentinische Republik",
+      "population": 45800000, "gdp": 630000, "popGrowth": 0.009, "gdpGrowth": -0.021, "unemployment": 0.072, "taxRate": 0.29
+    },
+    {
+      "id": "COL", "name": "Kolumbien", "fullName": "Republik Kolumbien",
+      "population": 51500000, "gdp": 340000, "popGrowth": 0.008, "gdpGrowth": 0.038, "unemployment": 0.112, "taxRate": 0.19
+    },
+    {
+      "id": "VEN", "name": "Venezuela", "fullName": "Bolivarische Republik Venezuela",
+      "population": 28400000, "gdp": 95000, "popGrowth": -0.012, "gdpGrowth": -0.05, "unemployment": 0.085, "taxRate": 0.12
+    },
+    {
+      "id": "PER", "name": "Peru", "fullName": "Republik Peru",
+      "population": 33700000, "gdp": 240000, "popGrowth": 0.012, "gdpGrowth": 0.032, "unemployment": 0.068, "taxRate": 0.16
+    },
+    {
+      "id": "CHL", "name": "Chile", "fullName": "Republik Chile",
+      "population": 19500000, "gdp": 300000, "popGrowth": 0.006, "gdpGrowth": 0.025, "unemployment": 0.078, "taxRate": 0.21
+    },
+    {
+      "id": "ECU", "name": "Ecuador", "fullName": "Republik Ecuador",
+      "population": 18000000, "gdp": 115000, "popGrowth": 0.013, "gdpGrowth": 0.028, "unemployment": 0.045, "taxRate": 0.14
+    },
+    {
+      "id": "BOL", "name": "Bolivien", "fullName": "Plurinationaler Staat Bolivien",
+      "population": 12000000, "gdp": 44000, "popGrowth": 0.013, "gdpGrowth": 0.035, "unemployment": 0.042, "taxRate": 0.22
+    },
+    {
+      "id": "PRY", "name": "Paraguay", "fullName": "Republik Paraguay",
+      "population": 7400000, "gdp": 42000, "popGrowth": 0.012, "gdpGrowth": 0.045, "unemployment": 0.065, "taxRate": 0.10
+    },
+    {
+      "id": "URY", "name": "Uruguay", "fullName": "Republik Uruguay",
+      "population": 3500000, "gdp": 64000, "popGrowth": 0.003, "gdpGrowth": 0.022, "unemployment": 0.078, "taxRate": 0.27
+    },
+    {
+      "id": "GUY", "name": "Guyana", "fullName": "Kooperative Republik Guyana",
+      "population": 800000, "gdp": 15000, "popGrowth": 0.005, "gdpGrowth": 0.085, "unemployment": 0.125, "taxRate": 0.28
+    },
+    {
+      "id": "GBR", "name": "Großbritannien", "fullName": "Vereinigtes Königreich",
+      "population": 67000000, "gdp": 3070000, "popGrowth": 0.003, "gdpGrowth": 0.014, "unemployment": 0.038, "taxRate": 0.35
+    },
+    {
+      "id": "FRA", "name": "Frankreich", "fullName": "Französische Republik",
+      "population": 67750000, "gdp": 2780000, "popGrowth": 0.002, "gdpGrowth": 0.017, "unemployment": 0.072, "taxRate": 0.46
+    },
+    {
+      "id": "DEU", "name": "Deutschland", "fullName": "Bundesrepublik Deutschland",
+      "population": 83200000, "gdp": 4070000, "popGrowth": 0.001, "gdpGrowth": 0.018, "unemployment": 0.031, "taxRate": 0.42
+    },
+    {
+      "id": "ITA", "name": "Italien", "fullName": "Italienische Republik",
+      "population": 59000000, "gdp": 2010000, "popGrowth": -0.001, "gdpGrowth": 0.008, "unemployment": 0.079, "taxRate": 0.43
+    },
+    {
+      "id": "ESP", "name": "Spanien", "fullName": "Königreich Spanien",
+      "population": 47400000, "gdp": 1420000, "popGrowth": 0.002, "gdpGrowth": 0.021, "unemployment": 0.128, "taxRate": 0.38
+    },
+    {
+      "id": "PRT", "name": "Portugal", "fullName": "Portugiesische Republik",
+      "population": 10300000, "gdp": 255000, "popGrowth": 0.001, "gdpGrowth": 0.025, "unemployment": 0.062, "taxRate": 0.35
+    },
+    {
+      "id": "NLD", "name": "Niederlande", "fullName": "Königreich der Niederlande",
+      "population": 17500000, "gdp": 1010000, "popGrowth": 0.003, "gdpGrowth": 0.028, "unemployment": 0.035, "taxRate": 0.39
+    },
+    {
+      "id": "BEL", "name": "Belgien", "fullName": "Königreich Belgien",
+      "population": 11600000, "gdp": 580000, "popGrowth": 0.003, "gdpGrowth": 0.015, "unemployment": 0.058, "taxRate": 0.45
+    },
+    {
+      "id": "LUX", "name": "Luxemburg", "fullName": "Großherzogtum Luxemburg",
+      "population": 660000, "gdp": 86000, "popGrowth": 0.015, "gdpGrowth": 0.025, "unemployment": 0.052, "taxRate": 0.38
+    },
+    {
+      "id": "CHE", "name": "Schweiz", "fullName": "Schweizerische Eidgenossenschaft",
+      "population": 8700000, "gdp": 810000, "popGrowth": 0.006, "gdpGrowth": 0.022, "unemployment": 0.024, "taxRate": 0.28
+    },
+    {
+      "id": "AUT", "name": "Österreich", "fullName": "Republik Österreich",
+      "population": 9000000, "gdp": 470000, "popGrowth": 0.003, "gdpGrowth": 0.018, "unemployment": 0.048, "taxRate": 0.42
+    },
+    {
+      "id": "IRL", "name": "Irland", "fullName": "Republik Irland",
+      "population": 5100000, "gdp": 530000, "popGrowth": 0.011, "gdpGrowth": 0.055, "unemployment": 0.042, "taxRate": 0.23
+    },
+    {
+      "id": "NOR", "name": "Norwegen", "fullName": "Königreich Norwegen",
+      "population": 5400000, "gdp": 480000, "popGrowth": 0.006, "gdpGrowth": 0.025, "unemployment": 0.035, "taxRate": 0.38
+    },
+    {
+      "id": "SWE", "name": "Schweden", "fullName": "Königreich Schweden",
+      "population": 10500000, "gdp": 590000, "popGrowth": 0.006, "gdpGrowth": 0.022, "unemployment": 0.072, "taxRate": 0.44
+    },
+    {
+      "id": "FIN", "name": "Finnland", "fullName": "Republik Finnland",
+      "population": 5500000, "gdp": 300000, "popGrowth": 0.002, "gdpGrowth": 0.018, "unemployment": 0.068, "taxRate": 0.43
+    },
+    {
+      "id": "DNK", "name": "Dänemark", "fullName": "Königreich Dänemark",
+      "population": 5900000, "gdp": 400000, "popGrowth": 0.004, "gdpGrowth": 0.025, "unemployment": 0.048, "taxRate": 0.46
+    },
+    {
+      "id": "ISL", "name": "Island", "fullName": "Republik Island",
+      "population": 370000, "gdp": 28000, "popGrowth": 0.008, "gdpGrowth": 0.035, "unemployment": 0.035, "taxRate": 0.37
+    },
+    {
+      "id": "GRL", "name": "Grönland", "fullName": "Grönland",
+      "population": 56000, "gdp": 3000, "popGrowth": 0.001, "gdpGrowth": 0.015, "unemployment": 0.095, "taxRate": 0.42
+    },
+    {
+      "id": "POL", "name": "Polen", "fullName": "Republik Polen",
+      "population": 38000000, "gdp": 700000, "popGrowth": -0.001, "gdpGrowth": 0.041, "unemployment": 0.029, "taxRate": 0.32
+    },
+    {
+      "id": "UKR", "name": "Ukraine", "fullName": "Ukraine",
+      "population": 41000000, "gdp": 160000, "popGrowth": -0.006, "gdpGrowth": -0.029, "unemployment": 0.085, "taxRate": 0.20
+    },
+    {
+      "id": "CZE", "name": "Tschechien", "fullName": "Tschechische Republik",
+      "population": 10500000, "gdp": 290000, "popGrowth": 0.001, "gdpGrowth": 0.025, "unemployment": 0.028, "taxRate": 0.35
+    },
+    {
+      "id": "ROU", "name": "Rumänien", "fullName": "Rumänien",
+      "population": 19000000, "gdp": 300000, "popGrowth": -0.005, "gdpGrowth": 0.045, "unemployment": 0.055, "taxRate": 0.26
+    },
+    {
+      "id": "HUN", "name": "Ungarn", "fullName": "Ungarn",
+      "population": 9700000, "gdp": 180000, "popGrowth": -0.003, "gdpGrowth": 0.035, "unemployment": 0.038, "taxRate": 0.37
+    },
+    {
+      "id": "BLR", "name": "Belarus", "fullName": "Republik Belarus",
+      "population": 9300000, "gdp": 70000, "popGrowth": -0.004, "gdpGrowth": 0.012, "unemployment": 0.045, "taxRate": 0.40
+    },
+    {
+      "id": "BGR", "name": "Bulgarien", "fullName": "Republik Bulgarien",
+      "population": 6900000, "gdp": 90000, "popGrowth": -0.007, "gdpGrowth": 0.035, "unemployment": 0.052, "taxRate": 0.29
+    },
+    {
+      "id": "SRB", "name": "Serbien", "fullName": "Republik Serbien",
+      "population": 6800000, "gdp": 63000, "popGrowth": -0.005, "gdpGrowth": 0.038, "unemployment": 0.098, "taxRate": 0.25
+    },
+    {
+      "id": "HRV", "name": "Kroatien", "fullName": "Republik Kroatien",
+      "population": 4000000, "gdp": 70000, "popGrowth": -0.004, "gdpGrowth": 0.062, "unemployment": 0.068, "taxRate": 0.36
+    },
+    {
+      "id": "SVK", "name": "Slowakei", "fullName": "Slowakische Republik",
+      "population": 5400000, "gdp": 115000, "popGrowth": 0.001, "gdpGrowth": 0.032, "unemployment": 0.062, "taxRate": 0.33
+    },
+    {
+      "id": "LTU", "name": "Litauen", "fullName": "Republik Litauen",
+      "population": 2800000, "gdp": 70000, "popGrowth": -0.011, "gdpGrowth": 0.038, "unemployment": 0.062, "taxRate": 0.32
+    },
+    {
+      "id": "LVA", "name": "Lettland", "fullName": "Republik Lettland",
+      "population": 1900000, "gdp": 40000, "popGrowth": -0.012, "gdpGrowth": 0.032, "unemployment": 0.072, "taxRate": 0.31
+    },
+    {
+      "id": "EST", "name": "Estland", "fullName": "Republik Estland",
+      "population": 1300000, "gdp": 38000, "popGrowth": -0.003, "gdpGrowth": 0.035, "unemployment": 0.055, "taxRate": 0.33
+    },
+    {
+      "id": "MDA", "name": "Moldau", "fullName": "Republik Moldau",
+      "population": 2600000, "gdp": 15000, "popGrowth": -0.008, "gdpGrowth": 0.025, "unemployment": 0.045, "taxRate": 0.30
+    },
+    {
+      "id": "ALB", "name": "Albanien", "fullName": "Republik Albanien",
+      "population": 2800000, "gdp": 19000, "popGrowth": -0.003, "gdpGrowth": 0.045, "unemployment": 0.115, "taxRate": 0.24
+    },
+    {
+      "id": "MKD", "name": "Nordmazedonien", "fullName": "Republik Nordmazedonien",
+      "population": 2100000, "gdp": 14000, "popGrowth": 0.001, "gdpGrowth": 0.035, "unemployment": 0.152, "taxRate": 0.29
+    },
+    {
+      "id": "SVN", "name": "Slowenien", "fullName": "Republik Slowenien",
+      "population": 2100000, "gdp": 62000, "popGrowth": 0.001, "gdpGrowth": 0.055, "unemployment": 0.042, "taxRate": 0.37
+    },
+    {
+      "id": "BIH", "name": "Bosnien-Herzegowina", "fullName": "Bosnien und Herzegowina",
+      "population": 3300000, "gdp": 24000, "popGrowth": -0.006, "gdpGrowth": 0.028, "unemployment": 0.158, "taxRate": 0.37
+    },
+    {
+      "id": "MNE", "name": "Montenegro", "fullName": "Montenegro",
+      "population": 620000, "gdp": 6000, "popGrowth": 0.001, "gdpGrowth": 0.062, "unemployment": 0.152, "taxRate": 0.22
+    },
+    {
+      "id": "GRC", "name": "Griechenland", "fullName": "Hellenische Republik",
+      "population": 10400000, "gdp": 220000, "popGrowth": -0.003, "gdpGrowth": 0.058, "unemployment": 0.125, "taxRate": 0.44
+    },
+    {
+      "id": "RUS", "name": "Russland", "fullName": "Russische Föderation",
+      "population": 144000000, "gdp": 1780000, "popGrowth": -0.002, "gdpGrowth": -0.022, "unemployment": 0.039, "taxRate": 0.20
+    },
+    {
+      "id": "KAZ", "name": "Kasachstan", "fullName": "Republik Kasachstan",
+      "population": 19400000, "gdp": 220000, "popGrowth": 0.012, "gdpGrowth": 0.045, "unemployment": 0.048, "taxRate": 0.20
+    },
+    {
+      "id": "UZB", "name": "Usbekistan", "fullName": "Republik Usbekistan",
+      "population": 35000000, "gdp": 80000, "popGrowth": 0.016, "gdpGrowth": 0.055, "unemployment": 0.095, "taxRate": 0.25
+    },
+    {
+      "id": "TKM", "name": "Turkmenistan", "fullName": "Turkmenistan",
+      "population": 6100000, "gdp": 53000, "popGrowth": 0.014, "gdpGrowth": 0.025, "unemployment": 0.042, "taxRate": 0.16
+    },
+    {
+      "id": "KGZ", "name": "Kirgisistan", "fullName": "Kirgisische Republik",
+      "population": 6700000, "gdp": 11000, "popGrowth": 0.015, "gdpGrowth": 0.035, "unemployment": 0.075, "taxRate": 0.29
+    },
+    {
+      "id": "TJK", "name": "Tadschikistan", "fullName": "Republik Tadschikistan",
+      "population": 9800000, "gdp": 11000, "popGrowth": 0.020, "gdpGrowth": 0.072, "unemployment": 0.025, "taxRate": 0.30
+    },
+    {
+      "id": "MNG", "name": "Mongolei", "fullName": "Mongolei",
+      "population": 3400000, "gdp": 17000, "popGrowth": 0.014, "gdpGrowth": 0.055, "unemployment": 0.065, "taxRate": 0.25
+    },
+    {
+      "id": "AFG", "name": "Afghanistan", "fullName": "Islamische Republik Afghanistan",
+      "population": 40000000, "gdp": 15000, "popGrowth": 0.023, "gdpGrowth": -0.02, "unemployment": 0.115, "taxRate": 0.07
+    },
+    {
+      "id": "CHN", "name": "China", "fullName": "Volksrepublik China",
+      "population": 1412000000, "gdp": 17960000, "popGrowth": 0.001, "gdpGrowth": 0.052, "unemployment": 0.054, "taxRate": 0.25
+    },
+    {
+      "id": "JPN", "name": "Japan", "fullName": "Japan",
+      "population": 125000000, "gdp": 4230000, "popGrowth": -0.003, "gdpGrowth": 0.011, "unemployment": 0.026, "taxRate": 0.32
+    },
+    {
+      "id": "KOR", "name": "Südkorea", "fullName": "Republik Korea",
+      "population": 51700000, "gdp": 1800000, "popGrowth": 0.001, "gdpGrowth": 0.026, "unemployment": 0.029, "taxRate": 0.28
+    },
+    {
+      "id": "PRK", "name": "Nordkorea", "fullName": "Demokratische Volksrepublik Korea",
+      "population": 25900000, "gdp": 18000, "popGrowth": 0.004, "gdpGrowth": 0.008, "unemployment": 0.025, "taxRate": 0.65
+    },
+    {
+      "id": "TWN", "name": "Taiwan", "fullName": "Republik China (Taiwan)",
+      "population": 23600000, "gdp": 790000, "popGrowth": 0.001, "gdpGrowth": 0.032, "unemployment": 0.038, "taxRate": 0.20
+    },
+    {
+      "id": "IDN", "name": "Indonesien", "fullName": "Republik Indonesien",
+      "population": 275000000, "gdp": 1320000, "popGrowth": 0.007, "gdpGrowth": 0.051, "unemployment": 0.055, "taxRate": 0.12
+    },
+    {
+      "id": "THA", "name": "Thailand", "fullName": "Königreich Thailand",
+      "population": 70000000, "gdp": 500000, "popGrowth": 0.002, "gdpGrowth": 0.028, "unemployment": 0.012, "taxRate": 0.17
+    },
+    {
+      "id": "VNM", "name": "Vietnam", "fullName": "Sozialistische Republik Vietnam",
+      "population": 98000000, "gdp": 410000, "popGrowth": 0.009, "gdpGrowth": 0.065, "unemployment": 0.022, "taxRate": 0.18
+    },
+    {
+      "id": "MYS", "name": "Malaysia", "fullName": "Malaysia",
+      "population": 33000000, "gdp": 410000, "popGrowth": 0.013, "gdpGrowth": 0.045, "unemployment": 0.035, "taxRate": 0.15
+    },
+    {
+      "id": "PHL", "name": "Philippinen", "fullName": "Republik der Philippinen",
+      "population": 113000000, "gdp": 400000, "popGrowth": 0.014, "gdpGrowth": 0.058, "unemployment": 0.045, "taxRate": 0.16
+    },
+    {
+      "id": "MMR", "name": "Myanmar", "fullName": "Republik der Union Myanmar",
+      "population": 54000000, "gdp": 65000, "popGrowth": 0.008, "gdpGrowth": -0.01, "unemployment": 0.028, "taxRate": 0.08
+    },
+    {
+      "id": "KHM", "name": "Kambodscha", "fullName": "Königreich Kambodscha",
+      "population": 17000000, "gdp": 30000, "popGrowth": 0.013, "gdpGrowth": 0.055, "unemployment": 0.018, "taxRate": 0.18
+    },
+    {
+      "id": "LAO", "name": "Laos", "fullName": "Demokratische Volksrepublik Laos",
+      "population": 7500000, "gdp": 19000, "popGrowth": 0.014, "gdpGrowth": 0.045, "unemployment": 0.022, "taxRate": 0.15
+    },
+    {
+      "id": "IND", "name": "Indien", "fullName": "Republik Indien",
+      "population": 1408000000, "gdp": 3390000, "popGrowth": 0.008, "gdpGrowth": 0.068, "unemployment": 0.078, "taxRate": 0.18
+    },
+    {
+      "id": "PAK", "name": "Pakistan", "fullName": "Islamische Republik Pakistan",
+      "population": 230000000, "gdp": 350000, "popGrowth": 0.019, "gdpGrowth": 0.042, "unemployment": 0.065, "taxRate": 0.12
+    },
+    {
+      "id": "BGD", "name": "Bangladesch", "fullName": "Volksrepublik Bangladesch",
+      "population": 170000000, "gdp": 460000, "popGrowth": 0.010, "gdpGrowth": 0.062, "unemployment": 0.052, "taxRate": 0.09
+    },
+    {
+      "id": "NPL", "name": "Nepal", "fullName": "Demokratische Bundesrepublik Nepal",
+      "population": 30500000, "gdp": 40000, "popGrowth": 0.011, "gdpGrowth": 0.045, "unemployment": 0.115, "taxRate": 0.22
+    },
+    {
+      "id": "LKA", "name": "Sri Lanka", "fullName": "Demokratische Sozialistische Republik Sri Lanka",
+      "population": 22000000, "gdp": 75000, "popGrowth": 0.004, "gdpGrowth": -0.02, "unemployment": 0.048, "taxRate": 0.12
+    },
+    {
+      "id": "SAU", "name": "Saudi-Arabien", "fullName": "Königreich Saudi-Arabien",
+      "population": 35000000, "gdp": 1110000, "popGrowth": 0.015, "gdpGrowth": 0.087, "unemployment": 0.108, "taxRate": 0.05
+    },
+    {
+      "id": "IRN", "name": "Iran", "fullName": "Islamische Republik Iran",
+      "population": 87000000, "gdp": 390000, "popGrowth": 0.010, "gdpGrowth": 0.025, "unemployment": 0.092, "taxRate": 0.09
+    },
+    {
+      "id": "TUR", "name": "Türkei", "fullName": "Republik Türkei",
+      "population": 85000000, "gdp": 900000, "popGrowth": 0.006, "gdpGrowth": 0.054, "unemployment": 0.102, "taxRate": 0.24
+    },
+    {
+      "id": "IRQ", "name": "Irak", "fullName": "Republik Irak",
+      "population": 43000000, "gdp": 265000, "popGrowth": 0.024, "gdpGrowth": 0.062, "unemployment": 0.135, "taxRate": 0.15
+    },
+    {
+      "id": "SYR", "name": "Syrien", "fullName": "Arabische Republik Syrien",
+      "population": 22000000, "gdp": 11000, "popGrowth": -0.015, "gdpGrowth": -0.03, "unemployment": 0.145, "taxRate": 0.14
+    },
+    {
+      "id": "YEM", "name": "Jemen", "fullName": "Republik Jemen",
+      "population": 32000000, "gdp": 22000, "popGrowth": 0.019, "gdpGrowth": -0.02, "unemployment": 0.145, "taxRate": 0.07
+    },
+    {
+      "id": "OMN", "name": "Oman", "fullName": "Sultanat Oman",
+      "population": 4500000, "gdp": 115000, "popGrowth": 0.020, "gdpGrowth": 0.045, "unemployment": 0.032, "taxRate": 0.05
+    },
+    {
+      "id": "ARE", "name": "VAE", "fullName": "Vereinigte Arabische Emirate",
+      "population": 10000000, "gdp": 500000, "popGrowth": 0.015, "gdpGrowth": 0.055, "unemployment": 0.028, "taxRate": 0.05
+    },
+    {
+      "id": "KWT", "name": "Kuwait", "fullName": "Staat Kuwait",
+      "population": 4300000, "gdp": 140000, "popGrowth": 0.015, "gdpGrowth": 0.035, "unemployment": 0.025, "taxRate": 0.05
+    },
+    {
+      "id": "JOR", "name": "Jordanien", "fullName": "Haschemitisches Königreich Jordanien",
+      "population": 11000000, "gdp": 48000, "popGrowth": 0.010, "gdpGrowth": 0.025, "unemployment": 0.185, "taxRate": 0.15
+    },
+    {
+      "id": "ISR", "name": "Israel", "fullName": "Staat Israel",
+      "population": 9500000, "gdp": 520000, "popGrowth": 0.018, "gdpGrowth": 0.065, "unemployment": 0.038, "taxRate": 0.31
+    },
+    {
+      "id": "LBN", "name": "Libanon", "fullName": "Libanesische Republik",
+      "population": 5500000, "gdp": 22000, "popGrowth": -0.008, "gdpGrowth": -0.05, "unemployment": 0.295, "taxRate": 0.11
+    },
+    {
+      "id": "QAT", "name": "Katar", "fullName": "Staat Katar",
+      "population": 2700000, "gdp": 220000, "popGrowth": 0.015, "gdpGrowth": 0.045, "unemployment": 0.002, "taxRate": 0.05
+    },
+    {
+      "id": "BHR", "name": "Bahrain", "fullName": "Königreich Bahrain",
+      "population": 1500000, "gdp": 44000, "popGrowth": 0.010, "gdpGrowth": 0.035, "unemployment": 0.008, "taxRate": 0.05
+    },
+    {
+      "id": "GEO", "name": "Georgien", "fullName": "Georgien",
+      "population": 3700000, "gdp": 25000, "popGrowth": -0.005, "gdpGrowth": 0.105, "unemployment": 0.175, "taxRate": 0.22
+    },
+    {
+      "id": "ARM", "name": "Armenien", "fullName": "Republik Armenien",
+      "population": 2800000, "gdp": 19000, "popGrowth": -0.003, "gdpGrowth": 0.125, "unemployment": 0.135, "taxRate": 0.22
+    },
+    {
+      "id": "AZE", "name": "Aserbaidschan", "fullName": "Republik Aserbaidschan",
+      "population": 10300000, "gdp": 78000, "popGrowth": 0.008, "gdpGrowth": 0.045, "unemployment": 0.058, "taxRate": 0.18
+    },
+    {
+      "id": "EGY", "name": "Ägypten", "fullName": "Arabische Republik Ägypten",
+      "population": 104000000, "gdp": 470000, "popGrowth": 0.017, "gdpGrowth": 0.041, "unemployment": 0.073, "taxRate": 0.14
+    },
+    {
+      "id": "LBY", "name": "Libyen", "fullName": "Staat Libyen",
+      "population": 7000000, "gdp": 42000, "popGrowth": 0.012, "gdpGrowth": 0.025, "unemployment": 0.195, "taxRate": 0.08
+    },
+    {
+      "id": "TUN", "name": "Tunesien", "fullName": "Tunesische Republik",
+      "population": 12000000, "gdp": 47000, "popGrowth": 0.009, "gdpGrowth": 0.025, "unemployment": 0.158, "taxRate": 0.25
+    },
+    {
+      "id": "DZA", "name": "Algerien", "fullName": "Demokratische Volksrepublik Algerien",
+      "population": 45000000, "gdp": 190000, "popGrowth": 0.016, "gdpGrowth": 0.032, "unemployment": 0.115, "taxRate": 0.20
+    },
+    {
+      "id": "MAR", "name": "Marokko", "fullName": "Königreich Marokko",
+      "population": 37000000, "gdp": 137000, "popGrowth": 0.011, "gdpGrowth": 0.035, "unemployment": 0.115, "taxRate": 0.22
+    },
+    {
+      "id": "ESH", "name": "Westsahara", "fullName": "Demokratische Arabische Republik Sahara",
+      "population": 600000, "gdp": 3000, "popGrowth": 0.026, "gdpGrowth": 0.02, "unemployment": 0.20, "taxRate": 0.10
+    },
+    {
+      "id": "SDN", "name": "Sudan", "fullName": "Republik Sudan",
+      "population": 45000000, "gdp": 35000, "popGrowth": 0.024, "gdpGrowth": -0.02, "unemployment": 0.195, "taxRate": 0.06
+    },
+    {
+      "id": "SSD", "name": "Südsudan", "fullName": "Republik Südsudan",
+      "population": 11500000, "gdp": 12000, "popGrowth": 0.010, "gdpGrowth": -0.03, "unemployment": 0.125, "taxRate": 0.08
+    },
+    {
+      "id": "NGA", "name": "Nigeria", "fullName": "Bundesrepublik Nigeria",
+      "population": 218000000, "gdp": 440000, "popGrowth": 0.024, "gdpGrowth": 0.031, "unemployment": 0.066, "taxRate": 0.06
+    },
+    {
+      "id": "GHA", "name": "Ghana", "fullName": "Republik Ghana",
+      "population": 32000000, "gdp": 77000, "popGrowth": 0.020, "gdpGrowth": 0.035, "unemployment": 0.132, "taxRate": 0.15
+    },
+    {
+      "id": "CIV", "name": "Elfenbeinküste", "fullName": "Republik Côte d'Ivoire",
+      "population": 27000000, "gdp": 70000, "popGrowth": 0.024, "gdpGrowth": 0.065, "unemployment": 0.025, "taxRate": 0.15
+    },
+    {
+      "id": "SEN", "name": "Senegal", "fullName": "Republik Senegal",
+      "population": 17000000, "gdp": 28000, "popGrowth": 0.026, "gdpGrowth": 0.055, "unemployment": 0.165, "taxRate": 0.20
+    },
+    {
+      "id": "MLI", "name": "Mali", "fullName": "Republik Mali",
+      "population": 21500000, "gdp": 19000, "popGrowth": 0.030, "gdpGrowth": 0.035, "unemployment": 0.085, "taxRate": 0.17
+    },
+    {
+      "id": "BFA", "name": "Burkina Faso", "fullName": "Burkina Faso",
+      "population": 22000000, "gdp": 19000, "popGrowth": 0.028, "gdpGrowth": 0.055, "unemployment": 0.062, "taxRate": 0.18
+    },
+    {
+      "id": "NER", "name": "Niger", "fullName": "Republik Niger",
+      "population": 25000000, "gdp": 15000, "popGrowth": 0.038, "gdpGrowth": 0.065, "unemployment": 0.025, "taxRate": 0.15
+    },
+    {
+      "id": "GIN", "name": "Guinea", "fullName": "Republik Guinea",
+      "population": 13500000, "gdp": 16000, "popGrowth": 0.028, "gdpGrowth": 0.055, "unemployment": 0.055, "taxRate": 0.15
+    },
+    {
+      "id": "BEN", "name": "Benin", "fullName": "Republik Benin",
+      "population": 12500000, "gdp": 18000, "popGrowth": 0.027, "gdpGrowth": 0.058, "unemployment": 0.015, "taxRate": 0.15
+    },
+    {
+      "id": "TGO", "name": "Togo", "fullName": "Togolesische Republik",
+      "population": 8500000, "gdp": 9000, "popGrowth": 0.024, "gdpGrowth": 0.055, "unemployment": 0.038, "taxRate": 0.18
+    },
+    {
+      "id": "SLE", "name": "Sierra Leone", "fullName": "Republik Sierra Leone",
+      "population": 8400000, "gdp": 4000, "popGrowth": 0.021, "gdpGrowth": 0.035, "unemployment": 0.042, "taxRate": 0.12
+    },
+    {
+      "id": "LBR", "name": "Liberia", "fullName": "Republik Liberia",
+      "population": 5200000, "gdp": 4000, "popGrowth": 0.024, "gdpGrowth": 0.045, "unemployment": 0.028, "taxRate": 0.13
+    },
+    {
+      "id": "MRT", "name": "Mauretanien", "fullName": "Islamische Republik Mauretanien",
+      "population": 4800000, "gdp": 10000, "popGrowth": 0.027, "gdpGrowth": 0.052, "unemployment": 0.105, "taxRate": 0.14
+    },
+    {
+      "id": "GMB", "name": "Gambia", "fullName": "Republik Gambia",
+      "population": 2500000, "gdp": 2000, "popGrowth": 0.028, "gdpGrowth": 0.045, "unemployment": 0.095, "taxRate": 0.18
+    },
+    {
+      "id": "COD", "name": "DR Kongo", "fullName": "Demokratische Republik Kongo",
+      "population": 95000000, "gdp": 64000, "popGrowth": 0.032, "gdpGrowth": 0.065, "unemployment": 0.045, "taxRate": 0.13
+    },
+    {
+      "id": "COG", "name": "Kongo", "fullName": "Republik Kongo",
+      "population": 5800000, "gdp": 14000, "popGrowth": 0.026, "gdpGrowth": 0.015, "unemployment": 0.195, "taxRate": 0.18
+    },
+    {
+      "id": "CMR", "name": "Kamerun", "fullName": "Republik Kamerun",
+      "population": 27500000, "gdp": 45000, "popGrowth": 0.026, "gdpGrowth": 0.035, "unemployment": 0.038, "taxRate": 0.15
+    },
+    {
+      "id": "TCD", "name": "Tschad", "fullName": "Republik Tschad",
+      "population": 17500000, "gdp": 12000, "popGrowth": 0.030, "gdpGrowth": 0.025, "unemployment": 0.055, "taxRate": 0.12
+    },
+    {
+      "id": "CAF", "name": "Zentralafrika", "fullName": "Zentralafrikanische Republik",
+      "population": 5000000, "gdp": 3000, "popGrowth": 0.019, "gdpGrowth": 0.015, "unemployment": 0.065, "taxRate": 0.09
+    },
+    {
+      "id": "GAB", "name": "Gabun", "fullName": "Gabunische Republik",
+      "population": 2300000, "gdp": 21000, "popGrowth": 0.025, "gdpGrowth": 0.035, "unemployment": 0.198, "taxRate": 0.17
+    },
+    {
+      "id": "GNQ", "name": "Äquatorialguinea", "fullName": "Republik Äquatorialguinea",
+      "population": 1600000, "gdp": 12000, "popGrowth": 0.035, "gdpGrowth": -0.02, "unemployment": 0.085, "taxRate": 0.03
+    },
+    {
+      "id": "ETH", "name": "Äthiopien", "fullName": "Demokratische Bundesrepublik Äthiopien",
+      "population": 120000000, "gdp": 126000, "popGrowth": 0.026, "gdpGrowth": 0.062, "unemployment": 0.032, "taxRate": 0.12
+    },
+    {
+      "id": "KEN", "name": "Kenia", "fullName": "Republik Kenia",
+      "population": 54000000, "gdp": 113000, "popGrowth": 0.020, "gdpGrowth": 0.055, "unemployment": 0.055, "taxRate": 0.16
+    },
+    {
+      "id": "TZA", "name": "Tansania", "fullName": "Vereinigte Republik Tansania",
+      "population": 63000000, "gdp": 75000, "popGrowth": 0.030, "gdpGrowth": 0.055, "unemployment": 0.022, "taxRate": 0.12
+    },
+    {
+      "id": "UGA", "name": "Uganda", "fullName": "Republik Uganda",
+      "population": 47000000, "gdp": 45000, "popGrowth": 0.030, "gdpGrowth": 0.062, "unemployment": 0.028, "taxRate": 0.13
+    },
+    {
+      "id": "RWA", "name": "Ruanda", "fullName": "Republik Ruanda",
+      "population": 13500000, "gdp": 13000, "popGrowth": 0.022, "gdpGrowth": 0.085, "unemployment": 0.015, "taxRate": 0.16
+    },
+    {
+      "id": "BDI", "name": "Burundi", "fullName": "Republik Burundi",
+      "population": 12500000, "gdp": 3000, "popGrowth": 0.030, "gdpGrowth": 0.018, "unemployment": 0.015, "taxRate": 0.18
+    },
+    {
+      "id": "SOM", "name": "Somalia", "fullName": "Bundesrepublik Somalia",
+      "population": 17000000, "gdp": 8000, "popGrowth": 0.028, "gdpGrowth": 0.025, "unemployment": 0.195, "taxRate": 0.06
+    },
+    {
+      "id": "ERI", "name": "Eritrea", "fullName": "Staat Eritrea",
+      "population": 3600000, "gdp": 2000, "popGrowth": 0.012, "gdpGrowth": 0.035, "unemployment": 0.068, "taxRate": 0.34
+    },
+    {
+      "id": "DJI", "name": "Dschibuti", "fullName": "Republik Dschibuti",
+      "population": 1000000, "gdp": 4000, "popGrowth": 0.015, "gdpGrowth": 0.055, "unemployment": 0.268, "taxRate": 0.20
+    },
+    {
+      "id": "MWI", "name": "Malawi", "fullName": "Republik Malawi",
+      "population": 20000000, "gdp": 13000, "popGrowth": 0.027, "gdpGrowth": 0.035, "unemployment": 0.058, "taxRate": 0.21
+    },
+    {
+      "id": "ZMB", "name": "Sambia", "fullName": "Republik Sambia",
+      "population": 19500000, "gdp": 22000, "popGrowth": 0.028, "gdpGrowth": 0.045, "unemployment": 0.125, "taxRate": 0.16
+    },
+    {
+      "id": "ZWE", "name": "Simbabwe", "fullName": "Republik Simbabwe",
+      "population": 16000000, "gdp": 21000, "popGrowth": 0.021, "gdpGrowth": 0.038, "unemployment": 0.052, "taxRate": 0.25
+    },
+    {
+      "id": "MOZ", "name": "Mosambik", "fullName": "Republik Mosambik",
+      "population": 32000000, "gdp": 18000, "popGrowth": 0.028, "gdpGrowth": 0.045, "unemployment": 0.035, "taxRate": 0.25
+    },
+    {
+      "id": "MDG", "name": "Madagaskar", "fullName": "Republik Madagaskar",
+      "population": 29000000, "gdp": 15000, "popGrowth": 0.026, "gdpGrowth": 0.045, "unemployment": 0.035, "taxRate": 0.11
+    },
+    {
+      "id": "ZAF", "name": "Südafrika", "fullName": "Republik Südafrika",
+      "population": 60000000, "gdp": 420000, "popGrowth": 0.008, "gdpGrowth": 0.019, "unemployment": 0.291, "taxRate": 0.26
+    },
+    {
+      "id": "NAM", "name": "Namibia", "fullName": "Republik Namibia",
+      "population": 2600000, "gdp": 13000, "popGrowth": 0.018, "gdpGrowth": 0.035, "unemployment": 0.205, "taxRate": 0.32
+    },
+    {
+      "id": "BWA", "name": "Botswana", "fullName": "Republik Botswana",
+      "population": 2400000, "gdp": 19000, "popGrowth": 0.020, "gdpGrowth": 0.045, "unemployment": 0.245, "taxRate": 0.22
+    },
+    {
+      "id": "AGO", "name": "Angola", "fullName": "Republik Angola",
+      "population": 34000000, "gdp": 125000, "popGrowth": 0.032, "gdpGrowth": 0.035, "unemployment": 0.085, "taxRate": 0.06
+    },
+    {
+      "id": "SWZ", "name": "Eswatini", "fullName": "Königreich Eswatini",
+      "population": 1200000, "gdp": 5000, "popGrowth": 0.010, "gdpGrowth": 0.025, "unemployment": 0.225, "taxRate": 0.28
+    },
+    {
+      "id": "LSO", "name": "Lesotho", "fullName": "Königreich Lesotho",
+      "population": 2200000, "gdp": 3000, "popGrowth": 0.010, "gdpGrowth": 0.035, "unemployment": 0.245, "taxRate": 0.26
+    },
+    {
+      "id": "AUS", "name": "Australien", "fullName": "Commonwealth of Australia",
+      "population": 26000000, "gdp": 1680000, "popGrowth": 0.011, "gdpGrowth": 0.037, "unemployment": 0.035, "taxRate": 0.30
+    },
+    {
+      "id": "NZL", "name": "Neuseeland", "fullName": "Neuseeland",
+      "population": 5100000, "gdp": 250000, "popGrowth": 0.009, "gdpGrowth": 0.032, "unemployment": 0.035, "taxRate": 0.33
+    },
+    {
+      "id": "PNG", "name": "Papua-Neuguinea", "fullName": "Unabhängiger Staat Papua-Neuguinea",
+      "population": 10000000, "gdp": 30000, "popGrowth": 0.019, "gdpGrowth": 0.045, "unemployment": 0.028, "taxRate": 0.02
+    }
+  ]
+}

@@ -1,0 +1,623 @@
+{
+  "politics": [
+    {
+      "id": "DEU",
+      "governmentType": "Democracy",
+      "headOfState": "Friedrich Merz",
+      "headOfGovernment": "Friedrich Merz",
+      "headOfStateImage": "merz_friedrich",
+      "rulingParty": "CDU/CSU",
+      "rulingCoalition": ["CDU/CSU", "SPD"],
+      "parties": [
+        { "name": "CDU/CSU", "ideology": "Conservative", "seats": 208, "totalSeats": 630, "popularity": 0.33 },
+        { "name": "AfD", "ideology": "Nationalist", "seats": 152, "totalSeats": 630, "popularity": 0.24 },
+        { "name": "SPD", "ideology": "Socialist", "seats": 120, "totalSeats": 630, "popularity": 0.19 },
+        { "name": "Gruene", "ideology": "Green", "seats": 85, "totalSeats": 630, "popularity": 0.13 },
+        { "name": "Die Linke", "ideology": "Communist", "seats": 28, "totalSeats": 630, "popularity": 0.04 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2025,
+      "stability": 0.70,
+      "notes": "Grand Coalition nach Ampel-Koalitionsbruch 2024"
+    },
+    {
+      "id": "USA",
+      "governmentType": "Democracy",
+      "headOfState": "Donald Trump",
+      "headOfGovernment": "Donald Trump",
+      "headOfStateImage": "trump_donald",
+      "rulingParty": "Republican Party",
+      "rulingCoalition": ["Republican Party"],
+      "parties": [
+        { "name": "Republican Party", "ideology": "Conservative", "seats": 218, "totalSeats": 435, "popularity": 0.50 },
+        { "name": "Democratic Party", "ideology": "Liberal", "seats": 213, "totalSeats": 435, "popularity": 0.49 }
+      ],
+      "senate": [
+        { "name": "Republican Party", "seats": 53, "totalSeats": 100 },
+        { "name": "Democratic Party", "seats": 45, "totalSeats": 100 },
+        { "name": "Independent", "seats": 2, "totalSeats": 100 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2024,
+      "stability": 0.65,
+      "notes": "Republican Trifecta seit 2025"
+    },
+    {
+      "id": "RUS",
+      "governmentType": "AuthoritarianRegime",
+      "headOfState": "Vladimir Putin",
+      "headOfGovernment": "Mikhail Mishustin",
+      "headOfStateImage": "putin_vladimir",
+      "rulingParty": "United Russia",
+      "rulingCoalition": ["United Russia"],
+      "parties": [
+        { "name": "United Russia", "ideology": "Nationalist", "seats": 323, "totalSeats": 450, "popularity": 0.72 },
+        { "name": "KPRF", "ideology": "Communist", "seats": 57, "totalSeats": 450, "popularity": 0.13 },
+        { "name": "A Just Russia", "ideology": "Socialist", "seats": 28, "totalSeats": 450, "popularity": 0.06 },
+        { "name": "LDPR", "ideology": "Nationalist", "seats": 21, "totalSeats": 450, "popularity": 0.05 },
+        { "name": "New People", "ideology": "Liberal", "seats": 13, "totalSeats": 450, "popularity": 0.03 }
+      ],
+      "electionCycle": 6,
+      "lastElection": 2024,
+      "stability": 0.80,
+      "notes": "De-facto Ein-Parteien-System unter Putin"
+    },
+    {
+      "id": "CHN",
+      "governmentType": "CommunistState",
+      "headOfState": "Xi Jinping",
+      "headOfGovernment": "Li Qiang",
+      "headOfStateImage": "xi_jinping",
+      "rulingParty": "Communist Party of China",
+      "rulingCoalition": ["Communist Party of China"],
+      "parties": [
+        { "name": "Communist Party of China", "ideology": "Communist", "seats": 2977, "totalSeats": 2977, "popularity": 1.0 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2023,
+      "stability": 0.90,
+      "notes": "Ein-Parteien-Staat, Xi Jinping seit 2012 an der Macht"
+    },
+    {
+      "id": "FRA",
+      "governmentType": "Democracy",
+      "headOfState": "Emmanuel Macron",
+      "headOfGovernment": "Francois Bayrou",
+      "headOfStateImage": "macron_emmanuel",
+      "rulingParty": "Ensemble",
+      "rulingCoalition": ["Ensemble", "LR"],
+      "parties": [
+        { "name": "NFP (New Popular Front)", "ideology": "Socialist", "seats": 180, "totalSeats": 577, "popularity": 0.31 },
+        { "name": "Ensemble", "ideology": "Liberal", "seats": 159, "totalSeats": 577, "popularity": 0.28 },
+        { "name": "Rassemblement National", "ideology": "Nationalist", "seats": 143, "totalSeats": 577, "popularity": 0.25 },
+        { "name": "Les Republicains", "ideology": "Conservative", "seats": 39, "totalSeats": 577, "popularity": 0.07 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.35,
+      "notes": "Politische Instabilitaet, mehrere Regierungsstuerze seit 2024"
+    },
+    {
+      "id": "GBR",
+      "governmentType": "Monarchy",
+      "headOfState": "Charles III",
+      "headOfGovernment": "Keir Starmer",
+      "headOfStateImage": "starmer_keir",
+      "rulingParty": "Labour Party",
+      "rulingCoalition": ["Labour Party"],
+      "parties": [
+        { "name": "Labour Party", "ideology": "Socialist", "seats": 399, "totalSeats": 650, "popularity": 0.61 },
+        { "name": "Conservative Party", "ideology": "Conservative", "seats": 121, "totalSeats": 650, "popularity": 0.19 },
+        { "name": "Liberal Democrats", "ideology": "Liberal", "seats": 72, "totalSeats": 650, "popularity": 0.11 },
+        { "name": "Scottish National Party", "ideology": "Nationalist", "seats": 9, "totalSeats": 650, "popularity": 0.01 },
+        { "name": "Reform UK", "ideology": "Nationalist", "seats": 5, "totalSeats": 650, "popularity": 0.01 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.60,
+      "notes": "Labour-Erdrutschsieg 2024, niedrigste Zustimmungswerte fuer Starmer"
+    },
+    {
+      "id": "JPN",
+      "governmentType": "Monarchy",
+      "headOfState": "Naruhito",
+      "headOfGovernment": "Shigeru Ishiba",
+      "headOfStateImage": "ishiba_shigeru",
+      "rulingParty": "LDP",
+      "rulingCoalition": ["LDP", "Komeito"],
+      "parties": [
+        { "name": "Liberal Democratic Party", "ideology": "Conservative", "seats": 191, "totalSeats": 465, "popularity": 0.41 },
+        { "name": "Constitutional Democratic Party", "ideology": "Liberal", "seats": 148, "totalSeats": 465, "popularity": 0.32 },
+        { "name": "Komeito", "ideology": "Democratic", "seats": 24, "totalSeats": 465, "popularity": 0.05 },
+        { "name": "Democratic Party for the People", "ideology": "Liberal", "seats": 28, "totalSeats": 465, "popularity": 0.06 },
+        { "name": "Japan Innovation Party", "ideology": "Conservative", "seats": 38, "totalSeats": 465, "popularity": 0.08 },
+        { "name": "Japanese Communist Party", "ideology": "Communist", "seats": 8, "totalSeats": 465, "popularity": 0.02 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2024,
+      "stability": 0.50,
+      "notes": "LDP verlor Mehrheit 2024, neue Koalition mit Innovationspartei"
+    },
+    {
+      "id": "ITA",
+      "governmentType": "Democracy",
+      "headOfState": "Sergio Mattarella",
+      "headOfGovernment": "Giorgia Meloni",
+      "headOfStateImage": "meloni_giorgia",
+      "rulingParty": "Fratelli d'Italia",
+      "rulingCoalition": ["Fratelli d'Italia", "Lega", "Forza Italia"],
+      "parties": [
+        { "name": "Fratelli d'Italia", "ideology": "Nationalist", "seats": 119, "totalSeats": 400, "popularity": 0.30 },
+        { "name": "Partito Democratico", "ideology": "Socialist", "seats": 69, "totalSeats": 400, "popularity": 0.17 },
+        { "name": "Movimento 5 Stelle", "ideology": "Democratic", "seats": 52, "totalSeats": 400, "popularity": 0.13 },
+        { "name": "Lega", "ideology": "Nationalist", "seats": 66, "totalSeats": 400, "popularity": 0.17 },
+        { "name": "Forza Italia", "ideology": "Conservative", "seats": 45, "totalSeats": 400, "popularity": 0.11 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2022,
+      "stability": 0.65,
+      "notes": "Rechte Koalition unter Meloni seit Oktober 2022"
+    },
+    {
+      "id": "POL",
+      "governmentType": "Democracy",
+      "headOfState": "Karol Nawrocki",
+      "headOfGovernment": "Donald Tusk",
+      "headOfStateImage": "tusk_donald",
+      "rulingParty": "Civic Coalition",
+      "rulingCoalition": ["Civic Coalition", "Third Way", "The Left"],
+      "parties": [
+        { "name": "Law and Justice (PiS)", "ideology": "Conservative", "seats": 194, "totalSeats": 460, "popularity": 0.42 },
+        { "name": "Civic Coalition (KO)", "ideology": "Liberal", "seats": 157, "totalSeats": 460, "popularity": 0.34 },
+        { "name": "Third Way", "ideology": "Democratic", "seats": 65, "totalSeats": 460, "popularity": 0.14 },
+        { "name": "The Left (NL)", "ideology": "Socialist", "seats": 26, "totalSeats": 460, "popularity": 0.06 },
+        { "name": "Confederation", "ideology": "Nationalist", "seats": 18, "totalSeats": 460, "popularity": 0.04 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2023,
+      "stability": 0.60,
+      "notes": "Pro-EU Koalition unter Tusk seit Dezember 2023"
+    },
+    {
+      "id": "UKR",
+      "governmentType": "Democracy",
+      "headOfState": "Volodymyr Zelensky",
+      "headOfGovernment": "Yuliia Svyrydenko",
+      "headOfStateImage": "zelensky_volodymyr",
+      "rulingParty": "Servant of the People",
+      "rulingCoalition": ["Servant of the People"],
+      "parties": [
+        { "name": "Servant of the People", "ideology": "Democratic", "seats": 241, "totalSeats": 424, "popularity": 0.57 },
+        { "name": "European Solidarity", "ideology": "Conservative", "seats": 25, "totalSeats": 424, "popularity": 0.06 },
+        { "name": "Batkivshchyna", "ideology": "Democratic", "seats": 24, "totalSeats": 424, "popularity": 0.06 },
+        { "name": "Opposition Platform", "ideology": "Socialist", "seats": 43, "totalSeats": 424, "popularity": 0.10 },
+        { "name": "Holos", "ideology": "Liberal", "seats": 20, "totalSeats": 424, "popularity": 0.05 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2019,
+      "stability": 0.45,
+      "notes": "Wahlen wegen Kriegsrecht ausgesetzt, Zelensky bleibt im Amt"
+    },
+    {
+      "id": "IND",
+      "governmentType": "Democracy",
+      "headOfState": "Droupadi Murmu",
+      "headOfGovernment": "Narendra Modi",
+      "headOfStateImage": "modi_narendra",
+      "rulingParty": "BJP",
+      "rulingCoalition": ["BJP", "TDP", "JD(U)"],
+      "parties": [
+        { "name": "Bharatiya Janata Party", "ideology": "Nationalist", "seats": 240, "totalSeats": 543, "popularity": 0.44 },
+        { "name": "Indian National Congress", "ideology": "Liberal", "seats": 99, "totalSeats": 543, "popularity": 0.18 },
+        { "name": "Samajwadi Party", "ideology": "Socialist", "seats": 37, "totalSeats": 543, "popularity": 0.07 },
+        { "name": "All India Trinamool Congress", "ideology": "Democratic", "seats": 29, "totalSeats": 543, "popularity": 0.05 },
+        { "name": "Dravida Munnetra Kazhagam", "ideology": "Socialist", "seats": 22, "totalSeats": 543, "popularity": 0.04 },
+        { "name": "Telugu Desam Party", "ideology": "Conservative", "seats": 16, "totalSeats": 543, "popularity": 0.03 },
+        { "name": "Janata Dal (United)", "ideology": "Democratic", "seats": 12, "totalSeats": 543, "popularity": 0.02 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.70,
+      "notes": "Modi's dritte Amtszeit, erstmals Koalitionsregierung"
+    },
+    {
+      "id": "BRA",
+      "governmentType": "Democracy",
+      "headOfState": "Luiz Inacio Lula da Silva",
+      "headOfGovernment": "Luiz Inacio Lula da Silva",
+      "headOfStateImage": "lula_da_silva",
+      "rulingParty": "PT",
+      "rulingCoalition": ["PT", "MDB", "PSB", "PSD"],
+      "parties": [
+        { "name": "Partido Liberal", "ideology": "Conservative", "seats": 99, "totalSeats": 513, "popularity": 0.19 },
+        { "name": "Partido dos Trabalhadores", "ideology": "Socialist", "seats": 68, "totalSeats": 513, "popularity": 0.13 },
+        { "name": "Uniao Brasil", "ideology": "Conservative", "seats": 59, "totalSeats": 513, "popularity": 0.12 },
+        { "name": "MDB", "ideology": "Democratic", "seats": 42, "totalSeats": 513, "popularity": 0.08 },
+        { "name": "PSD", "ideology": "Conservative", "seats": 45, "totalSeats": 513, "popularity": 0.09 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2022,
+      "stability": 0.55,
+      "notes": "Lula's dritte Amtszeit seit 2023, starke Polarisierung"
+    },
+    {
+      "id": "CAN",
+      "governmentType": "Monarchy",
+      "headOfState": "Charles III",
+      "headOfGovernment": "Mark Carney",
+      "headOfStateImage": "carney_mark",
+      "rulingParty": "Liberal Party",
+      "rulingCoalition": ["Liberal Party"],
+      "parties": [
+        { "name": "Liberal Party", "ideology": "Liberal", "seats": 153, "totalSeats": 338, "popularity": 0.45 },
+        { "name": "Conservative Party", "ideology": "Conservative", "seats": 119, "totalSeats": 338, "popularity": 0.35 },
+        { "name": "Bloc Quebecois", "ideology": "Nationalist", "seats": 32, "totalSeats": 338, "popularity": 0.09 },
+        { "name": "New Democratic Party", "ideology": "Socialist", "seats": 25, "totalSeats": 338, "popularity": 0.07 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2025,
+      "stability": 0.55,
+      "notes": "Mark Carney seit Maerz 2025 nach Trudeau-Ruecktritt"
+    },
+    {
+      "id": "ESP",
+      "governmentType": "Monarchy",
+      "headOfState": "Felipe VI",
+      "headOfGovernment": "Pedro Sanchez",
+      "headOfStateImage": "sanchez_pedro",
+      "rulingParty": "PSOE",
+      "rulingCoalition": ["PSOE", "Sumar"],
+      "parties": [
+        { "name": "Partido Popular", "ideology": "Conservative", "seats": 137, "totalSeats": 350, "popularity": 0.39 },
+        { "name": "PSOE", "ideology": "Socialist", "seats": 121, "totalSeats": 350, "popularity": 0.35 },
+        { "name": "Vox", "ideology": "Nationalist", "seats": 33, "totalSeats": 350, "popularity": 0.09 },
+        { "name": "Sumar", "ideology": "Socialist", "seats": 31, "totalSeats": 350, "popularity": 0.09 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2023,
+      "stability": 0.50,
+      "notes": "Minderheitsregierung unter Sanchez, abhaengig von Regionalparteien"
+    },
+    {
+      "id": "TUR",
+      "governmentType": "Democracy",
+      "headOfState": "Recep Tayyip Erdogan",
+      "headOfGovernment": "Recep Tayyip Erdogan",
+      "headOfStateImage": "erdogan_recep_tayyip",
+      "rulingParty": "AKP",
+      "rulingCoalition": ["AKP", "MHP"],
+      "parties": [
+        { "name": "AKP", "ideology": "Conservative", "seats": 268, "totalSeats": 600, "popularity": 0.45 },
+        { "name": "CHP", "ideology": "Socialist", "seats": 169, "totalSeats": 600, "popularity": 0.28 },
+        { "name": "MHP", "ideology": "Nationalist", "seats": 50, "totalSeats": 600, "popularity": 0.08 },
+        { "name": "IYI Party", "ideology": "Nationalist", "seats": 44, "totalSeats": 600, "popularity": 0.07 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2023,
+      "stability": 0.65,
+      "notes": "Erdogan seit 2003 an der Macht, zunehmend autoritaer"
+    },
+    {
+      "id": "KOR",
+      "governmentType": "Democracy",
+      "headOfState": "Han Duck-soo",
+      "headOfGovernment": "Han Duck-soo",
+      "headOfStateImage": "han_duck_soo",
+      "rulingParty": "People Power Party",
+      "rulingCoalition": ["People Power Party"],
+      "parties": [
+        { "name": "People Power Party", "ideology": "Conservative", "seats": 108, "totalSeats": 300, "popularity": 0.36 },
+        { "name": "Democratic Party", "ideology": "Liberal", "seats": 175, "totalSeats": 300, "popularity": 0.58 },
+        { "name": "Rebuilding Korea Party", "ideology": "Liberal", "seats": 12, "totalSeats": 300, "popularity": 0.04 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2022,
+      "stability": 0.30,
+      "notes": "Han Duck-soo seit Dezember 2024 nach Yoon-Amtsenthebung"
+    },
+    {
+      "id": "AUS",
+      "governmentType": "Monarchy",
+      "headOfState": "Charles III",
+      "headOfGovernment": "Anthony Albanese",
+      "headOfStateImage": "albanese_anthony",
+      "rulingParty": "Australian Labor Party",
+      "rulingCoalition": ["Australian Labor Party"],
+      "parties": [
+        { "name": "Australian Labor Party", "ideology": "Socialist", "seats": 77, "totalSeats": 151, "popularity": 0.51 },
+        { "name": "Liberal Party", "ideology": "Conservative", "seats": 48, "totalSeats": 151, "popularity": 0.32 },
+        { "name": "National Party", "ideology": "Conservative", "seats": 16, "totalSeats": 151, "popularity": 0.11 },
+        { "name": "Greens", "ideology": "Green", "seats": 4, "totalSeats": 151, "popularity": 0.03 }
+      ],
+      "electionCycle": 3,
+      "lastElection": 2022,
+      "stability": 0.65,
+      "notes": "Albanese seit Mai 2022, naechste Wahl bis Mai 2025"
+    },
+    {
+      "id": "MEX",
+      "governmentType": "Democracy",
+      "headOfState": "Claudia Sheinbaum",
+      "headOfGovernment": "Claudia Sheinbaum",
+      "headOfStateImage": "sheinbaum_claudia",
+      "rulingParty": "MORENA",
+      "rulingCoalition": ["MORENA", "PT", "PVEM"],
+      "parties": [
+        { "name": "MORENA", "ideology": "Socialist", "seats": 256, "totalSeats": 500, "popularity": 0.51 },
+        { "name": "PAN", "ideology": "Conservative", "seats": 72, "totalSeats": 500, "popularity": 0.14 },
+        { "name": "PRI", "ideology": "Democratic", "seats": 35, "totalSeats": 500, "popularity": 0.07 },
+        { "name": "MC", "ideology": "Liberal", "seats": 27, "totalSeats": 500, "popularity": 0.05 },
+        { "name": "PT", "ideology": "Socialist", "seats": 51, "totalSeats": 500, "popularity": 0.10 },
+        { "name": "PVEM", "ideology": "Green", "seats": 59, "totalSeats": 500, "popularity": 0.12 }
+      ],
+      "electionCycle": 6,
+      "lastElection": 2024,
+      "stability": 0.60,
+      "notes": "Erste weibliche Praesidentin, Erdrutschsieg 2024"
+    },
+    {
+      "id": "NLD",
+      "governmentType": "Monarchy",
+      "headOfState": "Willem-Alexander",
+      "headOfGovernment": "Dick Schoof",
+      "headOfStateImage": "schoof_dick",
+      "rulingParty": "PVV",
+      "rulingCoalition": ["PVV", "VVD", "NSC", "BBB"],
+      "parties": [
+        { "name": "PVV", "ideology": "Nationalist", "seats": 37, "totalSeats": 150, "popularity": 0.25 },
+        { "name": "GL-PvdA", "ideology": "Socialist", "seats": 25, "totalSeats": 150, "popularity": 0.17 },
+        { "name": "VVD", "ideology": "Liberal", "seats": 24, "totalSeats": 150, "popularity": 0.16 },
+        { "name": "NSC", "ideology": "Democratic", "seats": 20, "totalSeats": 150, "popularity": 0.13 },
+        { "name": "D66", "ideology": "Liberal", "seats": 9, "totalSeats": 150, "popularity": 0.06 },
+        { "name": "BBB", "ideology": "Conservative", "seats": 7, "totalSeats": 150, "popularity": 0.05 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2023,
+      "stability": 0.50,
+      "notes": "Rechte Koalition unter Schoof seit Juli 2024, PVV staerkste Kraft"
+    },
+    {
+      "id": "PRK",
+      "governmentType": "Dictatorship",
+      "headOfState": "Kim Jong-un",
+      "headOfGovernment": "Kim Tok-hun",
+      "headOfStateImage": "kim_jong_un",
+      "rulingParty": "Workers' Party of Korea",
+      "rulingCoalition": ["Workers' Party of Korea"],
+      "parties": [
+        { "name": "Workers' Party of Korea", "ideology": "Communist", "seats": 607, "totalSeats": 687, "popularity": 1.00 },
+        { "name": "Korean Social Democratic Party", "ideology": "Socialist", "seats": 50, "totalSeats": 687, "popularity": 0.00 },
+        { "name": "Chondoist Chongu Party", "ideology": "Religious", "seats": 22, "totalSeats": 687, "popularity": 0.00 },
+        { "name": "Independents", "ideology": "None", "seats": 8, "totalSeats": 687, "popularity": 0.00 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.95,
+      "notes": "Totalitaere Ein-Parteien-Diktatur unter Kim-Dynastie, Atomwaffenstaat"
+    },
+    {
+      "id": "FIN",
+      "governmentType": "Democracy",
+      "headOfState": "Alexander Stubb",
+      "headOfGovernment": "Petteri Orpo",
+      "headOfStateImage": "stubb_alexander",
+      "rulingParty": "Kokoomus",
+      "rulingCoalition": ["Kokoomus", "Perussuomalaiset", "RKP", "KD"],
+      "parties": [
+        { "name": "Kokoomus", "ideology": "Conservative", "seats": 48, "totalSeats": 200, "popularity": 0.24 },
+        { "name": "Perussuomalaiset", "ideology": "Nationalist", "seats": 46, "totalSeats": 200, "popularity": 0.23 },
+        { "name": "SDP", "ideology": "Socialist", "seats": 43, "totalSeats": 200, "popularity": 0.22 },
+        { "name": "Keskusta", "ideology": "Agrarian", "seats": 23, "totalSeats": 200, "popularity": 0.12 },
+        { "name": "Vihreät", "ideology": "Green", "seats": 13, "totalSeats": 200, "popularity": 0.07 },
+        { "name": "Vasemmistoliitto", "ideology": "Socialist", "seats": 11, "totalSeats": 200, "popularity": 0.06 },
+        { "name": "RKP", "ideology": "Liberal", "seats": 9, "totalSeats": 200, "popularity": 0.05 },
+        { "name": "KD", "ideology": "Conservative", "seats": 5, "totalSeats": 200, "popularity": 0.03 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2023,
+      "stability": 0.72,
+      "notes": "Mitte-Rechts-Koalition unter Orpo, EU- und NATO-Mitglied seit 2023"
+    },
+    {
+      "id": "NOR",
+      "governmentType": "Monarchy",
+      "headOfState": "King Harald V",
+      "headOfGovernment": "Jonas Gahr Store",
+      "headOfStateImage": "store_jonas_gahr",
+      "rulingParty": "Labour Party",
+      "rulingCoalition": ["Labour Party"],
+      "parties": [
+        { "name": "Labour Party", "ideology": "Socialist", "seats": 53, "totalSeats": 169, "popularity": 0.31 },
+        { "name": "Progress Party", "ideology": "Nationalist", "seats": 47, "totalSeats": 169, "popularity": 0.28 },
+        { "name": "Conservative Party", "ideology": "Conservative", "seats": 24, "totalSeats": 169, "popularity": 0.14 },
+        { "name": "Socialist Left Party", "ideology": "Socialist", "seats": 9, "totalSeats": 169, "popularity": 0.05 },
+        { "name": "Centre Party", "ideology": "Liberal", "seats": 9, "totalSeats": 169, "popularity": 0.05 },
+        { "name": "Red Party", "ideology": "Communist", "seats": 9, "totalSeats": 169, "popularity": 0.05 },
+        { "name": "Green Party", "ideology": "Green", "seats": 8, "totalSeats": 169, "popularity": 0.05 },
+        { "name": "Christian Democratic Party", "ideology": "Conservative", "seats": 7, "totalSeats": 169, "popularity": 0.04 },
+        { "name": "Liberal Party", "ideology": "Liberal", "seats": 3, "totalSeats": 169, "popularity": 0.02 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2025,
+      "stability": 0.70,
+      "notes": "Minderheitsregierung unter Store (Labour), Vertrauens-/Duldungsunterstuetzung von SP, SV, Rodt und MDG"
+    },
+    {
+      "id": "SWE",
+      "governmentType": "Monarchy",
+      "headOfState": "King Carl XVI Gustaf",
+      "headOfGovernment": "Ulf Kristersson",
+      "headOfStateImage": "kristersson_ulf",
+      "rulingParty": "Moderate Party",
+      "rulingCoalition": ["Moderate Party", "Christian Democrats", "Liberals"],
+      "parties": [
+        { "name": "Social Democrats", "ideology": "Socialist", "seats": 107, "totalSeats": 349, "popularity": 0.31 },
+        { "name": "Sweden Democrats", "ideology": "Nationalist", "seats": 73, "totalSeats": 349, "popularity": 0.21 },
+        { "name": "Moderate Party", "ideology": "Conservative", "seats": 68, "totalSeats": 349, "popularity": 0.19 },
+        { "name": "Left Party", "ideology": "Socialist", "seats": 24, "totalSeats": 349, "popularity": 0.07 },
+        { "name": "Centre Party", "ideology": "Liberal", "seats": 24, "totalSeats": 349, "popularity": 0.07 },
+        { "name": "Christian Democrats", "ideology": "Conservative", "seats": 19, "totalSeats": 349, "popularity": 0.05 },
+        { "name": "Green Party", "ideology": "Green", "seats": 18, "totalSeats": 349, "popularity": 0.05 },
+        { "name": "Liberals", "ideology": "Liberal", "seats": 16, "totalSeats": 349, "popularity": 0.05 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2022,
+      "stability": 0.62,
+      "notes": "Minderheitsregierung unter Kristersson, abhaengig von Schwedendemokraten (Tidoe-Abkommen)"
+    },
+    {
+      "id": "AUT",
+      "governmentType": "Democracy",
+      "headOfState": "Alexander Van der Bellen",
+      "headOfGovernment": "Herbert Kickl",
+      "headOfStateImage": "kickl_herbert",
+      "rulingParty": "FPOe",
+      "rulingCoalition": ["FPOe", "OeVP"],
+      "parties": [
+        { "name": "FPOe", "ideology": "Nationalist", "seats": 57, "totalSeats": 183, "popularity": 0.29 },
+        { "name": "OeVP", "ideology": "Conservative", "seats": 51, "totalSeats": 183, "popularity": 0.26 },
+        { "name": "SPOe", "ideology": "Socialist", "seats": 41, "totalSeats": 183, "popularity": 0.21 },
+        { "name": "NEOS", "ideology": "Liberal", "seats": 18, "totalSeats": 183, "popularity": 0.09 },
+        { "name": "Gruene", "ideology": "Green", "seats": 16, "totalSeats": 183, "popularity": 0.08 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.55,
+      "notes": "FPOe-OeVP Koalition unter Kickl seit Februar 2025, erstmals FPOe-gefuehrte Regierung"
+    },
+    {
+      "id": "CZE",
+      "governmentType": "Democracy",
+      "headOfState": "Petr Pavel",
+      "headOfGovernment": "Petr Fiala",
+      "headOfStateImage": "fiala_petr",
+      "rulingParty": "SPOLU",
+      "rulingCoalition": ["SPOLU", "STAN"],
+      "parties": [
+        { "name": "ANO 2011", "ideology": "Democratic", "seats": 72, "totalSeats": 200, "popularity": 0.34 },
+        { "name": "SPOLU", "ideology": "Conservative", "seats": 71, "totalSeats": 200, "popularity": 0.28 },
+        { "name": "Pirati + STAN", "ideology": "Liberal", "seats": 37, "totalSeats": 200, "popularity": 0.16 },
+        { "name": "SPD + Trikolora", "ideology": "Nationalist", "seats": 20, "totalSeats": 200, "popularity": 0.10 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2021,
+      "stability": 0.60,
+      "notes": "Mitte-Rechts-Koalition unter Fiala, naechste Wahl Herbst 2025"
+    },
+    {
+      "id": "CHE",
+      "governmentType": "Democracy",
+      "headOfState": "Karin Keller-Sutter",
+      "headOfGovernment": "Karin Keller-Sutter",
+      "headOfStateImage": "keller_sutter_karin",
+      "rulingParty": "FDP",
+      "rulingCoalition": ["SVP", "SP", "FDP", "Die Mitte"],
+      "parties": [
+        { "name": "SVP", "ideology": "Nationalist", "seats": 62, "totalSeats": 200, "popularity": 0.28 },
+        { "name": "SP", "ideology": "Socialist", "seats": 41, "totalSeats": 200, "popularity": 0.18 },
+        { "name": "FDP", "ideology": "Liberal", "seats": 29, "totalSeats": 200, "popularity": 0.14 },
+        { "name": "Die Mitte", "ideology": "Conservative", "seats": 29, "totalSeats": 200, "popularity": 0.14 },
+        { "name": "Gruene", "ideology": "Green", "seats": 23, "totalSeats": 200, "popularity": 0.10 },
+        { "name": "GLP", "ideology": "Green", "seats": 10, "totalSeats": 200, "popularity": 0.08 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2023,
+      "stability": 0.85,
+      "notes": "Bundesrat-System mit 7 Mitgliedern, Konkordanzdemokratie, Keller-Sutter Bundespraesidentin 2025"
+    },
+    {
+      "id": "SAU",
+      "governmentType": "Monarchy",
+      "headOfState": "Salman bin Abdulaziz",
+      "headOfGovernment": "Mohammed bin Salman",
+      "headOfStateImage": "bin_salman_mohammed",
+      "rulingParty": "Koenigshaus",
+      "rulingCoalition": ["Koenigshaus"],
+      "parties": [
+        { "name": "Koenigshaus Saud", "ideology": "Conservative", "seats": 1, "totalSeats": 1, "popularity": 1.0 }
+      ],
+      "electionCycle": 0,
+      "lastElection": 0,
+      "stability": 0.85,
+      "notes": "Absolute Monarchie, MBS de-facto Herrscher, Vision 2030 Modernisierungsprogramm"
+    },
+    {
+      "id": "IRN",
+      "governmentType": "Theocracy",
+      "headOfState": "Ali Khamenei",
+      "headOfGovernment": "Masoud Pezeshkian",
+      "headOfStateImage": "pezeshkian_masoud",
+      "rulingParty": "Reformisten",
+      "rulingCoalition": ["Reformisten"],
+      "parties": [
+        { "name": "Prinzipientreue", "ideology": "Conservative", "seats": 155, "totalSeats": 290, "popularity": 0.53 },
+        { "name": "Reformisten", "ideology": "Liberal", "seats": 45, "totalSeats": 290, "popularity": 0.16 },
+        { "name": "Unabhaengige", "ideology": "Democratic", "seats": 90, "totalSeats": 290, "popularity": 0.31 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2024,
+      "stability": 0.50,
+      "notes": "Islamische Republik, Oberster Fuehrer Khamenei seit 1989, Praesident Pezeshkian seit 2024"
+    },
+    {
+      "id": "ISR",
+      "governmentType": "Democracy",
+      "headOfState": "Isaac Herzog",
+      "headOfGovernment": "Benjamin Netanyahu",
+      "headOfStateImage": "netanyahu_benjamin",
+      "rulingParty": "Likud",
+      "rulingCoalition": ["Likud", "Shas", "UTJ", "Religious Zionism", "Otzma Yehudit"],
+      "parties": [
+        { "name": "Likud", "ideology": "Conservative", "seats": 32, "totalSeats": 120, "popularity": 0.27 },
+        { "name": "Yesh Atid", "ideology": "Liberal", "seats": 24, "totalSeats": 120, "popularity": 0.20 },
+        { "name": "Religious Zionism", "ideology": "Nationalist", "seats": 14, "totalSeats": 120, "popularity": 0.12 },
+        { "name": "National Unity", "ideology": "Conservative", "seats": 12, "totalSeats": 120, "popularity": 0.10 },
+        { "name": "Shas", "ideology": "Conservative", "seats": 11, "totalSeats": 120, "popularity": 0.09 },
+        { "name": "UTJ", "ideology": "Conservative", "seats": 7, "totalSeats": 120, "popularity": 0.06 },
+        { "name": "Otzma Yehudit", "ideology": "Nationalist", "seats": 6, "totalSeats": 120, "popularity": 0.05 },
+        { "name": "Israel Beiteinu", "ideology": "Nationalist", "seats": 6, "totalSeats": 120, "popularity": 0.05 },
+        { "name": "Ra'am", "ideology": "Democratic", "seats": 5, "totalSeats": 120, "popularity": 0.04 }
+      ],
+      "electionCycle": 4,
+      "lastElection": 2022,
+      "stability": 0.40,
+      "notes": "Rechts-religioese Koalition unter Netanyahu, Gaza-Krieg seit Oktober 2023"
+    },
+    {
+      "id": "BLR",
+      "governmentType": "AuthoritarianRegime",
+      "headOfState": "Alexander Lukashenko",
+      "headOfGovernment": "Alexander Lukashenko",
+      "headOfStateImage": "lukashenko_alexander",
+      "rulingParty": "Belaya Rus",
+      "rulingCoalition": ["Belaya Rus"],
+      "parties": [
+        { "name": "Belaya Rus", "ideology": "Nationalist", "seats": 90, "totalSeats": 110, "popularity": 0.82 },
+        { "name": "Unabhaengige", "ideology": "Democratic", "seats": 20, "totalSeats": 110, "popularity": 0.18 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2024,
+      "stability": 0.70,
+      "notes": "De-facto Diktatur unter Lukashenko seit 1994, enger Verbuendeter Russlands"
+    },
+    {
+      "id": "KAZ",
+      "governmentType": "AuthoritarianRegime",
+      "headOfState": "Kassym-Jomart Tokayev",
+      "headOfGovernment": "Olzhas Bektenov",
+      "headOfStateImage": "tokayev_kassym_jomart",
+      "rulingParty": "Amanat",
+      "rulingCoalition": ["Amanat"],
+      "parties": [
+        { "name": "Amanat", "ideology": "Nationalist", "seats": 62, "totalSeats": 98, "popularity": 0.63 },
+        { "name": "Auyl", "ideology": "Conservative", "seats": 8, "totalSeats": 98, "popularity": 0.08 },
+        { "name": "Respublica", "ideology": "Democratic", "seats": 6, "totalSeats": 98, "popularity": 0.06 },
+        { "name": "Unabhaengige", "ideology": "Democratic", "seats": 22, "totalSeats": 98, "popularity": 0.22 }
+      ],
+      "electionCycle": 5,
+      "lastElection": 2023,
+      "stability": 0.65,
+      "notes": "Autoritaeres System unter Tokayev, Nachfolger Nasarbajews, Unruhen 2022"
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "conflicts": [
+    {
+      "id": "ukraine_war",
+      "name": "Russisch-Ukrainischer Krieg",
+      "countries": ["UKR"],
+      "conflictZones": [
+        "Oblast Donezk",
+        "Oblast Luhansk",
+        "Oblast Saporischschja",
+        "Oblast Cherson",
+        "Oblast Charkiw"
+      ],
+      "type": "war",
+      "intensity": "high",
+      "startYear": 2022,
+      "description": "Russische Invasion der Ukraine"
+    },
+    {
+      "id": "gaza_conflict",
+      "name": "Gaza-Krieg",
+      "countries": ["ISR"],
+      "type": "war",
+      "intensity": "high",
+      "startYear": 2023,
+      "description": "Konflikt zwischen Israel und Hamas"
+    },
+    {
+      "id": "sudan_civil_war",
+      "name": "Buergerkrieg im Sudan",
+      "countries": ["SDN"],
+      "type": "civil_war",
+      "intensity": "high",
+      "startYear": 2023,
+      "description": "Kaempfe zwischen SAF und RSF"
+    },
+    {
+      "id": "myanmar_civil_war",
+      "name": "Buergerkrieg in Myanmar",
+      "countries": ["MMR"],
+      "type": "civil_war",
+      "intensity": "high",
+      "startYear": 2021,
+      "description": "Konflikt nach dem Militaerputsch"
+    },
+    {
+      "id": "syria_conflict",
+      "name": "Syrischer Buergerkrieg",
+      "countries": ["SYR"],
+      "type": "civil_war",
+      "intensity": "medium",
+      "startYear": 2011,
+      "description": "Andauernder Buergerkrieg in Syrien"
+    },
+    {
+      "id": "yemen_war",
+      "name": "Jemen-Krieg",
+      "countries": ["YEM"],
+      "type": "civil_war",
+      "intensity": "high",
+      "startYear": 2014,
+      "description": "Konflikt zwischen Regierung und Huthis"
+    },
+    {
+      "id": "afghanistan_conflict",
+      "name": "Konflikt in Afghanistan",
+      "countries": ["AFG"],
+      "type": "insurgency",
+      "intensity": "medium",
+      "startYear": 2001,
+      "description": "Instabilitaet und Widerstandskaempfe"
+    },
+    {
+      "id": "sahel_insurgency",
+      "name": "Sahel-Konflikt",
+      "countries": ["MLI", "BFA", "NGA"],
+      "type": "insurgency",
+      "intensity": "high",
+      "startYear": 2012,
+      "description": "Islamistische Aufstaende in der Sahel-Region"
+    },
+    {
+      "id": "drc_conflict",
+      "name": "Konflikt in der DR Kongo",
+      "countries": ["COD"],
+      "type": "civil_war",
+      "intensity": "high",
+      "startYear": 1996,
+      "description": "Kaempfe mit M23 und anderen Gruppen"
+    },
+    {
+      "id": "somalia_conflict",
+      "name": "Konflikt in Somalia",
+      "countries": ["SOM"],
+      "type": "insurgency",
+      "intensity": "medium",
+      "startYear": 1991,
+      "description": "Al-Shabaab Aufstand"
+    },
+    {
+      "id": "ethiopia_tigray",
+      "name": "Tigray-Konflikt",
+      "countries": ["ETH"],
+      "type": "civil_war",
+      "intensity": "low",
+      "startYear": 2020,
+      "description": "Nachwirkungen des Tigray-Krieges"
+    },
+    {
+      "id": "libya_instability",
+      "name": "Instabilitaet in Libyen",
+      "countries": ["LBY"],
+      "type": "civil_war",
+      "intensity": "low",
+      "startYear": 2011,
+      "description": "Rivalisierende Regierungen und Milizen"
+    },
+    {
+      "id": "iraq_isis",
+      "name": "ISIS-Reste im Irak",
+      "countries": ["IRQ"],
+      "type": "insurgency",
+      "intensity": "low",
+      "startYear": 2014,
+      "description": "Vereinzelte ISIS-Aktivitaeten"
+    },
+    {
+      "id": "pakistan_insurgency",
+      "name": "Aufstand in Pakistan",
+      "countries": ["PAK"],
+      "type": "insurgency",
+      "intensity": "medium",
+      "startYear": 2004,
+      "description": "TTP und andere militante Gruppen"
+    },
+    {
+      "id": "colombia_conflict",
+      "name": "Kolumbianischer Konflikt",
+      "countries": ["COL"],
+      "type": "insurgency",
+      "intensity": "low",
+      "startYear": 1964,
+      "description": "Verbleibende Guerilla-Gruppen"
+    },
+    {
+      "id": "mexico_drug_war",
+      "name": "Drogenkrieg in Mexiko",
+      "countries": ["MEX"],
+      "type": "drug_war",
+      "intensity": "high",
+      "startYear": 2006,
+      "description": "Gewalt durch Drogenkartelle"
+    },
+    {
+      "id": "lebanon_instability",
+      "name": "Instabilitaet im Libanon",
+      "countries": ["LBN"],
+      "type": "conflict",
+      "intensity": "medium",
+      "startYear": 2023,
+      "description": "Grenzkonflikt und interne Spannungen"
+    }
+  ]
+}

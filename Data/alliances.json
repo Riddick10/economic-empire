@@ -1,0 +1,47 @@
+{
+  "alliances": {
+    "NATO": {
+      "type": "military",
+      "color": [0, 65, 117, 255],
+      "members": ["USA", "CAN", "GBR", "FRA", "DEU", "ITA", "ESP", "POL", "NLD", "BEL", "PRT", "GRC", "TUR", "NOR", "DNK", "CZE", "HUN", "ROU", "BGR", "SVK", "HRV", "SVN", "LTU", "LVA", "EST", "ALB", "MNE", "MKD"]
+    },
+    "BRICS": {
+      "type": "economic",
+      "color": [117, 52, 0, 255],
+      "members": ["BRA", "RUS", "IND", "CHN", "ZAF", "IRN", "SAU", "ARE", "EGY", "ETH"]
+    },
+    "EU": {
+      "type": "economic",
+      "color": [0, 33, 100, 255],
+      "members": ["DEU", "FRA", "ITA", "ESP", "POL", "NLD", "BEL", "AUT", "CZE", "HUN", "ROU", "BGR", "GRC", "PRT", "SWE", "DNK", "FIN", "IRL", "SVK", "HRV", "SVN", "LTU", "LVA", "EST", "CYP", "LUX", "MLT"]
+    },
+    "CSTO": {
+      "type": "military",
+      "color": [90, 0, 0, 255],
+      "members": ["RUS", "BLR", "KAZ", "ARM", "TJK", "KGZ"]
+    },
+    "SCO": {
+      "type": "military",
+      "color": [100, 33, 100, 255],
+      "members": ["CHN", "RUS", "IND", "PAK", "KAZ", "UZB", "TJK", "KGZ", "IRN", "BLR"]
+    },
+    "AU": {
+      "type": "economic",
+      "color": [0, 83, 0, 255],
+      "members": ["DZA", "AGO", "BEN", "BWA", "BFA", "BDI", "CMR", "CPV", "CAF", "TCD", "COM", "COD", "COG", "CIV", "DJI", "EGY", "GNQ", "ERI", "SWZ", "ETH", "GAB", "GMB", "GHA", "GIN", "GNB", "KEN", "LSO", "LBR", "LBY", "MDG", "MWI", "MLI", "MRT", "MUS", "MAR", "MOZ", "NAM", "NER", "NGA", "RWA", "STP", "SEN", "SYC", "SLE", "SOM", "ZAF", "SSD", "SDN", "TZA", "TGO", "TUN", "UGA", "ZMB", "ZWE"]
+    },
+    "ASEAN": {
+      "type": "economic",
+      "color": [0, 98, 98, 255],
+      "members": ["IDN", "MYS", "PHL", "SGP", "THA", "BRN", "VNM", "LAO", "MMR", "KHM"]
+    },
+    "OPEC": {
+      "type": "economic",
+      "color": [35, 35, 35, 255],
+      "members": ["SAU", "IRN", "IRQ", "KWT", "VEN", "ARE", "DZA", "LBY", "NGA", "GAB", "AGO", "GNQ", "COG"]
+    }
+  },
+  "noneColor": [70, 70, 70, 255],
+  "militaryAlliances": ["NATO", "CSTO", "SCO"],
+  "economicAlliances": ["EU", "BRICS", "ASEAN", "AU", "OPEC"]
+}

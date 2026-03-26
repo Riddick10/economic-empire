@@ -1,0 +1,96 @@
+{
+  "highways": {
+    "ruta-1": {
+      "name": "Ruta 1 Buenos Aires-La Plata",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-57.95, -34.92]
+      ]
+    },
+    "ruta-2": {
+      "name": "Ruta 2 Buenos Aires-Mar del Plata",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-58.01, -35.57],
+        [-57.68, -36.32],
+        [-57.55, -38.00]
+      ]
+    },
+    "ruta-5": {
+      "name": "Ruta 5 Buenos Aires-Santa Rosa",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-59.10, -34.57],
+        [-60.95, -34.59],
+        [-64.28, -36.62]
+      ]
+    },
+    "ruta-7": {
+      "name": "Ruta 7 Buenos Aires-Mendoza",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-60.95, -34.59],
+        [-66.34, -33.30],
+        [-68.84, -32.89]
+      ]
+    },
+    "ruta-8": {
+      "name": "Ruta 8 Buenos Aires-Córdoba variant",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-60.57, -33.90],
+        [-64.35, -33.13],
+        [-64.18, -31.42]
+      ]
+    },
+    "ruta-9": {
+      "name": "Ruta 9 Buenos Aires-Córdoba-Tucumán",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-60.65, -32.95],
+        [-64.18, -31.42],
+        [-64.26, -27.78],
+        [-65.22, -26.82],
+        [-65.41, -24.79],
+        [-65.30, -24.19]
+      ]
+    },
+    "ruta-3": {
+      "name": "Ruta 3 Buenos Aires-Ushuaia",
+      "coordinates": [
+        [-58.38, -34.60],
+        [-62.27, -38.72],
+        [-65.31, -43.25],
+        [-67.50, -45.87],
+        [-69.22, -51.63],
+        [-68.30, -54.80]
+      ]
+    },
+    "ruta-40": {
+      "name": "Ruta 40 Mendoza-Salta (along Andes)",
+      "coordinates": [
+        [-68.84, -32.89],
+        [-68.54, -31.54],
+        [-66.85, -29.41],
+        [-65.78, -28.47],
+        [-65.22, -26.82],
+        [-65.41, -24.79]
+      ]
+    },
+    "ruta-14": {
+      "name": "Ruta 14 Paraná-Posadas",
+      "coordinates": [
+        [-60.52, -31.73],
+        [-58.02, -31.39],
+        [-55.90, -27.37]
+      ]
+    },
+    "ruta-12": {
+      "name": "Ruta 12 Posadas-Corrientes",
+      "coordinates": [
+        [-55.90, -27.37],
+        [-58.83, -27.47]
+      ]
+    }
+  }
+}

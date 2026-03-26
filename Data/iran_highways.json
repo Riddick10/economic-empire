@@ -1,0 +1,81 @@
+{
+  "highways": {
+    "freeway-1": {
+      "name": "Freeway 1 Tehran-Karaj-Qazvin",
+      "coordinates": [
+        [51.39, 35.69],
+        [50.99, 35.84],
+        [50.00, 36.27]
+      ]
+    },
+    "freeway-2": {
+      "name": "Freeway 2 Tehran-Isfahan",
+      "coordinates": [
+        [51.39, 35.69],
+        [50.88, 34.64],
+        [51.44, 33.98],
+        [51.68, 32.65]
+      ]
+    },
+    "tehran-mashhad": {
+      "name": "Tehran-Mashhad",
+      "coordinates": [
+        [51.39, 35.69],
+        [53.40, 35.57],
+        [54.98, 36.42],
+        [57.67, 36.22],
+        [58.82, 36.21],
+        [59.61, 36.30]
+      ]
+    },
+    "isfahan-shiraz": {
+      "name": "Isfahan-Shiraz",
+      "coordinates": [
+        [51.68, 32.65],
+        [51.88, 32.01],
+        [52.65, 31.16],
+        [52.58, 29.59]
+      ]
+    },
+    "tehran-tabriz": {
+      "name": "Tehran-Tabriz",
+      "coordinates": [
+        [51.39, 35.69],
+        [48.49, 36.67],
+        [46.30, 38.08]
+      ]
+    },
+    "bandar-abbas-highway": {
+      "name": "Bandar Abbas Highway",
+      "coordinates": [
+        [51.68, 32.65],
+        [57.08, 30.28],
+        [56.27, 27.19]
+      ]
+    },
+    "ahvaz-isfahan": {
+      "name": "Ahvaz-Isfahan",
+      "coordinates": [
+        [48.69, 31.32],
+        [50.86, 32.33],
+        [51.68, 32.65]
+      ]
+    },
+    "kerman-zahedan": {
+      "name": "Kerman-Zahedan",
+      "coordinates": [
+        [57.08, 30.28],
+        [58.36, 29.11],
+        [60.86, 29.50]
+      ]
+    },
+    "rasht-tehran": {
+      "name": "Rasht-Tehran",
+      "coordinates": [
+        [49.59, 37.28],
+        [50.00, 36.27],
+        [51.39, 35.69]
+      ]
+    }
+  }
+}

@@ -1,0 +1,1210 @@
+{
+  "USA": {
+    "oil": 1.0,
+    "naturalGas": 1.0,
+    "coal": 0.097,
+    "iron": 0.046,
+    "copper": 0.205,
+    "uranium": 0.011
+  },
+  "CAN": {
+    "oil": 0.294,
+    "naturalGas": 0.188,
+    "coal": 0.009,
+    "iron": 0.073,
+    "copper": 0.084,
+    "uranium": 0.615
+  },
+  "MEX": {
+    "oil": 0.095,
+    "naturalGas": 0.035,
+    "coal": 0.001,
+    "iron": 0.013,
+    "copper": 0.13,
+    "uranium": 0.0
+  },
+  "GTM": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CUB": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "HTI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "DOM": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "HND": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "NIC": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CRI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "PAN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.062,
+    "uranium": 0.0
+  },
+  "BRA": {
+    "oil": 0.174,
+    "naturalGas": 0.022,
+    "coal": 0.002,
+    "iron": 0.458,
+    "copper": 0.07,
+    "uranium": 0.018
+  },
+  "ARG": {
+    "oil": 0.044,
+    "naturalGas": 0.043,
+    "coal": 0.001,
+    "iron": 0.001,
+    "copper": 0.003,
+    "uranium": 0.003
+  },
+  "COL": {
+    "oil": 0.038,
+    "naturalGas": 0.011,
+    "coal": 0.017,
+    "iron": 0.0,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "VEN": {
+    "oil": 0.048,
+    "naturalGas": 0.031,
+    "coal": 0.0,
+    "iron": 0.005,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "PER": {
+    "oil": 0.006,
+    "naturalGas": 0.015,
+    "coal": 0.0,
+    "iron": 0.02,
+    "copper": 0.484,
+    "uranium": 0.0
+  },
+  "CHL": {
+    "oil": 0.001,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.019,
+    "copper": 1.0,
+    "uranium": 0.0
+  },
+  "ECU": {
+    "oil": 0.024,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.026,
+    "uranium": 0.0
+  },
+  "BOL": {
+    "oil": 0.003,
+    "naturalGas": 0.012,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "PRY": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "URY": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GUY": {
+    "oil": 0.031,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GBR": {
+    "oil": 0.032,
+    "naturalGas": 0.03,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "FRA": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "DEU": {
+    "oil": 0.002,
+    "naturalGas": 0.004,
+    "coal": 0.019,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ITA": {
+    "oil": 0.005,
+    "naturalGas": 0.003,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ESP": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.021,
+    "uranium": 0.0
+  },
+  "PRT": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.008,
+    "uranium": 0.0
+  },
+  "NLD": {
+    "oil": 0.001,
+    "naturalGas": 0.008,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BEL": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LUX": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CHE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "AUT": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "IRL": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "NOR": {
+    "oil": 0.09,
+    "naturalGas": 0.109,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "SWE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.04,
+    "copper": 0.014,
+    "uranium": 0.0
+  },
+  "FIN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.004,
+    "uranium": 0.0
+  },
+  "DNK": {
+    "oil": 0.003,
+    "naturalGas": 0.002,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ISL": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GRL": {
+    "oil": 0.002,
+    "naturalGas": 0.001,
+    "coal": 0.001,
+    "iron": 0.005,
+    "copper": 0.003,
+    "uranium": 0.008
+  },
+  "POL": {
+    "oil": 0.001,
+    "naturalGas": 0.003,
+    "coal": 0.018,
+    "iron": 0.0,
+    "copper": 0.076,
+    "uranium": 0.0
+  },
+  "UKR": {
+    "oil": 0.002,
+    "naturalGas": 0.018,
+    "coal": 0.004,
+    "iron": 0.038,
+    "copper": 0.0,
+    "uranium": 0.016
+  },
+  "CZE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.005,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ROU": {
+    "oil": 0.003,
+    "naturalGas": 0.009,
+    "coal": 0.003,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "HUN": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BLR": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BGR": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.003,
+    "iron": 0.0,
+    "copper": 0.014,
+    "uranium": 0.0
+  },
+  "SRB": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.007,
+    "iron": 0.0,
+    "copper": 0.044,
+    "uranium": 0.0
+  },
+  "HRV": {
+    "oil": 0.001,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SVK": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LTU": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LVA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "EST": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MDA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ALB": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "MKD": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "SVN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BIH": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MNE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GRC": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "RUS": {
+    "oil": 0.537,
+    "naturalGas": 0.608,
+    "coal": 0.089,
+    "iron": 0.092,
+    "copper": 0.169,
+    "uranium": 0.118
+  },
+  "KAZ": {
+    "oil": 0.09,
+    "naturalGas": 0.029,
+    "coal": 0.023,
+    "iron": 0.055,
+    "copper": 0.138,
+    "uranium": 1.0
+  },
+  "UZB": {
+    "oil": 0.002,
+    "naturalGas": 0.041,
+    "coal": 0.002,
+    "iron": 0.0,
+    "copper": 0.028,
+    "uranium": 0.172
+  },
+  "TKM": {
+    "oil": 0.014,
+    "naturalGas": 0.071,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "KGZ": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.001,
+    "uranium": 0.0
+  },
+  "TJK": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MNG": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.022,
+    "iron": 0.005,
+    "copper": 0.091,
+    "uranium": 0.004
+  },
+  "AFG": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.004,
+    "copper": 0.008,
+    "uranium": 0.0
+  },
+  "CHN": {
+    "oil": 0.214,
+    "naturalGas": 0.24,
+    "coal": 1.0,
+    "iron": 0.292,
+    "copper": 0.335,
+    "uranium": 0.069
+  },
+  "JPN": {
+    "oil": 0.001,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "KOR": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "PRK": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.005,
+    "iron": 0.003,
+    "copper": 0.002,
+    "uranium": 0.002
+  },
+  "TWN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "IDN": {
+    "oil": 0.03,
+    "naturalGas": 0.069,
+    "coal": 0.174,
+    "iron": 0.0,
+    "copper": 0.172,
+    "uranium": 0.0
+  },
+  "THA": {
+    "oil": 0.018,
+    "naturalGas": 0.028,
+    "coal": 0.003,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "VNM": {
+    "oil": 0.009,
+    "naturalGas": 0.006,
+    "coal": 0.009,
+    "iron": 0.001,
+    "copper": 0.005,
+    "uranium": 0.0
+  },
+  "MYS": {
+    "oil": 0.027,
+    "naturalGas": 0.078,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "PHL": {
+    "oil": 0.001,
+    "naturalGas": 0.001,
+    "coal": 0.002,
+    "iron": 0.0,
+    "copper": 0.011,
+    "uranium": 0.0
+  },
+  "MMR": {
+    "oil": 0.001,
+    "naturalGas": 0.014,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "KHM": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LAO": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.009,
+    "uranium": 0.0
+  },
+  "IND": {
+    "oil": 0.037,
+    "naturalGas": 0.031,
+    "coal": 0.229,
+    "iron": 0.281,
+    "copper": 0.005,
+    "uranium": 0.021
+  },
+  "PAK": {
+    "oil": 0.004,
+    "naturalGas": 0.025,
+    "coal": 0.004,
+    "iron": 0.002,
+    "copper": 0.003,
+    "uranium": 0.002
+  },
+  "BGD": {
+    "oil": 0.0,
+    "naturalGas": 0.019,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "NPL": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LKA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SAU": {
+    "oil": 0.542,
+    "naturalGas": 0.117,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.013,
+    "uranium": 0.0
+  },
+  "IRN": {
+    "oil": 0.254,
+    "naturalGas": 0.254,
+    "coal": 0.002,
+    "iron": 0.08,
+    "copper": 0.061,
+    "uranium": 0.001
+  },
+  "TUR": {
+    "oil": 0.003,
+    "naturalGas": 0.0,
+    "coal": 0.018,
+    "iron": 0.018,
+    "copper": 0.024,
+    "uranium": 0.0
+  },
+  "IRQ": {
+    "oil": 0.219,
+    "naturalGas": 0.012,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SYR": {
+    "oil": 0.002,
+    "naturalGas": 0.003,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "YEM": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "OMN": {
+    "oil": 0.049,
+    "naturalGas": 0.044,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "ARE": {
+    "oil": 0.199,
+    "naturalGas": 0.059,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "KWT": {
+    "oil": 0.134,
+    "naturalGas": 0.014,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "JOR": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.012
+  },
+  "ISR": {
+    "oil": 0.0,
+    "naturalGas": 0.021,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LBN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "QAT": {
+    "oil": 0.09,
+    "naturalGas": 0.173,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BHR": {
+    "oil": 0.002,
+    "naturalGas": 0.016,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "EGY": {
+    "oil": 0.032,
+    "naturalGas": 0.046,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LBY": {
+    "oil": 0.06,
+    "naturalGas": 0.014,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "TUN": {
+    "oil": 0.002,
+    "naturalGas": 0.002,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "DZA": {
+    "oil": 0.07,
+    "naturalGas": 0.092,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MAR": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.006,
+    "uranium": 0.0
+  },
+  "SDN": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SSD": {
+    "oil": 0.004,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "NGA": {
+    "oil": 0.08,
+    "naturalGas": 0.045,
+    "coal": 0.001,
+    "iron": 0.002,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GHA": {
+    "oil": 0.008,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CIV": {
+    "oil": 0.002,
+    "naturalGas": 0.002,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SEN": {
+    "oil": 0.0,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MLI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BFA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "NER": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.095
+  },
+  "GIN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.005,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BEN": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "TGO": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SLE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.005,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LBR": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.003,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MRT": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.014,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "GMB": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "COD": {
+    "oil": 0.001,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.586,
+    "uranium": 0.0
+  },
+  "COG": {
+    "oil": 0.013,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CMR": {
+    "oil": 0.003,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "TCD": {
+    "oil": 0.006,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "CAF": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GAB": {
+    "oil": 0.011,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "GNQ": {
+    "oil": 0.005,
+    "naturalGas": 0.003,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ETH": {
+    "oil": 0.0,
+    "naturalGas": 0.001,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "KEN": {
+    "oil": 0.002,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "TZA": {
+    "oil": 0.0,
+    "naturalGas": 0.018,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "UGA": {
+    "oil": 0.003,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "RWA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "BDI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SOM": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ERI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.003,
+    "uranium": 0.0
+  },
+  "DJI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MWI": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.002
+  },
+  "ZMB": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.13,
+    "uranium": 0.0
+  },
+  "ZWE": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.001,
+    "iron": 0.0,
+    "copper": 0.002,
+    "uranium": 0.0
+  },
+  "MOZ": {
+    "oil": 0.0,
+    "naturalGas": 0.045,
+    "coal": 0.001,
+    "iron": 0.001,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "MDG": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "ZAF": {
+    "oil": 0.001,
+    "naturalGas": 0.001,
+    "coal": 0.049,
+    "iron": 0.064,
+    "copper": 0.009,
+    "uranium": 0.009
+  },
+  "NAM": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.003,
+    "uranium": 0.315
+  },
+  "BWA": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.002,
+    "iron": 0.0,
+    "copper": 0.01,
+    "uranium": 0.0
+  },
+  "AGO": {
+    "oil": 0.06,
+    "naturalGas": 0.005,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "SWZ": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "LSO": {
+    "oil": 0.0,
+    "naturalGas": 0.0,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "AUS": {
+    "oil": 0.018,
+    "naturalGas": 0.145,
+    "coal": 0.096,
+    "iron": 1.0,
+    "copper": 0.145,
+    "uranium": 0.198
+  },
+  "NZL": {
+    "oil": 0.001,
+    "naturalGas": 0.003,
+    "coal": 0.001,
+    "iron": 0.002,
+    "copper": 0.0,
+    "uranium": 0.0
+  },
+  "PNG": {
+    "oil": 0.002,
+    "naturalGas": 0.005,
+    "coal": 0.0,
+    "iron": 0.0,
+    "copper": 0.016,
+    "uranium": 0.0
+  }
+}
