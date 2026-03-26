@@ -43,6 +43,9 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
     // Lade-Status (thread-sicher, gekapselt in LoadingState)
     internal static readonly LoadingState _loading = new();
 
+    // Custom Cursor
+    static Texture2D? _cursorTexture = null;
+
     // Textur-Caches
     static Texture2D? _mapViewIcon = null;
     static Texture2D? _resourceViewIcon = null;
@@ -103,6 +106,14 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
             Image icon = Raylib.LoadImage(iconPath);
             Raylib.SetWindowIcon(icon);
             Raylib.UnloadImage(icon);
+        }
+
+        // Custom Cursor laden
+        string cursorPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Icons", "cursor.png");
+        if (File.Exists(cursorPath))
+        {
+            _cursorTexture = Raylib.LoadTexture(cursorPath);
+            Raylib.HideCursor();
         }
 
         // Fenster maximierbar und in der Groesse aenderbar machen
@@ -169,6 +180,7 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
         if (_tutorialIcon != null) Raylib.UnloadTexture(_tutorialIcon.Value);
         if (_loadingScreenTexture != null) Raylib.UnloadTexture(_loadingScreenTexture.Value);
         if (_blastIcon != null) Raylib.UnloadTexture(_blastIcon.Value);
+        if (_cursorTexture != null) Raylib.UnloadTexture(_cursorTexture.Value);
         UnloadTextureCache(_tutorialIcons);
 
         // Sounds und Musik freigeben

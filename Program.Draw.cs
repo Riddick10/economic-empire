@@ -29,6 +29,12 @@ partial class Program
             DrawFPSCounter();
         }
 
+        // Custom Cursor zeichnen (immer ueber allem)
+        if (_cursorTexture != null)
+        {
+            Raylib.DrawTexture(_cursorTexture.Value, (int)_cachedMousePos.X, (int)_cachedMousePos.Y, Color.White);
+        }
+
         Raylib.EndDrawing();
     }
 
