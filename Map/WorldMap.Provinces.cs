@@ -107,7 +107,7 @@ public partial class WorldMap
 
         // Provinzgrenzen sind duenner und heller als Landesgrenzen
         float borderWidth = GetAdaptiveBorderWidth(0.25f);  // 25% der Landesgrenz-Dicke
-        Color borderColor = new Color((byte)60, (byte)60, (byte)80, (byte)180);  // Grau, leicht transparent
+        Color borderColor = new Color((byte)100, (byte)100, (byte)120, (byte)255);  // Hellgrau, voll sichtbar
 
         // Maximale Linienlaenge um Artefakte zu vermeiden
         float maxLineLength = MAP_WIDTH * Zoom * 0.45f;
