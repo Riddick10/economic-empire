@@ -237,7 +237,7 @@ class UIState
     public bool ShowTradeCreatePanel;
     public bool ShowEconomyRanking;
     public int EconomyRankingTab; // 0 = BIP-Rangliste, 1 = Globale Wirtschaft & Ressourcen
-    public HashSet<ResourceType> ResourceChartFilter = new(Enum.GetValues<ResourceType>()); // Aktive Ressourcen im Chart
+    public HashSet<ResourceType> ResourceChartFilter = new(); // Aktive Ressourcen im Chart (anfangs leer)
     public bool ShowFPS = true;
     public bool ShowMainMenuOptions;
 

@@ -40,7 +40,7 @@ public class Mine
     {
         return type switch
         {
-            MineType.OilWell => 5,       // Oel
+            MineType.OilWell => 10,      // Oel
             MineType.GasDrill => 6,      // Erdgas
             MineType.CoalMine => 7,      // Kohle
             MineType.IronMine => 6,      // Eisen
