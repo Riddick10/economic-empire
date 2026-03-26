@@ -270,15 +270,22 @@ public class ProductionManager : GameSystemBase
             // Provinz-Ressourcenvorkommen fuer Produktionsbonus pruefen
             var provinceDeposits = context.WorldMap.GetProvinceResources(province.Name);
 
+            // Provinz-Ressourcenwerte mit Abundance-Daten (0.0-1.0) holen
+            var provinceResValues = context.WorldMap.GetProvinceResourcesWithValues(province.Name, province.CountryId);
+
             foreach (var mine in province.Mines)
             {
                 var resourceType = Mine.GetResourceType(mine.Type);
                 double production = mine.ProductionPerDay * mine.Level;
 
-                // Produktion abhaengig vom Ressourcenvorkommen: 100% mit, 10% ohne
-                bool hasDeposit = provinceDeposits.Any(r => r.Type == resourceType);
-                if (!hasDeposit)
-                    production *= 0.1;
+                // Produktion skaliert mit Ressourcenvorkommen der Provinz (0.0-1.0)
+                // Hohe Vorkommen (1.0) = volle Produktion, niedrige (0.05) = kaum Produktion
+                float abundanceValue = 0.05f;
+                foreach (var (type, _, value) in provinceResValues)
+                {
+                    if (type == resourceType) { abundanceValue = value; break; }
+                }
+                production *= abundanceValue;
 
                 if (!mineProduction[province.CountryId].ContainsKey(resourceType))
                     mineProduction[province.CountryId][resourceType] = 0;
@@ -341,6 +348,30 @@ public class ProductionManager : GameSystemBase
     private void ProcessResourceConversion(Country country, IndustryData industry, GameContext context)
     {
         double efficiency = industry.IndustrialEfficiency;
+
+        // Fabrik-Oelverbrauch: 0.05 Oel pro Fabrik pro Tag
+        int totalFactories = industry.CivilianFactories + industry.MilitaryFactories + industry.Dockyards;
+        double oilNeeded = totalFactories * 0.01;
+        if (oilNeeded > 0)
+        {
+            double oilAvailable = country.GetResource(ResourceType.Oil);
+            double oilConsumed = Math.Min(oilNeeded, oilAvailable);
+            if (oilConsumed > 0)
+            {
+                country.UseResource(ResourceType.Oil, oilConsumed);
+                if (!country.DailyConsumption.ContainsKey(ResourceType.Oil))
+                    country.DailyConsumption[ResourceType.Oil] = 0;
+                country.DailyConsumption[ResourceType.Oil] += oilConsumed;
+            }
+
+            // Effizienz sinkt wenn nicht genug Oel vorhanden
+            if (oilAvailable < oilNeeded)
+            {
+                double oilRatio = oilNeeded > 0 ? oilAvailable / oilNeeded : 1.0;
+                // Mindestens 30% Effizienz, auch ohne Oel
+                efficiency *= 0.3 + 0.7 * oilRatio;
+            }
+        }
 
         // Tech-Bonus fuer Fabrikproduktion (nur Spieler-Land)
         double factoryTechBonus = 0;

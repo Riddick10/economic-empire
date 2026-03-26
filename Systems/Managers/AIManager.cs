@@ -192,13 +192,15 @@ public class AIManager : GameSystemBase
 
         double spent = 0;
 
-        // 1) Zivile Fabrik bauen
-        if (budgetLeft >= FactoryCost && _production != null)
+        // 1) Zivile Fabrik bauen (benoetigt Budget + 5 Maschinen)
+        double machineryStock = country.Stockpile.GetValueOrDefault(ResourceType.Machinery, 0);
+        if (budgetLeft >= FactoryCost && machineryStock >= 5 && _production != null)
         {
             var province = GetRandomOwnedProvince(countryId, context);
             if (province != null)
             {
                 country.Budget -= FactoryCost;
+                country.UseResource(ResourceType.Machinery, 5);
                 _production.BuildFactory(countryId, FactoryType.Civilian);
                 province.CivilianFactories += 10;
                 spent += FactoryCost;

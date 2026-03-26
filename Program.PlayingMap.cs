@@ -377,7 +377,7 @@ partial class Program
             // Ressourcen-Icon (kleines Quadrat mit Farbe)
             Color indicatorColor = type switch
             {
-                ResourceType.Oil => new Color((byte)40, (byte)40, (byte)40, (byte)255),
+                ResourceType.Oil => new Color((byte)0, (byte)0, (byte)0, (byte)255),
                 ResourceType.NaturalGas => new Color((byte)100, (byte)180, (byte)255, (byte)255),
                 ResourceType.Coal => new Color((byte)80, (byte)80, (byte)80, (byte)255),
                 ResourceType.Iron => new Color((byte)180, (byte)120, (byte)80, (byte)255),
@@ -561,7 +561,7 @@ partial class Program
             // Farb-Indikator (kleines Quadrat)
             Color indicatorColor = type switch
             {
-                ResourceType.Oil => new Color((byte)40, (byte)40, (byte)40, (byte)255),
+                ResourceType.Oil => new Color((byte)0, (byte)0, (byte)0, (byte)255),
                 ResourceType.NaturalGas => new Color((byte)100, (byte)180, (byte)255, (byte)255),
                 ResourceType.Coal => new Color((byte)80, (byte)80, (byte)80, (byte)255),
                 ResourceType.Iron => new Color((byte)180, (byte)120, (byte)80, (byte)255),

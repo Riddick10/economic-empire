@@ -849,6 +849,9 @@ partial class Program
         double civilianCost = 1_000;      // 1 Mrd.
         double militaryCost = 1_500;      // 1.5 Mrd.
         double dockyardCost = 900;        // 900 Mio.
+        int machineryCost = 5;            // 5 Maschinen pro Fabrik
+        double machineryStock = player.Stockpile.GetValueOrDefault(ResourceType.Machinery, 0);
+        bool hasMachinery = machineryStock >= machineryCost;
 
         bool DrawFactoryButton(int bx, int by, int bw, int bh, string label, double cost, bool canAfford)
         {
@@ -869,13 +872,18 @@ partial class Program
             return isHovered && canAfford && Raylib.IsMouseButtonPressed(MouseButton.Left);
         }
 
+        // Maschinen-Kosten anzeigen
+        DrawGameText($"Benoetigt: {machineryCost} Maschinen (Lager: {machineryStock:F1})", contentX, y, 12,
+            hasMachinery ? ColorPalette.Green : ColorPalette.Red);
+        y += 18;
+
         int btnW = 78;
         int btnH = 34;
         int btnSpacing = 6;
 
-        bool canAffordCivilian = player.Budget >= civilianCost;
-        bool canAffordMilitary = player.Budget >= militaryCost;
-        bool canAffordDockyard = player.Budget >= dockyardCost;
+        bool canAffordCivilian = player.Budget >= civilianCost && hasMachinery;
+        bool canAffordMilitary = player.Budget >= militaryCost && hasMachinery;
+        bool canAffordDockyard = player.Budget >= dockyardCost && hasMachinery;
 
         if (DrawFactoryButton(contentX, y, btnW, btnH, "Zivil", civilianCost, canAffordCivilian))
         {

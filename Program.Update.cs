@@ -395,9 +395,11 @@ partial class Program
                         _ => 0
                     };
 
-                    if (game.PlayerCountry.Budget >= cost)
+                    double machineryStock = game.PlayerCountry.Stockpile.GetValueOrDefault(ResourceType.Machinery, 0);
+                    if (game.PlayerCountry.Budget >= cost && machineryStock >= 5)
                     {
                         game.PlayerCountry.Budget -= cost;
+                        game.PlayerCountry.UseResource(ResourceType.Machinery, 5);
                         SoundManager.Play(SoundEffect.Coin);
                         SoundManager.Play(SoundEffect.Build);
 
@@ -423,7 +425,7 @@ partial class Program
                     }
                     else
                     {
-                        // Nicht genug Budget - Bau-Modus trotzdem beenden
+                        // Nicht genug Budget oder Maschinen - Bau-Modus trotzdem beenden
                         ui.FactoryBuildMode = null;
                         return;
                     }

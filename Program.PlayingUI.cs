@@ -939,7 +939,7 @@ partial class Program
     /// </summary>
     static readonly Dictionary<ResourceType, Color> ResourceChartColors = new()
     {
-        { ResourceType.Oil,          new Color((byte)40,  (byte)40,  (byte)40,  (byte)255) },  // Dunkelgrau (Erdoel)
+        { ResourceType.Oil,          new Color((byte)0,  (byte)0,  (byte)0,  (byte)255) },  // Schwarz (Erdoel)
         { ResourceType.NaturalGas,   new Color((byte)100, (byte)180, (byte)255, (byte)255) },  // Hellblau
         { ResourceType.Coal,         new Color((byte)120, (byte)100, (byte)80,  (byte)255) },  // Braun
         { ResourceType.Iron,         new Color((byte)180, (byte)180, (byte)190, (byte)255) },  // Silber
