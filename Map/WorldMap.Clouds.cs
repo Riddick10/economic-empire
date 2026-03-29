@@ -21,12 +21,12 @@ public partial class WorldMap
 
     // Wolkenschicht-Konfiguration
     private static readonly CloudLayerConfig[] CloudLayers = {
-        // Hohe Cirrus-Wolken: duenne Schleierwolken, schnell
-        new(NoiseScale: 2.2f, Octaves: 3, SpeedX: 0.0022f, SpeedY: 0.0003f, BaseAlpha: 0.20f, Threshold: 0.51f),
-        // Mittlere Cumulus-Wolken: Hauptschicht, deutlich sichtbar
-        new(NoiseScale: 4.5f, Octaves: 5, SpeedX: 0.0011f, SpeedY: -0.0005f, BaseAlpha: 0.35f, Threshold: 0.48f),
-        // Niedrige Stratus-Wolken: grosse langsame Formationen
-        new(NoiseScale: 7.0f, Octaves: 5, SpeedX: 0.0006f, SpeedY: 0.0004f, BaseAlpha: 0.25f, Threshold: 0.54f),
+        // Kleine Cumulus-Wolken: einzelne Woelkchen, schnell
+        new(NoiseScale: 2.5f, Octaves: 4, SpeedX: 0.0022f, SpeedY: -0.0003f, BaseAlpha: 0.22f, Threshold: 0.68f),
+        // Mittlere Cumulus: Hauptschicht mit klaren Formen
+        new(NoiseScale: 5.0f, Octaves: 4, SpeedX: 0.0011f, SpeedY: -0.0004f, BaseAlpha: 0.30f, Threshold: 0.62f),
+        // Grosse Wolkenfelder: breite zusammenhaengende Formationen
+        new(NoiseScale: 10.0f, Octaves: 3, SpeedX: 0.0004f, SpeedY: 0.0002f, BaseAlpha: 0.20f, Threshold: 0.65f),
     };
 
     private record struct CloudLayerConfig(
@@ -43,18 +43,18 @@ public partial class WorldMap
         {
             Console.WriteLine("[Clouds] Generiere Wolken-Texturen...");
 
-            int texW = 512;
-            int texH = 256;
+            int texW = 2048;
+            int texH = 1024;
             _cloudTextures = new Texture2D[CloudLayers.Length];
 
             for (int layer = 0; layer < CloudLayers.Length; layer++)
             {
                 var cfg = CloudLayers[layer];
 
-                // Seed pro Schicht stark variieren fuer unterschiedliche Muster
-                float seedX = layer * 173.7f + 31.1f;
-                float seedY = layer * 251.3f + 67.9f;
-                float seedZ = layer * 89.1f + 149.3f;
+                // Stark unterschiedliche Seeds pro Schicht fuer maximale Formenvielfalt
+                float seedX = layer * 347.3f + 31.1f + MathF.Sin(layer * 7.13f) * 200f;
+                float seedY = layer * 521.7f + 67.9f + MathF.Cos(layer * 11.37f) * 200f;
+                float seedZ = layer * 193.9f + 149.3f + MathF.Sin(layer * 3.71f) * 200f;
 
                 // CPU-seitiges Image erstellen
                 Image img = Raylib.GenImageColor(texW, texH, Color.Blank);
@@ -78,28 +78,26 @@ public partial class WorldMap
                             float nz = MathF.Sin(angle) * r;
                             float ny = v * r * 2f;
 
-                            // Domain-Warping: Noise verzerrt die Koordinaten fuer unregelmaessigere Formen
-                            float warpStrength = 1.2f;
+                            // Moderates Domain-Warping: natuerliche Unregelmaessigkeit ohne Rauch
                             float warpX = CloudNoise.FractalNoise(
                                 nx + seedX + 5.2f, ny + seedY + 1.3f, nz + seedZ,
-                                2, 0.5f, 2.0f) * warpStrength;
+                                2, 0.5f, 2.0f) * 0.65f;
                             float warpY = CloudNoise.FractalNoise(
                                 nx + seedX + 9.7f, ny + seedY + 4.8f, nz + seedZ + 3.1f,
-                                2, 0.5f, 2.0f) * warpStrength;
+                                2, 0.5f, 2.0f) * 0.65f;
 
-                            // Fraktales Noise mit verzerrten Koordinaten
-                            float noise = CloudNoise.FractalNoise(
+                            // Billowy Noise: runde aufgetuermte Cumulus-Formen
+                            float noise = CloudNoise.BillowNoise(
                                 nx + seedX + warpX, ny + seedY + warpY, nz + seedZ,
                                 cfg.Octaves, 0.5f, 2.0f);
 
-                            // Normalisieren [-1,1] -> [0,1]
-                            float density = (noise + 1f) * 0.5f;
+                            float density = noise; // bereits [0,1]
 
-                            // Schwellenwert anwenden (erzeugt klare Luecken zwischen Wolken)
+                            // Schwellenwert anwenden
                             density = Math.Clamp((density - cfg.Threshold) / (1f - cfg.Threshold), 0f, 1f);
 
-                            // Steilere Kurve: dichter Kern, duenne Raender
-                            density = MathF.Pow(density, 1.5f);
+                            // Smoothstep: saubere Wolkenraender mit natuerlichem Dichteabfall
+                            density = density * density * (3f - 2f * density);
 
                             // Polregionen abdunkeln (weniger Wolken an den Raendern)
                             float polarFade = 1f - MathF.Pow(MathF.Abs(v - 0.5f) * 2f, 3f);
@@ -305,6 +303,26 @@ public partial class WorldMap
                 frequency *= lacunarity;
             }
 
+            return total / maxValue;
+        }
+
+        /// <summary>
+        /// Billowy Noise: 1 - |noise|, dann quadriert pro Oktave
+        /// Erzeugt runde, aufgetuermte Cumulus-artige Wolkenformen [0, 1]
+        /// </summary>
+        public static float BillowNoise(float x, float y, float z, int octaves, float persistence, float lacunarity)
+        {
+            float total = 0f, amplitude = 1f, frequency = 1f, maxValue = 0f;
+            for (int i = 0; i < octaves; i++)
+            {
+                float n = Noise3D(x * frequency, y * frequency, z * frequency);
+                n = 1f - MathF.Abs(n);
+                n *= n;
+                total += n * amplitude;
+                maxValue += amplitude;
+                amplitude *= persistence;
+                frequency *= lacunarity;
+            }
             return total / maxValue;
         }
     }
