@@ -85,7 +85,7 @@ partial class Program
             {
                 fixed (int* codepointsPtr = codepointArray)
                 {
-                    _gameFont = Raylib.LoadFontEx((sbyte*)fileNamePtr, 48, codepointsPtr, codepointArray.Length);
+                    _gameFont = Raylib.LoadFontEx((sbyte*)fileNamePtr, 96, codepointsPtr, codepointArray.Length);
                 }
             }
         }
@@ -95,7 +95,7 @@ partial class Program
         }
 
         // Point-Filter für scharfe Pixel-Schrift (VCR OSD Mono Retro-Look)
-        Raylib.SetTextureFilter(_gameFont.Texture, TextureFilter.Point);
+        Raylib.SetTextureFilter(_gameFont.Texture, TextureFilter.Bilinear);
 
         _fontLoaded = true;
         Console.WriteLine($"[Font] Geladen: {foundPath} ({codepointArray.Length} Zeichen)");
@@ -121,7 +121,7 @@ partial class Program
         if (_fontLoaded)
         {
             // Custom Font verwenden
-            float scale = fontSize / 48f; // Basis-Größe ist 48
+            float scale = fontSize / 96f; // Basis-Größe ist 48
             Raylib.DrawTextEx(_gameFont, text, new Vector2(x, y), fontSize, scale, color);
         }
         else
@@ -138,7 +138,7 @@ partial class Program
     {
         if (_fontLoaded)
         {
-            float scale = fontSize / 48f;
+            float scale = fontSize / 96f;
             Vector2 size = Raylib.MeasureTextEx(_gameFont, text, fontSize, scale);
             return (int)size.X;
         }

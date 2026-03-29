@@ -235,11 +235,10 @@ partial class Program
         }
 
         // Land auswaehlen mit linker Maustaste - nur wenn nicht ueber UI
+        // (Provinz-Auswahl wird in der Panel-Logik weiter unten behandelt)
         if (Raylib.IsMouseButtonPressed(MouseButton.Left) && ui.HoveredCountryId != null && !overUI)
         {
             ui.SelectedCountryId = ui.HoveredCountryId;
-            // Provinz auch auswaehlen falls vorhanden
-            ui.SelectedProvinceId = ui.HoveredProvinceId;
         }
     }
 
@@ -593,9 +592,12 @@ partial class Program
             {
                 if (ui.ShowProvincePanel && ui.SelectedProvinceId == ui.HoveredProvinceId)
                 {
-                    // Gleiches Panel schliessen
+                    // Gleiches Panel schliessen - alles abwaehlen
                     ui.ShowProvincePanel = false;
                     ui.SelectedProvinceId = null;
+                    ui.SelectedCountryId = null;
+                    ui.ShowPoliticsPanel = false;
+                    ui.PoliticsPanelCountryId = null;
                 }
                 else
                 {
@@ -604,12 +606,11 @@ partial class Program
                     ui.SelectedProvinceId = ui.HoveredProvinceId;
                     // Politik-Panel schliessen
                     ui.ShowPoliticsPanel = false;
+                    ui.PoliticsPanelCountryId = null;
+                    // SelectedCountryId auf das Land der angeklickten Provinz setzen
+                    if (ui.HoveredCountryId != null)
+                        ui.SelectedCountryId = ui.HoveredCountryId;
                 }
-                // SelectedCountryId auf das Land der angeklickten Provinz setzen
-                // (wichtig fuer Kriegserklaerung - Land muss ausgewaehlt bleiben)
-                if (ui.HoveredCountryId != null)
-                    ui.SelectedCountryId = ui.HoveredCountryId;
-                ui.PoliticsPanelCountryId = null;
             }
             else if (ui.HoveredCountryId == null && !IsMouseOverUI())
             {

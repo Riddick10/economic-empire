@@ -83,17 +83,11 @@ partial class Program
         int x = 10;
         int y = TOP_MENU_START_Y;
 
-        // 7 Buttons pruefen (News-Button ist unten rechts separat)
-        for (int i = 0; i < 7; i++)
-        {
-            Rectangle btnRect = new Rectangle(x, y, TOP_MENU_BTN_SIZE, TOP_MENU_BTN_SIZE);
-            if (Raylib.CheckCollisionPointRec(mousePos, btnRect))
-            {
-                return true;
-            }
-            x += TOP_MENU_BTN_SIZE + TOP_MENU_BTN_SPACING;
-        }
-        return false;
+        // Alle Buttons pruefen (News-Button ist unten rechts separat)
+        int totalButtons = TopMenuButtons.Length;
+        int totalWidth = totalButtons * TOP_MENU_BTN_SIZE + (totalButtons - 1) * TOP_MENU_BTN_SPACING;
+        Rectangle allButtonsRect = new Rectangle(x, y, totalWidth, TOP_MENU_BTN_SIZE);
+        return Raylib.CheckCollisionPointRec(mousePos, allButtonsRect);
     }
 
     /// <summary>
