@@ -417,8 +417,9 @@ public partial class WorldMap
         // Terrain-Overlay zeichnen (Relief-Shading fuer 3D-Effekt)
         DrawTerrainOverlay();
 
-        // Wolken-Overlay zeichnen (atmosphaerischer Effekt)
-        DrawCloudOverlay();
+        // Wolken-Overlay nur in der politischen Kartenansicht zeichnen
+        if (viewMode == MapViewMode.Political)
+            DrawCloudOverlay();
 
         // Fluesse zeichnen (ueber Land, aber unter Grenzen)
         if (ShowRivers)

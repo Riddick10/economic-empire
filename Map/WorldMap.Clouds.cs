@@ -22,11 +22,11 @@ public partial class WorldMap
     // Wolkenschicht-Konfiguration
     private static readonly CloudLayerConfig[] CloudLayers = {
         // Hohe Cirrus-Wolken: duenne Schleierwolken, schnell
-        new(NoiseScale: 2.2f, Octaves: 3, SpeedX: 0.0022f, SpeedY: 0.0003f, BaseAlpha: 0.20f, Threshold: 0.58f),
+        new(NoiseScale: 2.2f, Octaves: 3, SpeedX: 0.0022f, SpeedY: 0.0003f, BaseAlpha: 0.20f, Threshold: 0.51f),
         // Mittlere Cumulus-Wolken: Hauptschicht, deutlich sichtbar
-        new(NoiseScale: 4.5f, Octaves: 5, SpeedX: 0.0011f, SpeedY: -0.0005f, BaseAlpha: 0.35f, Threshold: 0.55f),
+        new(NoiseScale: 4.5f, Octaves: 5, SpeedX: 0.0011f, SpeedY: -0.0005f, BaseAlpha: 0.35f, Threshold: 0.48f),
         // Niedrige Stratus-Wolken: grosse langsame Formationen
-        new(NoiseScale: 7.0f, Octaves: 5, SpeedX: 0.0006f, SpeedY: 0.0004f, BaseAlpha: 0.25f, Threshold: 0.62f),
+        new(NoiseScale: 7.0f, Octaves: 5, SpeedX: 0.0006f, SpeedY: 0.0004f, BaseAlpha: 0.25f, Threshold: 0.54f),
     };
 
     private record struct CloudLayerConfig(
