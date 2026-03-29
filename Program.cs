@@ -30,6 +30,10 @@ partial class Program
     internal static MusicManager musicManager = new MusicManager();
     internal static bool shouldQuit = false;
 
+    // Quickstart-Modus: Ueberspringt Hauptmenue und startet direkt mit gewaehltem Land
+    // Starten mit: dotnet run -- --quickstart RUS
+    internal static string? QuickstartCountryId = null;
+
     // UI-State (gruppiert alle UI-bezogenen Zustaende)
     internal static readonly UIState ui = new();
 
@@ -93,6 +97,17 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
 
     static void Main(string[] args)
     {
+        // Quickstart-Argument pruefen: --quickstart RUS
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i] == "--quickstart")
+            {
+                QuickstartCountryId = args[i + 1].ToUpperInvariant();
+                Console.WriteLine($"[Quickstart] Starte direkt mit Land: {QuickstartCountryId}");
+                break;
+            }
+        }
+
         // Fenster mit Standardgroesse erstellen
         Raylib.InitWindow(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT, "Economic Empire");
 

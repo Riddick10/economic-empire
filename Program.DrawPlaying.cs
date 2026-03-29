@@ -22,6 +22,9 @@ partial class Program
         if (game.PlayerCountry == null) return;
         var player = game.PlayerCountry;
 
+        // Wolken-Spielzeit setzen (fuer Animation synchron mit Spielzeit)
+        worldMap.CloudGameTime = (float)(game.TotalHours + game.Minute / 60.0);
+
         // Weltkarte als Hintergrund
         worldMap.Draw(ui.HoveredCountryId, ui.SelectedCountryId, player.Id, ui.SelectedProvinceId, ui.HoveredProvinceId, ui.CurrentMapView, ui.HeatmapResource);
 

@@ -320,6 +320,7 @@ public partial class WorldMap
 
     // Flag fuer einmaliges Terrain-Laden im Hauptthread
     private bool _terrainInitAttempted = false;
+    // Flag fuer einmaliges Wolken-Generieren wird in WorldMap.Clouds.cs definiert
 
     /// <summary>
     /// Zeichnet die gesamte Weltkarte
@@ -331,6 +332,13 @@ public partial class WorldMap
         {
             _terrainInitAttempted = true;
             LoadTerrainTextures();
+        }
+
+        // Lazy Loading: Wolken-Texturen beim ersten Draw generieren
+        if (!_cloudsInitAttempted)
+        {
+            _cloudsInitAttempted = true;
+            GenerateCloudTextures();
         }
 
         // Hintergrund (Ozean-Gradient)
@@ -408,6 +416,9 @@ public partial class WorldMap
 
         // Terrain-Overlay zeichnen (Relief-Shading fuer 3D-Effekt)
         DrawTerrainOverlay();
+
+        // Wolken-Overlay zeichnen (atmosphaerischer Effekt)
+        DrawCloudOverlay();
 
         // Fluesse zeichnen (ueber Land, aber unter Grenzen)
         if (ShowRivers)

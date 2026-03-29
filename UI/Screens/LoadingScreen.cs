@@ -31,6 +31,32 @@ internal class LoadingScreen : IGameScreen
             // Sounds starten (Musik laeuft bereits)
             SoundManager.Initialize();
 
+            // Quickstart: Direkt ins Spiel mit gewaehltem Land
+            // (via GameQuickstart.cs oder --quickstart Argument)
+            string? quickstartId = Program.QuickstartCountryId ??
+                (GameQuickstart.Enabled ? GameQuickstart.CountryId : null);
+            if (quickstartId != null)
+            {
+                if (Program.game.SelectPlayerCountry(quickstartId))
+                {
+                    Program.worldMap.DayNightCycleEnabled = Program.ui.MainMenuDayNightCycleEnabled;
+                    Program.worldMap.Zoom = 2.0f;
+                    Program.worldMap.CenterOnCountry(quickstartId, Program.ScreenWidth, Program.ScreenHeight);
+                    Program.currentScreen = GameScreen.Playing;
+                    Console.WriteLine($"[Quickstart] Spiel gestartet mit {quickstartId}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Quickstart] Land '{quickstartId}' nicht gefunden! Starte Hauptmenue.");
+                    Program.worldMap.Zoom = 2.0f;
+                    Program.worldMap.CenterOnCountry("DEU", Program.ScreenWidth, Program.ScreenHeight);
+                    Program.currentScreen = GameScreen.MainMenu;
+                }
+                Program.QuickstartCountryId = null; // Einmalig
+                GameQuickstart.Enabled = false;
+                return;
+            }
+
             // Initial auf Europa zoomen und zentrieren
             Program.worldMap.Zoom = 2.0f;
             Program.worldMap.CenterOnCountry("DEU", Program.ScreenWidth, Program.ScreenHeight);

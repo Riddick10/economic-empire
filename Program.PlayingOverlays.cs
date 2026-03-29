@@ -350,6 +350,28 @@ partial class Program
         int statusW = MeasureTextCached(toggleStatus, 16);
         DrawGameText(toggleStatus, toggleX - statusW - 10, toggleY + 1, 16, toggleStatusColor);
 
+        // Wolken Toggle
+        int cloudToggleY = toggleY + 38;
+        DrawGameText("Wolken", sliderX, cloudToggleY, 18, ColorPalette.TextWhite);
+
+        int cloudToggleX = menuX + menuW - 40 - toggleW;
+        Rectangle cloudToggleRect = new Rectangle(cloudToggleX, cloudToggleY - 2, toggleW, toggleH);
+        bool hoverCloudToggle = Raylib.CheckCollisionPointRec(mousePos, cloudToggleRect);
+        bool cloudsOn = worldMap.ShowClouds;
+
+        Color cloudToggleBg = cloudsOn ? ColorPalette.Accent : ColorPalette.Background;
+        Raylib.DrawRectangleRec(cloudToggleRect, cloudToggleBg);
+        Raylib.DrawRectangleLinesEx(cloudToggleRect, 1, cloudsOn ? ColorPalette.Accent : ColorPalette.PanelLight);
+
+        int cloudKnobX = cloudsOn ? cloudToggleX + toggleW - knobW : cloudToggleX;
+        Raylib.DrawRectangle(cloudKnobX, (int)cloudToggleRect.Y, knobW, toggleH, hoverCloudToggle ? ColorPalette.TextWhite : ColorPalette.PanelLight);
+        Raylib.DrawRectangleLinesEx(new Rectangle(cloudKnobX, cloudToggleRect.Y, knobW, toggleH), 1, ColorPalette.TextWhite);
+
+        string cloudStatus = cloudsOn ? "AN" : "AUS";
+        Color cloudStatusColor = cloudsOn ? new Color((byte)100, (byte)255, (byte)100, (byte)255) : ColorPalette.TextGray;
+        int cloudStatusW = MeasureTextCached(cloudStatus, 16);
+        DrawGameText(cloudStatus, cloudToggleX - cloudStatusW - 10, cloudToggleY + 1, 16, cloudStatusColor);
+
         // Zurueck-Button
         int backBtnW = 360;
         int backBtnH = 50;

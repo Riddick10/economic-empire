@@ -831,6 +831,11 @@ partial class Program
             int toggleX = menuX + menuW - 40 - toggleW;
             Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
 
+            // Wolken Toggle
+            int cloudToggleY = toggleY + 38;
+            int cloudToggleX = menuX + menuW - 40 - toggleW;
+            Rectangle cloudToggleRect = new Rectangle(cloudToggleX, cloudToggleY - 2, toggleW, toggleH);
+
             // Musik-Slider-Interaktion
             if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, musicSliderRect))
             {
@@ -878,6 +883,11 @@ partial class Program
                 else if (Raylib.CheckCollisionPointRec(mousePos, toggleRect))
                 {
                     worldMap.DayNightCycleEnabled = !worldMap.DayNightCycleEnabled;
+                    SoundManager.Play(SoundEffect.Click);
+                }
+                else if (Raylib.CheckCollisionPointRec(mousePos, cloudToggleRect))
+                {
+                    worldMap.ShowClouds = !worldMap.ShowClouds;
                     SoundManager.Play(SoundEffect.Click);
                 }
             }
