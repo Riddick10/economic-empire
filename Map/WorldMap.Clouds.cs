@@ -21,12 +21,12 @@ public partial class WorldMap
 
     // Wolkenschicht-Konfiguration
     private static readonly CloudLayerConfig[] CloudLayers = {
-        // Kleine Cumulus-Wolken: einzelne Woelkchen, schnell
-        new(NoiseScale: 2.5f, Octaves: 4, SpeedX: 0.0022f, SpeedY: -0.0003f, BaseAlpha: 0.22f, Threshold: 0.68f),
-        // Mittlere Cumulus: Hauptschicht mit klaren Formen
-        new(NoiseScale: 5.0f, Octaves: 4, SpeedX: 0.0011f, SpeedY: -0.0004f, BaseAlpha: 0.30f, Threshold: 0.62f),
-        // Grosse Wolkenfelder: breite zusammenhaengende Formationen
-        new(NoiseScale: 10.0f, Octaves: 3, SpeedX: 0.0004f, SpeedY: 0.0002f, BaseAlpha: 0.20f, Threshold: 0.65f),
+        // Kleine Cumulus-Wolken: feine Details, viele Oktaven
+        new(NoiseScale: 2.5f, Octaves: 5, SpeedX: 0.0012f, SpeedY: -0.0002f, BaseAlpha: 0.25f, Threshold: 0.35f),
+        // Mittlere Cumulus: Hauptschicht, breite runde Formen
+        new(NoiseScale: 5.0f, Octaves: 3, SpeedX: 0.0010f, SpeedY: -0.0003f, BaseAlpha: 0.35f, Threshold: 0.30f),
+        // Grosse Wolkenfelder: grob, wenig Detail, massiv
+        new(NoiseScale: 10.0f, Octaves: 2, SpeedX: 0.0008f, SpeedY: 0.0001f, BaseAlpha: 0.22f, Threshold: 0.32f),
     };
 
     private record struct CloudLayerConfig(
@@ -78,25 +78,34 @@ public partial class WorldMap
                             float nz = MathF.Sin(angle) * r;
                             float ny = v * r * 2f;
 
-                            // Moderates Domain-Warping: natuerliche Unregelmaessigkeit ohne Rauch
+                            // Minimales Warping: nur leichte Unregelmaessigkeit, kein Rauch
                             float warpX = CloudNoise.FractalNoise(
                                 nx + seedX + 5.2f, ny + seedY + 1.3f, nz + seedZ,
-                                2, 0.5f, 2.0f) * 0.65f;
+                                2, 0.5f, 2.0f) * 0.3f;
                             float warpY = CloudNoise.FractalNoise(
                                 nx + seedX + 9.7f, ny + seedY + 4.8f, nz + seedZ + 3.1f,
-                                2, 0.5f, 2.0f) * 0.65f;
+                                2, 0.5f, 2.0f) * 0.3f;
 
-                            // Billowy Noise: runde aufgetuermte Cumulus-Formen
-                            float noise = CloudNoise.BillowNoise(
+                            // Detail-Wolken: Billowy Noise fuer runde puffige Formen
+                            float detail = CloudNoise.BillowNoise(
                                 nx + seedX + warpX, ny + seedY + warpY, nz + seedZ,
                                 cfg.Octaves, 0.5f, 2.0f);
 
-                            float density = noise; // bereits [0,1]
+                            // Grobe Wolkengruppen: niederfrequentes Billowy Noise
+                            // definiert WO Wolken sein duerfen (grosse Cluster)
+                            float groups = CloudNoise.BillowNoise(
+                                nx * 0.4f + seedX + 47.3f, ny * 0.4f + seedY + 23.1f, nz * 0.4f + seedZ + 11.7f,
+                                2, 0.5f, 2.0f);
+
+                            // Multiplizieren: Wolken nur wo BEIDE Noise-Werte hoch sind
+                            // → natuerliches Clustering, grosse wolkenlose Bereiche
+                            float density = detail * groups;
 
                             // Schwellenwert anwenden
                             density = Math.Clamp((density - cfg.Threshold) / (1f - cfg.Threshold), 0f, 1f);
 
-                            // Smoothstep: saubere Wolkenraender mit natuerlichem Dichteabfall
+                            // Doppelter Smoothstep: scharfe, saubere Wolkenraender
+                            density = density * density * (3f - 2f * density);
                             density = density * density * (3f - 2f * density);
 
                             // Polregionen abdunkeln (weniger Wolken an den Raendern)
@@ -142,7 +151,7 @@ public partial class WorldMap
 
         // Bei hohem Zoom ausblenden (Provinz-Ebene)
         float zoomFade = 1.0f;
-        if (Zoom >= 6.0f)
+        if (Zoom >= 12.0f)
             zoomFade = Math.Clamp(1.0f - (Zoom - 6.0f) / 4.0f, 0.0f, 1.0f);
         if (zoomFade <= 0.01f) return;
 
