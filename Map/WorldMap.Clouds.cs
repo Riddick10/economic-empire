@@ -27,9 +27,9 @@ public partial class WorldMap
 
     // Zoom-Schwellen fuer die Uebergaenge
     private const float MACRO_FULL = 1.5f;    // Macro voll sichtbar
-    private const float MACRO_FADE_END = 4.0f; // Macro komplett ausgeblendet
-    private const float DETAIL_FADE_IN = 2.5f; // Detail beginnt einzublenden
-    private const float DETAIL_FULL = 4.5f;    // Detail voll sichtbar
+    private const float MACRO_FADE_END = 6.0f; // Macro komplett ausgeblendet
+    private const float DETAIL_FADE_IN = 5.0f; // Detail beginnt einzublenden
+    private const float DETAIL_FULL = 7.0f;    // Detail voll sichtbar
     private const float DETAIL_FADE_OUT = 12.0f; // Detail beginnt auszublenden
     private const float DETAIL_GONE = 18.0f;   // Detail komplett weg
 
