@@ -40,12 +40,12 @@ public partial class WorldMap
 
     // Detail-Wolken Konfiguration (aktuelle Wolken bei mittlerem Zoom)
     private static readonly CloudLayerConfig[] DetailLayers = {
-        // Kleine Cumulus-Wolken
-        new(NoiseScale: 2.5f, Octaves: 5, SpeedX: 0.0012f, SpeedY: -0.0002f, BaseAlpha: 0.25f, Threshold: 0.35f),
-        // Mittlere Cumulus: Hauptschicht
-        new(NoiseScale: 5.0f, Octaves: 3, SpeedX: 0.0010f, SpeedY: -0.0003f, BaseAlpha: 0.35f, Threshold: 0.30f),
-        // Grosse Wolkenfelder
-        new(NoiseScale: 10.0f, Octaves: 2, SpeedX: 0.0008f, SpeedY: 0.0001f, BaseAlpha: 0.22f, Threshold: 0.32f),
+        // Winzige Cumulus-Woelkchen
+        new(NoiseScale: 1.0f, Octaves: 4, SpeedX: 0.0012f, SpeedY: -0.0002f, BaseAlpha: 0.25f, Threshold: 0.35f),
+        // Kleine Cumulus: Hauptschicht
+        new(NoiseScale: 2.0f, Octaves: 3, SpeedX: 0.0010f, SpeedY: -0.0003f, BaseAlpha: 0.35f, Threshold: 0.30f),
+        // Mittlere Wolkenfelder
+        new(NoiseScale: 4.0f, Octaves: 2, SpeedX: 0.0008f, SpeedY: 0.0001f, BaseAlpha: 0.22f, Threshold: 0.32f),
     };
 
     private record struct CloudLayerConfig(
