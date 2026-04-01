@@ -152,7 +152,7 @@ public partial class WorldMap
         // Bei hohem Zoom ausblenden (Provinz-Ebene)
         float zoomFade = 1.0f;
         if (Zoom >= 12.0f)
-            zoomFade = Math.Clamp(1.0f - (Zoom - 6.0f) / 4.0f, 0.0f, 1.0f);
+            zoomFade = Math.Clamp(1.0f - (Zoom - 12.0f) / 6.0f, 0.0f, 1.0f);
         if (zoomFade <= 0.01f) return;
 
         // Bei sehr niedrigem Zoom leicht reduzieren
