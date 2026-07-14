@@ -94,6 +94,7 @@ _systemManager.RegisterSystem(new MilitaryManager());
         _systemManager.RegisterSystem(new NotificationManager());
         _systemManager.RegisterSystem(new TechTreeManager());
         _systemManager.RegisterSystem(new ConflictManager());
+        _systemManager.RegisterSystem(new MissionManager());
         _systemManager.RegisterSystem(new AIManager());
 
         // Systeme initialisieren

@@ -5,7 +5,7 @@ Ein Grand-Strategy-Wirtschaftssimulator inspiriert von Europa Universalis und He
 ## Voraussetzungen
 
 - .NET 10.0 SDK
-- Windows
+- Windows oder Linux
 
 ## Bauen & Starten
 
@@ -14,6 +14,8 @@ dotnet build
 dotnet run
 ```
 
+Unter Linux alternativ einfach `./start-linux.sh` ausführen (nutzt das SDK unter `~/.dotnet`).
+
 ## Steuerung
 
 | Taste | Aktion |
@@ -21,13 +23,22 @@ dotnet run
 | Leertaste | Pause/Fortsetzen |
 | +/- | Geschwindigkeit |
 | ESC | Pause-Menü |
+| F3 | FPS-Anzeige |
 | F5 | Speicher-Panel |
 | F9 | Schnellspeichern |
+| F11 | Vollbild umschalten |
 | 1-8 | Panels öffnen |
 | WASD | Karte verschieben |
 | Mausrad | Zoomen |
 | Linksklick | Provinz auswählen |
 | Rechtsklick | Land-Infos |
+
+## Features (Auswahl)
+
+- **Autosave**: Alle 90 Spieltage wird automatisch in einen eigenen Autosave-Slot gespeichert (im Lade-Menü sichtbar)
+- **Missionen**: 10 Ziele (Wirtschaft, Bildung, Militär, Forschung …) mit Erfolgs-Benachrichtigungen
+- **Haushaltspolitik**: Defizit-Slider im Finanzen-Panel — von Sparkurs (Überschuss tilgt Schulden) bis expansiv
+- **Vollständige Spielstände**: Eroberungen, Kriege, Politik-Stabilität, Demografie und Diagramm-Historie werden gespeichert (Save-Version 3, alte Spielstände bleiben ladbar)
 
 ---
 

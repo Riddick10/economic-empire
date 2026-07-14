@@ -142,12 +142,56 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         Program.DrawGameText($"${monthlyInterestDisplay:N0}M/Monat", contentX + 130, y, 14, ColorPalette.Red);
         y += 18;
 
+        // === HAUSHALTSPOLITIK (interaktiver Slider) ===
+        // Von Sparkurs (-5% = Ueberschuss tilgt Schulden) bis expansiv (+20% Defizit)
+        const double DeficitMin = 0.95;
+        const double DeficitMax = 1.20;
+
         double deficitPct = (player.DeficitMultiplier - 1.0) * 100;
-        Color deficitColor = deficitPct <= 3 ? ColorPalette.Green :
+        Color deficitColor = deficitPct <= 0 ? ColorPalette.Green :
                              deficitPct <= 8 ? ColorPalette.Yellow : ColorPalette.Red;
-        Program.DrawGameText("Defizitquote:", contentX, y, 14, ColorPalette.TextGray);
-        Program.DrawGameText($"{deficitPct:F1}%", contentX + 130, y, 14, deficitColor);
-        y += 24;
+        Program.DrawGameText("Haushaltspolitik:", contentX, y, 14, ColorPalette.TextGray);
+        string deficitLabel = deficitPct <= -0.05 ? $"Sparkurs ({deficitPct:F0}%)" :
+                              deficitPct < 0.05 ? "Ausgeglichen (0%)" :
+                              $"Defizit (+{deficitPct:F0}%)";
+        Program.DrawGameText(deficitLabel, contentX + 130, y, 14, deficitColor);
+        y += 20;
+
+        int defSliderW = panelW - 60;
+        int defSliderH = 8;
+        Rectangle defSliderRect = new Rectangle(contentX, y, defSliderW, defSliderH);
+        Rectangle defSliderHitbox = new Rectangle(contentX - 4, y - 8, defSliderW + 8, defSliderH + 16);
+
+        // Slider-Interaktion
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, defSliderHitbox))
+        {
+            Program.ui.IsDraggingDeficitSlider = true;
+        }
+        if (Raylib.IsMouseButtonReleased(MouseButton.Left))
+        {
+            Program.ui.IsDraggingDeficitSlider = false;
+        }
+        if (Program.ui.IsDraggingDeficitSlider)
+        {
+            double t = Math.Clamp((mousePos.X - contentX) / (double)defSliderW, 0, 1);
+            // Auf ganze Prozentpunkte runden fuer saubere Werte
+            player.DeficitMultiplier = Math.Round(DeficitMin + t * (DeficitMax - DeficitMin), 2);
+        }
+
+        // Slider zeichnen: Track, gefuellter Bereich, Knopf
+        Raylib.DrawRectangleRec(defSliderRect, ColorPalette.PanelDark);
+        Raylib.DrawRectangleLinesEx(defSliderRect, 1, ColorPalette.PanelLight);
+        float knobT = (float)((player.DeficitMultiplier - DeficitMin) / (DeficitMax - DeficitMin));
+        int knobX = contentX + (int)(knobT * defSliderW);
+        Raylib.DrawRectangle(contentX, (int)y, knobX - contentX, defSliderH, deficitColor);
+        Raylib.DrawRectangle(knobX - 5, (int)y - 4, 10, defSliderH + 8, ColorPalette.TextWhite);
+        y += 16;
+
+        Program.DrawGameText("Sparkurs", contentX, y, 11, ColorPalette.Green);
+        string expansivText = "Expansiv";
+        int expansivW = Program.MeasureTextCached(expansivText, 11);
+        Program.DrawGameText(expansivText, contentX + defSliderW - expansivW, y, 11, ColorPalette.Red);
+        y += 22;
 
         Program.DrawGameText("Kredit aufnehmen:", contentX, y, 14, ColorPalette.TextGray);
         y += 22;

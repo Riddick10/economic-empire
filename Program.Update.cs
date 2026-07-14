@@ -152,6 +152,12 @@ partial class Program
             ui.ShowFPS = !ui.ShowFPS;
         }
 
+        // F11 = Randloses Vollbild umschalten (funktioniert in jedem Bildschirm)
+        if (Raylib.IsKeyPressed(KeyboardKey.F11))
+        {
+            Raylib.ToggleBorderlessWindowed();
+        }
+
         // Screen-basierter Dispatch
         if (_screens.TryGetValue(currentScreen, out var screen))
         {
@@ -710,6 +716,25 @@ partial class Program
         double deltaTime = Raylib.GetFrameTime();
         game.Update(deltaTime);
 
+        // Autosave alle 90 Spieltage (ca. 1 Quartal)
+        if (_lastAutosaveDay > game.TotalDays)
+        {
+            // Neues Spiel nach vorheriger Session: Zaehler zuruecksetzen
+            _lastAutosaveDay = game.TotalDays;
+        }
+        else if (game.TotalDays - _lastAutosaveDay >= 90 && game.PlayerCountry != null)
+        {
+            _lastAutosaveDay = game.TotalDays;
+            if (SaveGameManager.Autosave(game, worldMap))
+            {
+                Console.WriteLine($"[Autosave] Automatisch gespeichert (Tag {game.TotalDays})");
+                _mgr.Notif?.AddNotification(
+                    "Automatisch gespeichert",
+                    $"Spielstand wurde automatisch gesichert ({game.GetDateString()}).",
+                    NotificationType.Info);
+            }
+        }
+
         // Pruefe ob bewegende Einheiten visuell angekommen sind
         _mgr.Military?.CheckVisualMovementCompletion();
 
@@ -831,11 +856,6 @@ partial class Program
             int toggleX = menuX + menuW - 40 - toggleW;
             Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
 
-            // Wolken Toggle
-            int cloudToggleY = toggleY + 38;
-            int cloudToggleX = menuX + menuW - 40 - toggleW;
-            Rectangle cloudToggleRect = new Rectangle(cloudToggleX, cloudToggleY - 2, toggleW, toggleH);
-
             // Musik-Slider-Interaktion
             if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, musicSliderRect))
             {
@@ -883,11 +903,6 @@ partial class Program
                 else if (Raylib.CheckCollisionPointRec(mousePos, toggleRect))
                 {
                     worldMap.DayNightCycleEnabled = !worldMap.DayNightCycleEnabled;
-                    SoundManager.Play(SoundEffect.Click);
-                }
-                else if (Raylib.CheckCollisionPointRec(mousePos, cloudToggleRect))
-                {
-                    worldMap.ShowClouds = !worldMap.ShowClouds;
                     SoundManager.Play(SoundEffect.Click);
                 }
             }

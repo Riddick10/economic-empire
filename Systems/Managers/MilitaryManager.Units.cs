@@ -160,5 +160,9 @@ public partial class MilitaryManager
         _unitsByCountry.Clear();
         _unitsByProvince.Clear();
         _activeRecruitments.Clear();
+
+        // Einheiten kommen jetzt aus dem Spielstand - keine Starteinheiten
+        // nachtraeglich erzeugen (wuerde geladene Armeen verdoppeln)
+        _startingUnitsCreated = true;
     }
 }

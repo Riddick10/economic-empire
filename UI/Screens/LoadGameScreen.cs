@@ -28,7 +28,8 @@ internal class LoadGameScreen : IGameScreen
         int slotStartY = 180;
         int slotSpacing = 20;
 
-        for (int i = 0; i < 3; i++)
+        // 4 Slots: Index 0-2 = manuelle Slots 1-3, Index 3 = Autosave
+        for (int i = 0; i < 4; i++)
         {
             Program.ui.SaveSlotRects[i] = new Rectangle(
                 (Program.ScreenWidth - slotWidth) / 2,
@@ -56,22 +57,32 @@ internal class LoadGameScreen : IGameScreen
                 return;
             }
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
             {
+                // UI-Index auf Slot-Nummer abbilden (Index 3 = Autosave-Slot 0)
+                int slotNumber = i == 3 ? SaveGameManager.AutosaveSlot : i + 1;
+
                 if (Program.ui.DeleteSlotHovered[i])
                 {
-                    SaveGameManager.DeleteSlot(i + 1);
+                    SaveGameManager.DeleteSlot(slotNumber);
                     Program.ui.SaveSlots = SaveGameManager.GetAllSlots();
                     return;
                 }
 
                 if (Program.ui.SaveSlotHovered[i] && Program.ui.SaveSlots[i] != null)
                 {
-                    var saveData = SaveGameManager.LoadGame(i + 1);
+                    var saveData = SaveGameManager.LoadGame(slotNumber);
                     if (saveData != null)
                     {
                         Program.game = new Game();
                         Program.game.Initialize();
+
+                        // WorldMap-Referenz VOR ApplySaveData setzen, damit
+                        // Provinz-Resync, Minenproduktion und KI funktionieren
+                        if (Program.game.GameContext != null)
+                        {
+                            Program.game.GameContext.WorldMap = Program.worldMap;
+                        }
 
                         SaveGameManager.ApplySaveData(saveData, Program.game, Program.worldMap);
 
@@ -100,12 +111,13 @@ internal class LoadGameScreen : IGameScreen
 
         Program.DrawMenuButton(Program.ui.BackButtonRect, "Zurueck", Program.ui.BackButtonHovered);
 
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             Program.DrawSaveSlot(i, Program.ui.SaveSlotRects[i], Program.ui.SaveSlots[i], Program.ui.SaveSlotHovered[i], Program.ui.DeleteSlotHovered[i], false);
         }
 
-        bool hasAnySave = Program.ui.SaveSlots[0] != null || Program.ui.SaveSlots[1] != null || Program.ui.SaveSlots[2] != null;
+        bool hasAnySave = Program.ui.SaveSlots[0] != null || Program.ui.SaveSlots[1] != null ||
+                          Program.ui.SaveSlots[2] != null || Program.ui.SaveSlots[3] != null;
         if (!hasAnySave)
         {
             string noSaves = "Keine Spielstaende vorhanden";

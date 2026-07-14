@@ -9,9 +9,13 @@ namespace GrandStrategyGame;
 /// <summary>
 /// Verwaltet Spielstaende - Speichern und Laden
 /// Unterstuetzt 3 Speicherplaetze mit benutzerdefinierten Namen
+/// sowie einen automatischen Autosave-Slot (Slot 0)
 /// </summary>
 public static class SaveGameManager
 {
+    /// <summary>Slot-Nummer des Autosave-Slots</summary>
+    public const int AutosaveSlot = 0;
+
     private static readonly string SaveDirectory;
     private static readonly JsonSerializerOptions JsonOptions;
 
@@ -41,7 +45,9 @@ public static class SaveGameManager
     /// </summary>
     private static string GetSaveFilePath(int slot)
     {
-        return Path.Combine(SaveDirectory, $"save_{slot}.json");
+        return slot == AutosaveSlot
+            ? Path.Combine(SaveDirectory, "autosave.json")
+            : Path.Combine(SaveDirectory, $"save_{slot}.json");
     }
 
     /// <summary>
@@ -49,8 +55,15 @@ public static class SaveGameManager
     /// </summary>
     private static string GetMetadataFilePath(int slot)
     {
-        return Path.Combine(SaveDirectory, $"save_{slot}_meta.json");
+        return slot == AutosaveSlot
+            ? Path.Combine(SaveDirectory, "autosave_meta.json")
+            : Path.Combine(SaveDirectory, $"save_{slot}_meta.json");
     }
+
+    /// <summary>
+    /// Prueft ob eine Slot-Nummer gueltig ist (0 = Autosave, 1-3 = manuell)
+    /// </summary>
+    private static bool IsValidSlot(int slot) => slot >= AutosaveSlot && slot <= 3;
 
     /// <summary>
     /// Laedt die Metadaten eines Speicherslots (fuer Anzeige im Menue)
@@ -73,7 +86,8 @@ public static class SaveGameManager
     }
 
     /// <summary>
-    /// Gibt alle 3 Speicherslot-Infos zurueck
+    /// Gibt alle Speicherslot-Infos zurueck.
+    /// Index 0-2 = manuelle Slots 1-3, Index 3 = Autosave.
     /// </summary>
     public static SaveSlotInfo?[] GetAllSlots()
     {
@@ -81,8 +95,18 @@ public static class SaveGameManager
         {
             GetSlotInfo(1),
             GetSlotInfo(2),
-            GetSlotInfo(3)
+            GetSlotInfo(3),
+            GetSlotInfo(AutosaveSlot)
         };
+    }
+
+    /// <summary>
+    /// Speichert das Spiel automatisch in den Autosave-Slot
+    /// </summary>
+    public static bool Autosave(Game game, WorldMap worldMap)
+    {
+        return SaveGame(game, worldMap, AutosaveSlot,
+            $"Autosave - {game.PlayerCountry?.Name} - {game.GetDateString()}");
     }
 
     /// <summary>
@@ -90,7 +114,7 @@ public static class SaveGameManager
     /// </summary>
     public static bool SaveGame(Game game, WorldMap worldMap, int slot, string? customName = null)
     {
-        if (slot < 1 || slot > 3) return false;
+        if (!IsValidSlot(slot)) return false;
         if (game.PlayerCountry == null) return false;
 
         try
@@ -138,7 +162,7 @@ public static class SaveGameManager
     /// </summary>
     public static SaveGameData? LoadGame(int slot)
     {
-        if (slot < 1 || slot > 3) return null;
+        if (!IsValidSlot(slot)) return null;
 
         string savePath = GetSaveFilePath(slot);
         if (!File.Exists(savePath))
@@ -166,7 +190,7 @@ public static class SaveGameManager
     /// </summary>
     public static bool DeleteSlot(int slot)
     {
-        if (slot < 1 || slot > 3) return false;
+        if (!IsValidSlot(slot)) return false;
 
         try
         {
@@ -194,7 +218,7 @@ public static class SaveGameManager
     {
         var data = new SaveGameData
         {
-            Version = 2,
+            Version = 3,
             SavedAt = DateTime.Now,
 
             // Zeitdaten
@@ -230,7 +254,11 @@ public static class SaveGameManager
                 EducationSpendingPercent = c.EducationSpendingPercent,
                 HealthSpendingPercent = c.HealthSpendingPercent,
                 AdministrationSpendingPercent = c.AdministrationSpendingPercent,
-                Stockpile = c.Stockpile.ToDictionary(kv => kv.Key.ToString(), kv => kv.Value)
+                Stockpile = c.Stockpile.ToDictionary(kv => kv.Key.ToString(), kv => kv.Value),
+                DeficitMultiplier = c.DeficitMultiplier,
+                MilitaryEquipment = c.MilitaryEquipment.Count > 0
+                    ? new Dictionary<string, int>(c.MilitaryEquipment)
+                    : null
             }).ToList(),
 
             // Ressourcen-Markt
@@ -243,9 +271,9 @@ public static class SaveGameManager
                     GlobalDemand = kv.Value.GlobalDemand
                 }),
 
-            // Provinzdaten (Minen, Fabriken)
+            // Provinzdaten (Minen, Fabriken, Werften)
             Provinces = worldMap.Provinces.Values
-                .Where(p => p.Mines.Count > 0 || p.CivilianFactories > 0 || p.MilitaryFactories > 0)
+                .Where(p => p.Mines.Count > 0 || p.CivilianFactories > 0 || p.MilitaryFactories > 0 || p.Dockyards > 0)
                 .Select(p => new ProvinceSaveData
                 {
                     Id = p.Id,
@@ -363,6 +391,104 @@ public static class SaveGameManager
                 }).ToList();
         }
 
+        // === Version 3+: Vollstaendige Zustandssicherung ===
+
+        // Eroberte Provinzen: nur Provinzen speichern, deren Besitzer sich
+        // gegenueber dem Kartenstart geaendert hat
+        data.ProvinceOwners = new List<ProvinceOwnerSaveData>();
+        foreach (var province in worldMap.Provinces.Values)
+        {
+            string? originalOwner = worldMap.GetOriginalOwner(province.Id);
+            if (originalOwner != null && originalOwner != province.CountryId)
+            {
+                data.ProvinceOwners.Add(new ProvinceOwnerSaveData
+                {
+                    Id = province.Id,
+                    OwnerId = province.CountryId
+                });
+            }
+        }
+
+        // Aktive Kriege + Kriegsmuedigkeit
+        if (militaryManager != null)
+        {
+            data.Wars = militaryManager.GetAllWars()
+                .Where(w => w.IsActive)
+                .Select(w => new WarSaveData
+                {
+                    Id = w.Id,
+                    Attackers = new List<string>(w.Attackers),
+                    Defenders = new List<string>(w.Defenders),
+                    WarGoal = w.WarGoal,
+                    StartYear = w.StartYear
+                }).ToList();
+
+            data.WarExhaustion = new Dictionary<string, double>();
+            foreach (var countryId in game.Countries.Keys)
+            {
+                var strength = militaryManager.GetMilitaryStrength(countryId);
+                if (strength != null && strength.WarExhaustion > 0)
+                    data.WarExhaustion[countryId] = strength.WarExhaustion;
+            }
+        }
+
+        // Politischer Zustand (Stabilitaet, Zustimmung, Kriegsbereitschaft)
+        var politicsManager = game.GetSystem<PoliticsManager>();
+        if (politicsManager != null)
+        {
+            data.Politics = new List<PoliticsSaveData>();
+            foreach (var countryId in game.Countries.Keys)
+            {
+                var politics = politicsManager.GetPolitics(countryId);
+                if (politics == null) continue;
+                data.Politics.Add(new PoliticsSaveData
+                {
+                    CountryId = countryId,
+                    Stability = politics.Stability,
+                    PublicSupport = politics.PublicSupport,
+                    WarSupport = politics.WarSupport
+                });
+            }
+        }
+
+        // Demografie (Geburten-/Sterberate, Urbanisierung, Alphabetisierung)
+        var populationManager = game.GetSystem<PopulationManager>();
+        if (populationManager != null)
+        {
+            data.Demographics = populationManager.GetAllDemographics()
+                .Select(kv => new DemographicsSaveData
+                {
+                    CountryId = kv.Key,
+                    BirthRate = kv.Value.BirthRate,
+                    DeathRate = kv.Value.DeathRate,
+                    WorkingAgeRatio = kv.Value.WorkingAgeRatio,
+                    UrbanizationRate = kv.Value.UrbanizationRate,
+                    LiteracyRate = kv.Value.LiteracyRate
+                }).ToList();
+        }
+
+        // Ressourcen-Diagramm-Historie
+        var economyManager = game.GetSystem<EconomyManager>();
+        if (economyManager != null)
+        {
+            data.MoneyHistory = economyManager.MoneyHistory
+                .Select(s => new MoneySnapshotSaveData
+                {
+                    TotalDays = s.TotalDays,
+                    Year = s.Year,
+                    Month = s.Month,
+                    Day = s.Day,
+                    ResourceTotals = s.ResourceTotals.ToDictionary(kv => kv.Key.ToString(), kv => kv.Value)
+                }).ToList();
+        }
+
+        // Abgeschlossene Missionen
+        var missionManager = game.GetSystem<MissionManager>();
+        if (missionManager != null)
+        {
+            data.CompletedMissions = missionManager.CompletedMissionIds.ToList();
+        }
+
         return data;
     }
 
@@ -406,6 +532,7 @@ public static class SaveGameManager
                     country.EducationSpendingPercent = countrySave.EducationSpendingPercent;
                     country.HealthSpendingPercent = countrySave.HealthSpendingPercent;
                     country.AdministrationSpendingPercent = countrySave.AdministrationSpendingPercent;
+                    country.DeficitMultiplier = countrySave.DeficitMultiplier;
 
                     // Stockpile wiederherstellen
                     country.Stockpile.Clear();
@@ -415,6 +542,47 @@ public static class SaveGameManager
                         {
                             country.Stockpile[type] = amount;
                         }
+                    }
+
+                    // Militaer-Equipment wiederherstellen (Version 3+)
+                    if (countrySave.MilitaryEquipment != null)
+                    {
+                        country.MilitaryEquipment.Clear();
+                        foreach (var (equipment, amount) in countrySave.MilitaryEquipment)
+                            country.MilitaryEquipment[equipment] = amount;
+                    }
+                }
+            }
+
+            // Eroberte Provinzen wiederherstellen (Version 3+).
+            // WICHTIG: Original-Besitzer-Cache VORHER initialisieren, damit er den
+            // GeoJSON-Kartenstart widerspiegelt und Eroberungen korrekt erkannt werden.
+            worldMap.EnsureOriginalOwnersInitialized();
+
+            // Provinzen auf Kartenstart zuruecksetzen, damit kein Zustand aus der
+            // laufenden Session (Eroberungen, gebaute Fabriken/Minen) in den
+            // geladenen Spielstand leckt. Der Spielstand enthaelt alle Provinzen
+            // mit Fabriken/Minen und alle Besitzerwechsel - die Wiederherstellung
+            // unten stellt daher den exakten Save-Zustand her.
+            foreach (var province in worldMap.Provinces.Values)
+            {
+                string? originalOwner = worldMap.GetOriginalOwner(province.Id);
+                if (originalOwner != null)
+                    province.CountryId = originalOwner;
+
+                province.CivilianFactories = 0;
+                province.MilitaryFactories = 0;
+                province.Dockyards = 0;
+                province.Mines.Clear();
+            }
+
+            if (saveData.ProvinceOwners != null)
+            {
+                foreach (var ownerSave in saveData.ProvinceOwners)
+                {
+                    if (worldMap.Provinces.TryGetValue(ownerSave.Id, out var province))
+                    {
+                        province.CountryId = ownerSave.OwnerId;
                     }
                 }
             }
@@ -471,11 +639,16 @@ public static class SaveGameManager
                 {
                     if (Enum.TryParse<ResourceType>(agreement.ResourceType, out var type))
                     {
-                        tradeManager.CreateTradeAgreement(
+                        var restored = tradeManager.CreateTradeAgreement(
                             agreement.ExporterId,
                             agreement.ImporterId,
                             type,
                             agreement.Amount);
+
+                        // Erstellungstag uebernehmen, sonst gilt die
+                        // Mindest-Vertragslaufzeit nach dem Laden neu
+                        if (restored != null)
+                            restored.CreatedGameDay = agreement.CreatedGameDay;
                     }
                 }
             }
@@ -578,7 +751,103 @@ public static class SaveGameManager
                 }
             }
 
-            Console.WriteLine($"[SaveGameManager] Spielstand angewendet: {saveData.PlayerCountryId}, {saveData.Year}-{saveData.Month}-{saveData.Day} {saveData.Hour:D2}:{saveData.Minute:D2}");
+            // === Version 3+: Vollstaendige Zustandswiederherstellung ===
+
+            // Aktive Kriege wiederherstellen
+            if (militaryManager != null && saveData.Wars != null)
+            {
+                militaryManager.ClearAllWars();
+                foreach (var warSave in saveData.Wars)
+                {
+                    militaryManager.RestoreWar(new War
+                    {
+                        Id = warSave.Id,
+                        Attackers = new List<string>(warSave.Attackers),
+                        Defenders = new List<string>(warSave.Defenders),
+                        WarGoal = warSave.WarGoal,
+                        StartYear = warSave.StartYear,
+                        IsActive = true
+                    });
+                }
+
+                // Kriegsmuedigkeit wiederherstellen
+                if (saveData.WarExhaustion != null)
+                {
+                    foreach (var (countryId, exhaustion) in saveData.WarExhaustion)
+                        militaryManager.RestoreWarExhaustion(countryId, exhaustion);
+                }
+            }
+
+            // Politischen Zustand wiederherstellen
+            var politicsManager = game.GetSystem<PoliticsManager>();
+            if (politicsManager != null && saveData.Politics != null)
+            {
+                foreach (var politicsSave in saveData.Politics)
+                {
+                    var politics = politicsManager.GetPolitics(politicsSave.CountryId);
+                    if (politics == null) continue;
+                    politics.Stability = politicsSave.Stability;
+                    politics.PublicSupport = politicsSave.PublicSupport;
+                    politics.WarSupport = politicsSave.WarSupport;
+                }
+            }
+
+            // Demografie wiederherstellen
+            var populationManager = game.GetSystem<PopulationManager>();
+            if (populationManager != null && saveData.Demographics != null)
+            {
+                foreach (var demoSave in saveData.Demographics)
+                {
+                    // Bevoelkerungszahl kommt aus den Laenderdaten (bereits geladen)
+                    long population = game.Countries.TryGetValue(demoSave.CountryId, out var c)
+                        ? c.Population
+                        : 0;
+
+                    populationManager.RestoreDemographics(demoSave.CountryId, new Demographics
+                    {
+                        TotalPopulation = population,
+                        BirthRate = demoSave.BirthRate,
+                        DeathRate = demoSave.DeathRate,
+                        WorkingAgeRatio = demoSave.WorkingAgeRatio,
+                        UrbanizationRate = demoSave.UrbanizationRate,
+                        LiteracyRate = demoSave.LiteracyRate
+                    });
+                }
+            }
+
+            // Ressourcen-Diagramm-Historie wiederherstellen
+            var economyManager = game.GetSystem<EconomyManager>();
+            if (economyManager != null && saveData.MoneyHistory != null)
+            {
+                var history = new List<MoneySnapshot>();
+                foreach (var snapSave in saveData.MoneyHistory)
+                {
+                    var snapshot = new MoneySnapshot
+                    {
+                        TotalDays = snapSave.TotalDays,
+                        Year = snapSave.Year,
+                        Month = snapSave.Month,
+                        Day = snapSave.Day,
+                        ResourceTotals = new Dictionary<ResourceType, double>()
+                    };
+                    foreach (var (typeStr, amount) in snapSave.ResourceTotals)
+                    {
+                        if (Enum.TryParse<ResourceType>(typeStr, out var type))
+                            snapshot.ResourceTotals[type] = amount;
+                    }
+                    history.Add(snapshot);
+                }
+                economyManager.RestoreMoneyHistory(history);
+            }
+
+            // Abgeschlossene Missionen wiederherstellen
+            var missionManager = game.GetSystem<MissionManager>();
+            if (missionManager != null && saveData.CompletedMissions != null)
+            {
+                missionManager.RestoreCompleted(saveData.CompletedMissions);
+            }
+
+            Console.WriteLine($"[SaveGameManager] Spielstand angewendet: {saveData.PlayerCountryId}, {saveData.Year}-{saveData.Month}-{saveData.Day} {saveData.Hour:D2}:{saveData.Minute:D2} (Version {saveData.Version})");
             return true;
         }
         catch (Exception ex)
@@ -653,6 +922,29 @@ public class SaveGameData
     // Forschungsfortschritt
     public List<TechProgressSaveData>? TechProgress { get; set; }
     public string? CurrentResearch { get; set; }
+
+    // === Version 3+: Vollstaendige Zustandssicherung ===
+
+    // Eroberte Provinzen (Besitzerwechsel gegenueber dem Kartenstart)
+    public List<ProvinceOwnerSaveData>? ProvinceOwners { get; set; }
+
+    // Aktive Kriege
+    public List<WarSaveData>? Wars { get; set; }
+
+    // Kriegsmuedigkeit pro Land
+    public Dictionary<string, double>? WarExhaustion { get; set; }
+
+    // Politischer Zustand pro Land (Stabilitaet etc.)
+    public List<PoliticsSaveData>? Politics { get; set; }
+
+    // Demografie pro Land (Geburtenrate, Urbanisierung etc.)
+    public List<DemographicsSaveData>? Demographics { get; set; }
+
+    // Ressourcen-Diagramm-Historie
+    public List<MoneySnapshotSaveData>? MoneyHistory { get; set; }
+
+    // Abgeschlossene Missionen
+    public List<string>? CompletedMissions { get; set; }
 }
 
 public class CountrySaveData
@@ -675,6 +967,12 @@ public class CountrySaveData
     public double HealthSpendingPercent { get; set; }
     public double AdministrationSpendingPercent { get; set; }
     public Dictionary<string, double> Stockpile { get; set; } = new();
+
+    // Version 3+: Haushaltspolitik (Default fuer alte Spielstaende: 1.06)
+    public double DeficitMultiplier { get; set; } = 1.06;
+
+    // Version 3+: Militaer-Equipment (Waffen, Munition etc.)
+    public Dictionary<string, int>? MilitaryEquipment { get; set; }
 }
 
 public class ResourceSaveData
@@ -747,4 +1045,61 @@ public class TechProgressSaveData
     public string TechId { get; set; } = "";
     public string Status { get; set; } = "";
     public int ProgressDays { get; set; }
+}
+
+/// <summary>
+/// Provinz-Besitzerwechsel (Eroberung) - nur gespeichert wenn abweichend vom Kartenstart
+/// </summary>
+public class ProvinceOwnerSaveData
+{
+    public string Id { get; set; } = "";
+    public string OwnerId { get; set; } = "";
+}
+
+/// <summary>
+/// Ein aktiver Krieg
+/// </summary>
+public class WarSaveData
+{
+    public string Id { get; set; } = "";
+    public List<string> Attackers { get; set; } = new();
+    public List<string> Defenders { get; set; } = new();
+    public string WarGoal { get; set; } = "";
+    public int StartYear { get; set; }
+}
+
+/// <summary>
+/// Politischer Zustand eines Landes (nur die sich aendernden Werte)
+/// </summary>
+public class PoliticsSaveData
+{
+    public string CountryId { get; set; } = "";
+    public double Stability { get; set; }
+    public double PublicSupport { get; set; }
+    public double WarSupport { get; set; }
+}
+
+/// <summary>
+/// Demografische Daten eines Landes
+/// </summary>
+public class DemographicsSaveData
+{
+    public string CountryId { get; set; } = "";
+    public double BirthRate { get; set; }
+    public double DeathRate { get; set; }
+    public double WorkingAgeRatio { get; set; }
+    public double UrbanizationRate { get; set; }
+    public double LiteracyRate { get; set; }
+}
+
+/// <summary>
+/// Ein Datenpunkt der Ressourcen-Diagramm-Historie
+/// </summary>
+public class MoneySnapshotSaveData
+{
+    public int TotalDays { get; set; }
+    public int Year { get; set; }
+    public int Month { get; set; }
+    public int Day { get; set; }
+    public Dictionary<string, double> ResourceTotals { get; set; } = new();
 }

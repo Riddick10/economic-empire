@@ -349,7 +349,7 @@ public class ProductionManager : GameSystemBase
     {
         double efficiency = industry.IndustrialEfficiency;
 
-        // Fabrik-Oelverbrauch: 0.05 Oel pro Fabrik pro Tag
+        // Fabrik-Oelverbrauch: 0.01 Oel pro Fabrik pro Tag
         int totalFactories = industry.CivilianFactories + industry.MilitaryFactories + industry.Dockyards;
         double oilNeeded = totalFactories * 0.01;
         if (oilNeeded > 0)

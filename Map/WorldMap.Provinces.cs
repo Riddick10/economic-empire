@@ -1170,6 +1170,25 @@ public partial class WorldMap
     }
 
     /// <summary>
+    /// Stellt sicher, dass der Original-Besitzer-Cache initialisiert ist.
+    /// Muss VOR dem Anwenden eines Spielstands aufgerufen werden, damit die
+    /// Original-Besitzer dem Kartenzustand (GeoJSON) entsprechen - nicht dem Spielstand.
+    /// </summary>
+    public void EnsureOriginalOwnersInitialized() => InitializeOriginalProvinceOwners();
+
+    /// <summary>
+    /// Gibt den urspruenglichen Besitzer einer Provinz zurueck (oder null).
+    /// Wird vom SaveGameManager genutzt um eroberte Provinzen zu erkennen.
+    /// </summary>
+    public string? GetOriginalOwner(string provinceId)
+    {
+        InitializeOriginalProvinceOwners();
+        return _originalProvinceOwners != null && _originalProvinceOwners.TryGetValue(provinceId, out var owner)
+            ? owner
+            : null;
+    }
+
+    /// <summary>
     /// Zeichnet eroberte Provinzen mit der Farbe des neuen Besitzers.
     /// Optimiert: Nutzt Cache statt teure ContainsPoint-Pruefungen.
     /// </summary>

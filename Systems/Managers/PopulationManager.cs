@@ -249,6 +249,13 @@ public class PopulationManager : GameSystemBase
         fromDemo.TotalPopulation -= amount;
         toDemo.TotalPopulation += amount;
 
+        // Country-Objekte SOFORT synchronisieren (nicht erst beim Jahres-Tick),
+        // damit die Bevoelkerungsanzeige in der UI aktuell bleibt
+        if (context.Countries.TryGetValue(fromId, out var fromCountry))
+            fromCountry.Population = fromDemo.TotalPopulation;
+        if (context.Countries.TryGetValue(toId, out var toCountry))
+            toCountry.Population = toDemo.TotalPopulation;
+
         // Publiziere Event
         context.Events.Publish(new PopulationMigratedEvent(fromId, toId, amount));
     }
@@ -279,6 +286,19 @@ public class PopulationManager : GameSystemBase
             country.Population = demo.TotalPopulation;
             country.PopulationGrowthRate = growthRate;
         }
+    }
+
+    /// <summary>
+    /// Zugriff auf alle Demografie-Daten (fuer Speichern)
+    /// </summary>
+    public IReadOnlyDictionary<string, Demographics> GetAllDemographics() => _demographics;
+
+    /// <summary>
+    /// Stellt Demografie-Daten aus einem Spielstand wieder her (fuer Laden)
+    /// </summary>
+    public void RestoreDemographics(string countryId, Demographics demo)
+    {
+        _demographics[countryId] = demo;
     }
 
     private void UpdateDemographics(GameContext context)

@@ -75,6 +75,9 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
     // Gecachte System-Referenzen -> siehe ManagerRefs.cs
     internal static readonly ManagerRefs _mgr = new();
 
+    // Autosave: Spieltag der letzten automatischen Speicherung
+    internal static int _lastAutosaveDay = 0;
+
     // Statische Resource-Arrays -> siehe ResourceConfig.cs
 
     // Logistik-Panel dynamische Inhaltshoehe
@@ -108,6 +111,11 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
             }
         }
 
+        // Grafik-Flags VOR der Fenster-Erstellung setzen:
+        // - VSyncHint: synchronisiert mit Monitor-Bildrate (kein Tearing, weniger GPU-Last)
+        // - Msaa4xHint: 4x Kantenglaettung fuer weichere Landesgrenzen-Polygone
+        Raylib.SetConfigFlags(ConfigFlags.VSyncHint | ConfigFlags.Msaa4xHint);
+
         // Fenster mit Standardgroesse erstellen
         Raylib.InitWindow(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT, "Economic Empire");
 
@@ -134,7 +142,11 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
         // Fenster maximierbar und in der Groesse aenderbar machen
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
         Raylib.SetWindowMinSize(GameConfig.WINDOW_MIN_WIDTH, GameConfig.WINDOW_MIN_HEIGHT);
-        // FPS unbegrenzt (Spiel nutzt Delta-Zeit)
+
+        // FPS auf Monitor-Bildrate begrenzen (Fallback 60) - spart GPU-Last und Strom.
+        // Falls der Treiber VSync erzwingt/ignoriert, greift dieses Limit zusaetzlich.
+        int refreshRate = Raylib.GetMonitorRefreshRate(Raylib.GetCurrentMonitor());
+        Raylib.SetTargetFPS(refreshRate > 0 ? refreshRate : 60);
 
         // Audio initialisieren
         Raylib.InitAudioDevice();
@@ -309,6 +321,7 @@ class UIState
     public float OptionsSoundVolume = 0.5f;
     public bool IsDraggingMusicSlider;
     public bool IsDraggingSoundSlider;
+    public bool IsDraggingDeficitSlider;
     public bool MainMenuDayNightCycleEnabled = true;
 
     // Sonstiges
@@ -324,15 +337,15 @@ class UIState
     public bool OptionsButtonHovered;
     public bool QuitButtonHovered;
 
-    // Save/Load Screen
+    // Save/Load Screen (Index 0-2 = manuelle Slots, Index 3 = Autosave)
     public int SelectedSaveSlot = -1;
-    public bool[] SaveSlotHovered = new bool[3];
-    public SaveSlotInfo?[] SaveSlots = new SaveSlotInfo?[3];
+    public bool[] SaveSlotHovered = new bool[4];
+    public SaveSlotInfo?[] SaveSlots = new SaveSlotInfo?[4];
     public Rectangle BackButtonRect = new(0, 0, 150, 40);
     public bool BackButtonHovered;
-    public Rectangle[] SaveSlotRects = new Rectangle[3];
-    public Rectangle[] DeleteSlotRects = new Rectangle[3];
-    public bool[] DeleteSlotHovered = new bool[3];
+    public Rectangle[] SaveSlotRects = new Rectangle[4];
+    public Rectangle[] DeleteSlotRects = new Rectangle[4];
+    public bool[] DeleteSlotHovered = new bool[4];
     public Rectangle ConfirmSaveButtonRect = new(0, 0, 200, 45);
     public bool ConfirmSaveButtonHovered;
 

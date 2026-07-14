@@ -25,9 +25,6 @@ public partial class WorldMap
         // Terrain-Texturen freigeben
         UnloadTerrainTextures();
 
-        // Wolken-Texturen freigeben
-        UnloadCloudTextures();
-
         // Ressourcen-Icons freigeben
         for (int i = 0; i < _depositIcons.Length; i++)
         {

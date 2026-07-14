@@ -41,6 +41,9 @@ public partial class MilitaryManager : GameSystemBase
     private GameContext? _context;
     private NotificationManager? _notificationManager;
 
+    // Flag: Starteinheiten bereits erstellt (oder aus Spielstand geladen)
+    private bool _startingUnitsCreated;
+
     public override void Initialize(GameContext context)
     {
         _context = context;
@@ -61,7 +64,9 @@ public partial class MilitaryManager : GameSystemBase
             };
         }
 
-        // Starteinheiten fuer groessere Laender erstellen (basierend auf BIP)
+        // Starteinheiten fuer groessere Laender erstellen (basierend auf BIP).
+        // Falls die WorldMap hier noch nicht gesetzt ist (normaler Spielstart),
+        // wird die Erstellung beim ersten Tick nachgeholt (siehe OnTick).
         CreateStartingUnits(context);
     }
 
@@ -71,7 +76,9 @@ public partial class MilitaryManager : GameSystemBase
     /// </summary>
     private void CreateStartingUnits(GameContext context)
     {
-        if (context.WorldMap == null) return;
+        if (_startingUnitsCreated) return;
+        if (context.WorldMap == null || context.WorldMap.Provinces.Count == 0) return;
+        _startingUnitsCreated = true;
 
         foreach (var (countryId, country) in context.Countries)
         {
@@ -126,6 +133,11 @@ public partial class MilitaryManager : GameSystemBase
 
     public override void OnTick(TickType tickType, GameContext context)
     {
+        // Starteinheiten nachholen, sobald die WorldMap verfuegbar ist
+        // (beim Initialize ist context.WorldMap in der Regel noch null)
+        if (!_startingUnitsCreated)
+            CreateStartingUnits(context);
+
         switch (tickType)
         {
             case TickType.Hourly:

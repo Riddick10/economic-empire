@@ -51,12 +51,27 @@ public class EconomyManager : GameSystemBase
                 foreach (var country in context.Countries.Values)
                 {
                     double budgetChange = country.CalculateDailyBudgetChange();
-                    country.Budget += budgetChange;
 
-                    // Defizit als Neuverschuldung verbuchen (wie in der Realitaet)
                     if (budgetChange < 0)
                     {
-                        country.NationalDebt += Math.Abs(budgetChange);
+                        // Defizit wird durch Neuverschuldung finanziert (Anleihen):
+                        // Die Kasse bleibt stabil, dafuer steigen die Schulden.
+                        // (Vorher wurde beides belastet -> Doppelverbuchung + Abwaertsspirale)
+                        country.NationalDebt += -budgetChange;
+                    }
+                    else
+                    {
+                        // Ueberschuss: Haelfte tilgt Schulden (falls vorhanden), Rest in die Kasse
+                        if (country.NationalDebt > 0)
+                        {
+                            double repayment = Math.Min(budgetChange * 0.5, country.NationalDebt);
+                            country.NationalDebt -= repayment;
+                            country.Budget += budgetChange - repayment;
+                        }
+                        else
+                        {
+                            country.Budget += budgetChange;
+                        }
                     }
                 }
                 // Ressourcen-Snapshot alle 7 Tage erfassen
@@ -111,7 +126,7 @@ public class EconomyManager : GameSystemBase
             data.Inflation = Math.Clamp(data.Inflation + inflationChange, eco.InflationMin, eco.InflationMax);
             country.Inflation = data.Inflation;
 
-            // Tech-Effekte anwenden (nur Spieler-Land)
+            // Tech-Effekte anwenden (Spieler-Land)
             if (countryId == context.PlayerCountry?.Id)
             {
                 var techManager = context.Game.GetSystem<TechTreeManager>();
@@ -125,6 +140,15 @@ public class EconomyManager : GameSystemBase
                     if (unempBonus > 0)
                         country.UnemploymentRate = Math.Clamp(country.UnemploymentRate - unempBonus, 0, 1);
                 }
+            }
+            else
+            {
+                // KI-Laender: langsamer passiver Fortschritt (simuliert eigene Forschung),
+                // damit der Spieler nicht nach wenigen Jahrzehnten uneinholbar davonzieht.
+                // Bewusst deutlich schwaecher als aktive Spieler-Forschung.
+                country.EducationLevel = Math.Clamp(country.EducationLevel + 0.003, 0, 0.95);
+                if (country.UnemploymentRate > 0.03)
+                    country.UnemploymentRate = Math.Max(0.03, country.UnemploymentRate - 0.0005);
             }
         }
     }
@@ -161,6 +185,16 @@ public class EconomyManager : GameSystemBase
         // Maximal 200 Datenpunkte behalten (~3.8 Jahre Spielzeit)
         if (_moneyHistory.Count > 200)
             _moneyHistory.RemoveAt(0);
+    }
+
+    /// <summary>
+    /// Stellt die Ressourcen-Diagramm-Historie aus einem Spielstand wieder her
+    /// </summary>
+    public void RestoreMoneyHistory(List<MoneySnapshot> history)
+    {
+        _moneyHistory.Clear();
+        _moneyHistory.AddRange(history);
+        _lastSnapshotDay = _moneyHistory.Count > 0 ? _moneyHistory[^1].TotalDays : -1;
     }
 
     private double CalculateGrowthRate(Country country, CountryEconomyData data)

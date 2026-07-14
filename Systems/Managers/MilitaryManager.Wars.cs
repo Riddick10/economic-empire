@@ -14,12 +14,12 @@ public partial class MilitaryManager
         {
             var war = _activeWars[i];
             if (!war.IsActive) continue;
-            // Berechne Kriegsmüdigkeit
+            // Berechne Kriegsmüdigkeit (Wochen-Tick: 7 Tage auf einmal anwenden)
             foreach (var participantId in war.Attackers.Concat(war.Defenders))
             {
                 if (_militaryStrength.TryGetValue(participantId, out var strength))
                 {
-                    strength.WarExhaustion += BalanceConfig.Military.DailyWarExhaustion;
+                    strength.WarExhaustion += BalanceConfig.Military.DailyWarExhaustion * 7;
                     strength.WarExhaustion = Math.Min(1.0, strength.WarExhaustion);
                 }
             }
@@ -46,6 +46,10 @@ public partial class MilitaryManager
                 EndWar(war, WarResult.WhitePeace);
             }
         }
+
+        // Beendete Kriege aus der Liste entfernen (sonst waechst sie unbegrenzt
+        // und alle Abfragen iterieren ueber tote Eintraege)
+        _activeWars.RemoveAll(w => !w.IsActive);
     }
 
     /// <summary>
@@ -173,6 +177,31 @@ public partial class MilitaryManager
             if (w.IsActive && (w.Attackers.Contains(countryId) || w.Defenders.Contains(countryId)))
                 yield return w;
         }
+    }
+
+    /// <summary>
+    /// Gibt alle Kriege zurueck (fuer Speichern)
+    /// </summary>
+    public IReadOnlyList<War> GetAllWars() => _activeWars;
+
+    /// <summary>
+    /// Entfernt alle Kriege (vor dem Laden eines Spielstands)
+    /// </summary>
+    public void ClearAllWars() => _activeWars.Clear();
+
+    /// <summary>
+    /// Stellt einen Krieg aus einem Spielstand wieder her -
+    /// ohne Events, Buendnis-Logik oder Benachrichtigungen auszuloesen
+    /// </summary>
+    public void RestoreWar(War war) => _activeWars.Add(war);
+
+    /// <summary>
+    /// Setzt die Kriegsmuedigkeit eines Landes (fuer Laden)
+    /// </summary>
+    public void RestoreWarExhaustion(string countryId, double exhaustion)
+    {
+        if (_militaryStrength.TryGetValue(countryId, out var strength))
+            strength.WarExhaustion = Math.Clamp(exhaustion, 0, 1);
     }
 
     /// <summary>

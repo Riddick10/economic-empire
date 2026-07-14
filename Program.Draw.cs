@@ -170,8 +170,9 @@ partial class Program
         int x = (int)rect.X + 15;
         int y = (int)rect.Y + 12;
 
-        string slotNumber = $"Slot {index + 1}";
-        DrawGameText(slotNumber, x, y, 11, ColorPalette.Accent);
+        // Index 3 = Autosave-Slot (nur im Lade-Menue sichtbar)
+        string slotNumber = index == 3 ? "Autosave" : $"Slot {index + 1}";
+        DrawGameText(slotNumber, x, y, 11, index == 3 ? ColorPalette.Green : ColorPalette.Accent);
 
         if (slotInfo != null)
         {
