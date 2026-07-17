@@ -162,6 +162,28 @@ public partial class WorldMap
         ("haiti_single.geojson", "HTI", 0.01),
         ("dominican_single.geojson", "DOM", 0.01),
         ("geoBoundaries-CUB-ADM1.geojson", "CUB", 0.01),
+        // Neue Laender (Kartenluecken-Fix)
+        ("belize_single.geojson", "BLZ", 0.01),
+        ("elsalvador_single.geojson", "SLV", 0.01),
+        ("jamaica_single.geojson", "JAM", 0.01),
+        ("bahamas_single.geojson", "BHS", 0.01),
+        ("trinidad_single.geojson", "TTO", 0.005),
+        ("kosovo_single.geojson", "KOS", 0.01),
+        ("cyprus_single.geojson", "CYP", 0.005),
+        ("malta_single.geojson", "MLT", 0.002),
+        ("palestine_single.geojson", "PSE", 0.005),
+        ("bhutan_single.geojson", "BTN", 0.01),
+        ("brunei_single.geojson", "BRN", 0.005),
+        ("timorleste_single.geojson", "TLS", 0.01),
+        ("singapore_single.geojson", "SGP", 0.002),
+        ("guineabissau_single.geojson", "GNB", 0.01),
+        ("capeverde_single.geojson", "CPV", 0.005),
+        ("comoros_single.geojson", "COM", 0.005),
+        ("mauritius_single.geojson", "MUS", 0.005),
+        ("fiji_single.geojson", "FJI", 0.01),
+        ("solomon_single.geojson", "SLB", 0.01),
+        ("vanuatu_single.geojson", "VUT", 0.01),
+        ("samoa_single.geojson", "WSM", 0.005),
     };
 
     // === Fabrikverteilungen fuer Industrielaender ===

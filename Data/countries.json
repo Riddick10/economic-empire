@@ -623,6 +623,90 @@
     {
       "id": "PNG", "name": "Papua-Neuguinea", "fullName": "Unabhängiger Staat Papua-Neuguinea",
       "population": 10000000, "gdp": 30000, "popGrowth": 0.019, "gdpGrowth": 0.045, "unemployment": 0.028, "taxRate": 0.02
+    },
+    {
+      "id": "BLZ", "name": "Belize", "fullName": "Belize",
+      "population": 410000, "gdp": 3200, "popGrowth": 0.017, "gdpGrowth": 0.03, "unemployment": 0.08, "taxRate": 0.25
+    },
+    {
+      "id": "SLV", "name": "El Salvador", "fullName": "Republik El Salvador",
+      "population": 6300000, "gdp": 34000, "popGrowth": 0.004, "gdpGrowth": 0.025, "unemployment": 0.06, "taxRate": 0.28
+    },
+    {
+      "id": "JAM", "name": "Jamaika", "fullName": "Jamaika",
+      "population": 2800000, "gdp": 19000, "popGrowth": 0.002, "gdpGrowth": 0.015, "unemployment": 0.06, "taxRate": 0.25
+    },
+    {
+      "id": "BHS", "name": "Bahamas", "fullName": "Commonwealth der Bahamas",
+      "population": 410000, "gdp": 14000, "popGrowth": 0.008, "gdpGrowth": 0.018, "unemployment": 0.09, "taxRate": 0.18
+    },
+    {
+      "id": "TTO", "name": "Trinidad und Tobago", "fullName": "Republik Trinidad und Tobago",
+      "population": 1500000, "gdp": 28000, "popGrowth": 0.003, "gdpGrowth": 0.015, "unemployment": 0.05, "taxRate": 0.25
+    },
+    {
+      "id": "KOS", "name": "Kosovo", "fullName": "Republik Kosovo",
+      "population": 1800000, "gdp": 10000, "popGrowth": 0.004, "gdpGrowth": 0.035, "unemployment": 0.11, "taxRate": 0.1
+    },
+    {
+      "id": "CYP", "name": "Zypern", "fullName": "Republik Zypern",
+      "population": 1250000, "gdp": 32000, "popGrowth": 0.006, "gdpGrowth": 0.03, "unemployment": 0.06, "taxRate": 0.22
+    },
+    {
+      "id": "MLT", "name": "Malta", "fullName": "Republik Malta",
+      "population": 540000, "gdp": 20000, "popGrowth": 0.009, "gdpGrowth": 0.04, "unemployment": 0.03, "taxRate": 0.3
+    },
+    {
+      "id": "PSE", "name": "Palästina", "fullName": "Staat Palästina",
+      "population": 5400000, "gdp": 17000, "popGrowth": 0.024, "gdpGrowth": 0.02, "unemployment": 0.25, "taxRate": 0.15
+    },
+    {
+      "id": "BTN", "name": "Bhutan", "fullName": "Königreich Bhutan",
+      "population": 780000, "gdp": 2900, "popGrowth": 0.006, "gdpGrowth": 0.045, "unemployment": 0.05, "taxRate": 0.25
+    },
+    {
+      "id": "BRN", "name": "Brunei", "fullName": "Sultanat Brunei",
+      "population": 450000, "gdp": 15000, "popGrowth": 0.008, "gdpGrowth": 0.012, "unemployment": 0.05, "taxRate": 0.02
+    },
+    {
+      "id": "TLS", "name": "Osttimor", "fullName": "Demokratische Republik Timor-Leste",
+      "population": 1400000, "gdp": 2000, "popGrowth": 0.018, "gdpGrowth": 0.03, "unemployment": 0.05, "taxRate": 0.1
+    },
+    {
+      "id": "SGP", "name": "Singapur", "fullName": "Republik Singapur",
+      "population": 5900000, "gdp": 500000, "popGrowth": 0.008, "gdpGrowth": 0.026, "unemployment": 0.02, "taxRate": 0.17
+    },
+    {
+      "id": "GNB", "name": "Guinea-Bissau", "fullName": "Republik Guinea-Bissau",
+      "population": 2100000, "gdp": 1600, "popGrowth": 0.021, "gdpGrowth": 0.035, "unemployment": 0.06, "taxRate": 0.15
+    },
+    {
+      "id": "CPV", "name": "Kap Verde", "fullName": "Republik Cabo Verde",
+      "population": 590000, "gdp": 2500, "popGrowth": 0.009, "gdpGrowth": 0.045, "unemployment": 0.09, "taxRate": 0.22
+    },
+    {
+      "id": "COM", "name": "Komoren", "fullName": "Union der Komoren",
+      "population": 850000, "gdp": 1300, "popGrowth": 0.018, "gdpGrowth": 0.03, "unemployment": 0.09, "taxRate": 0.15
+    },
+    {
+      "id": "MUS", "name": "Mauritius", "fullName": "Republik Mauritius",
+      "population": 1260000, "gdp": 14500, "popGrowth": 0.001, "gdpGrowth": 0.045, "unemployment": 0.06, "taxRate": 0.15
+    },
+    {
+      "id": "FJI", "name": "Fidschi", "fullName": "Republik Fidschi",
+      "population": 930000, "gdp": 5500, "popGrowth": 0.006, "gdpGrowth": 0.035, "unemployment": 0.045, "taxRate": 0.2
+    },
+    {
+      "id": "SLB", "name": "Salomonen", "fullName": "Salomonen",
+      "population": 720000, "gdp": 1600, "popGrowth": 0.023, "gdpGrowth": 0.025, "unemployment": 0.03, "taxRate": 0.25
+    },
+    {
+      "id": "VUT", "name": "Vanuatu", "fullName": "Republik Vanuatu",
+      "population": 330000, "gdp": 1100, "popGrowth": 0.022, "gdpGrowth": 0.02, "unemployment": 0.04, "taxRate": 0.15
+    },
+    {
+      "id": "WSM", "name": "Samoa", "fullName": "Unabhängiger Staat Samoa",
+      "population": 220000, "gdp": 900, "popGrowth": 0.012, "gdpGrowth": 0.025, "unemployment": 0.08, "taxRate": 0.25
     }
   ]
 }

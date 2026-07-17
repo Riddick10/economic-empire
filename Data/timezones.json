@@ -29,6 +29,7 @@
     "ISR": 2,
     "BRA": -3,
     "ARG": -3, "URY": -3, "SUR": -3, "GUY": -4,
+    "BLZ": -6, "BHS": -5, "TTO": -4, "KOS": 1, "CYP": 2, "PSE": 2, "BTN": 6, "BRN": 8, "TLS": 9, "GNB": 0, "CPV": -1, "COM": 3, "MUS": 4, "FJI": 12, "SLB": 11, "VUT": 11, "WSM": 13,
     "CHL": -4, "BOL": -4, "PRY": -4, "VEN": -4,
     "PER": -5, "COL": -5, "ECU": -5, "PAN": -5,
     "MEX": -6,
