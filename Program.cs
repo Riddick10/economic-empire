@@ -94,6 +94,9 @@ internal static readonly PoliticsInfoPanel _politicsInfoPanel = new();
         { GameScreen.SaveGame, new SaveGameScreen() },
     };
 
+    // Zuletzt aktiver Screen fuer den Enter/Exit-Lifecycle
+    internal static GameScreen? _lastDispatchedScreen;
+
     // Aktuelle Fenstergroesse (dynamisch)
     internal static int ScreenWidth => Raylib.GetScreenWidth();
     internal static int ScreenHeight => Raylib.GetScreenHeight();

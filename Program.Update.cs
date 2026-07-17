@@ -158,9 +158,16 @@ partial class Program
             Raylib.ToggleBorderlessWindowed();
         }
 
-        // Screen-basierter Dispatch
+        // Screen-basierter Dispatch (mit Enter/Exit-Lifecycle)
         if (_screens.TryGetValue(currentScreen, out var screen))
         {
+            if (_lastDispatchedScreen != currentScreen)
+            {
+                if (_lastDispatchedScreen is { } last && _screens.TryGetValue(last, out var prevScreen))
+                    prevScreen.Exit();
+                screen.Enter();
+                _lastDispatchedScreen = currentScreen;
+            }
             screen.Update();
         }
     }
