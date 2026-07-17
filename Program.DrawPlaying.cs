@@ -156,17 +156,18 @@ partial class Program
         DrawGameText(timeStr, rightX, row1Y, 18, ColorPalette.Accent);
 
         // === Zeile 1: Alle 6 Daten-Boxen (Auto-Breite) ===
+        // Boxen duerfen den Datum/Speed-Rahmen rechts nicht uebermalen
+        int infoMaxX = frameX - 10;
         int x = infoStartX;
 
-        DrawTopBarInfoBox(ref x, row1Y, "Bev:", Formatting.Population(player.Population));
-        DrawTopBarInfoBox(ref x, row1Y, "BIP:", $"${Formatting.Number(player.GDP)}M");
-        DrawTopBarInfoBox(ref x, row1Y, "BIP/K:", $"${player.GetGDPPerCapita().ToString("N0", System.Globalization.CultureInfo.InvariantCulture)}");
+        DrawTopBarInfoBox(ref x, row1Y, "Bev:", Formatting.Population(player.Population), maxX: infoMaxX);
+        DrawTopBarInfoBox(ref x, row1Y, "BIP:", $"${Formatting.Number(player.GDP)}M", maxX: infoMaxX);
+        DrawTopBarInfoBox(ref x, row1Y, "BIP/K:", $"${player.GetGDPPerCapita().ToString("N0", System.Globalization.CultureInfo.InvariantCulture)}", maxX: infoMaxX);
         DrawTopBarInfoBox(ref x, row1Y, "Wachstum:", Formatting.Percentage(player.GDPGrowthRate, showSign: true),
-            player.GDPGrowthRate >= 0 ? ColorPalette.Green : ColorPalette.Red);
-        DrawTopBarInfoBox(ref x, row1Y, "Schulden:", Formatting.Money(player.NationalDebt),
-            player.NationalDebt > 0 ? ColorPalette.Red : null);
+            player.GDPGrowthRate >= 0 ? ColorPalette.Green : ColorPalette.Red, maxX: infoMaxX);
         {
-            // Budget-Box mit Netto-Aenderung
+            // Budget-Box mit Netto-Aenderung (VOR Schulden: bei schmalem Fenster
+            // faellt lieber die Schulden-Box weg als das Budget)
             double dailyBudgetChange = player.CalculateDailyBudgetChange();
             double dailyTradeBalance = player.TradeBalance;
             double dailyNet = dailyBudgetChange + dailyTradeBalance;
@@ -175,12 +176,19 @@ partial class Program
             string netStr = netSign + Formatting.BudgetChange(dailyNet);
             Color budgetColor = player.Budget >= 0 ? ColorPalette.TextWhite : ColorPalette.Red;
             int budgetStartX = x;
-            DrawTopBarInfoBox(ref x, row1Y, "Budget:", budgetVal, budgetColor, extraWidth: 35);
-            // Netto direkt neben Budget-Wert
-            int netX = budgetStartX + 8 + MeasureTextCached("Budget:", 16) + 4 + MeasureTextCached(budgetVal, 16);
-            Color netColor = dailyNet >= 0 ? ColorPalette.Green : ColorPalette.Red;
-            DrawGameText(netStr, netX, row1Y + 4, 11, netColor);
+            // Box-Breite an die tatsaechliche Breite des Netto-Textes anpassen
+            int netStrWidth = MeasureTextCached(netStr, 11);
+            bool budgetDrawn = DrawTopBarInfoBox(ref x, row1Y, "Budget:", budgetVal, budgetColor, extraWidth: netStrWidth + 6, maxX: infoMaxX);
+            if (budgetDrawn)
+            {
+                // Netto mit Abstand neben dem Budget-Wert
+                int netX = budgetStartX + 8 + MeasureTextCached("Budget:", 16) + 4 + MeasureTextCached(budgetVal, 16) + 6;
+                Color netColor = dailyNet >= 0 ? ColorPalette.Green : ColorPalette.Red;
+                DrawGameText(netStr, netX, row1Y + 4, 11, netColor);
+            }
         }
+        DrawTopBarInfoBox(ref x, row1Y, "Schulden:", Formatting.Money(player.NationalDebt),
+            player.NationalDebt > 0 ? ColorPalette.Red : null, maxX: infoMaxX);
 
         // === Zeile 2: Alle Ressourcen ===
         x = infoStartX;

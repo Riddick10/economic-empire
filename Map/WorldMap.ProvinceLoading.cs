@@ -27,7 +27,7 @@ public partial class WorldMap
         ("czech_regions.geojson", "CZE", 0.01),
         ("finland_regions.geojson", "FIN", 0.02),
         ("greenland_adm1_raw.geojson", "GRL", 0.05),
-        ("chile_regions.geojson", "CHL", 0.02),
+        ("chile_single.geojson", "CHL", 0.02),
         ("peru_departments.geojson", "PER", 0.01),
         ("argentina_provinces.geojson", "ARG", 0.04),
         ("iran_provinces.geojson", "IRN", 0.03),
@@ -41,7 +41,7 @@ public partial class WorldMap
         ("netherlands_regions.geojson", "NLD", 0.02),
         ("belgium_provinces.geojson", "BEL", 0.005),
         ("luxembourg_single.geojson", "LUX", 0.02),
-        ("ireland_provinces.geojson", "IRL", 0.02),
+        ("ireland_single.geojson", "IRL", 0.02),
         ("denmark_regions.geojson", "DNK", 0.02),
         ("iceland_regions.geojson", "ISL", 0.02),
         ("serbia_regions.geojson", "SRB", 0.02),
@@ -67,6 +67,7 @@ public partial class WorldMap
         ("paraguay_departments.geojson", "PRY", 0.02),
         ("uruguay_departments.geojson", "URY", 0.02),
         ("guyana_single.geojson", "GUY", 0.02),
+        ("suriname_single.geojson", "SUR", 0.02),
         // Afrika
         ("geoBoundaries-LBY-ADM1.geojson", "LBY", 0.01),
         ("geoBoundaries-TUN-ADM1.geojson", "TUN", 0.01),
@@ -705,13 +706,27 @@ public partial class WorldMap
 
             foreach (var feature in features.EnumerateArray())
             {
-                var props = feature.GetProperty("properties");
-                string? name = props.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : null;
-                int scaleRank = props.TryGetProperty("scalerank", out var rankProp) ? rankProp.GetInt32() : 6;
+                // Defekte Features (geometry: null) ueberspringen statt das
+                // komplette Fluss-Laden abzubrechen (kommt in Natural-Earth-Daten vor)
+                if (!feature.TryGetProperty("geometry", out var geometry) ||
+                    geometry.ValueKind != System.Text.Json.JsonValueKind.Object)
+                    continue;
 
-                var geometry = feature.GetProperty("geometry");
-                string? geomType = geometry.GetProperty("type").GetString();
-                var coordinates = geometry.GetProperty("coordinates");
+                string? name = null;
+                int scaleRank = 6;
+                if (feature.TryGetProperty("properties", out var props) &&
+                    props.ValueKind == System.Text.Json.JsonValueKind.Object)
+                {
+                    name = props.TryGetProperty("name", out var nameProp) ? nameProp.GetString() : null;
+                    scaleRank = props.TryGetProperty("scalerank", out var rankProp) &&
+                                rankProp.ValueKind == System.Text.Json.JsonValueKind.Number
+                        ? rankProp.GetInt32() : 6;
+                }
+
+                if (!geometry.TryGetProperty("type", out var geomTypeProp) ||
+                    !geometry.TryGetProperty("coordinates", out var coordinates))
+                    continue;
+                string? geomType = geomTypeProp.GetString();
 
                 var lineSegments = new List<Vector2[]>();
 

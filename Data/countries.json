@@ -89,6 +89,10 @@
       "population": 800000, "gdp": 15000, "popGrowth": 0.005, "gdpGrowth": 0.085, "unemployment": 0.125, "taxRate": 0.28
     },
     {
+      "id": "SUR", "name": "Suriname", "fullName": "Republik Suriname",
+      "population": 630000, "gdp": 4000, "popGrowth": 0.008, "gdpGrowth": 0.03, "unemployment": 0.09, "taxRate": 0.3
+    },
+    {
       "id": "GBR", "name": "Großbritannien", "fullName": "Vereinigtes Königreich",
       "population": 67000000, "gdp": 3070000, "popGrowth": 0.003, "gdpGrowth": 0.014, "unemployment": 0.038, "taxRate": 0.35
     },

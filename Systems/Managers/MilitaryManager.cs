@@ -167,7 +167,8 @@ public partial class MilitaryManager : GameSystemBase
 
     private static bool IsMilitaryAlliance(string allianceName)
     {
-        return allianceName is "NATO" or "OVKS" or "SCO";
+        // Namen muessen zu diplomacy.json passen ("CSTO", nicht "OVKS")
+        return allianceName is "NATO" or "CSTO" or "SCO";
     }
 }
 

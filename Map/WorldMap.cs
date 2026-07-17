@@ -162,7 +162,7 @@ public partial class WorldMap
         var regions = new (string Name, string[] Countries)[] {
             ("Nordamerika", new[] { "USA", "CAN", "MEX" }),
             ("Mittelamerika", new[] { "GTM", "CUB", "HTI", "DOM", "HND", "NIC", "CRI", "PAN" }),
-            ("Suedamerika", new[] { "BRA", "ARG", "COL", "VEN", "PER", "CHL", "ECU", "BOL", "PRY", "URY", "GUY" }),
+            ("Suedamerika", new[] { "BRA", "ARG", "COL", "VEN", "PER", "CHL", "ECU", "BOL", "PRY", "URY", "GUY", "SUR" }),
             ("Westeuropa", new[] { "GBR", "FRA", "DEU", "ITA", "ESP", "PRT", "NLD", "BEL", "LUX", "CHE", "AUT", "IRL" }),
             ("Nordeuropa", new[] { "NOR", "SWE", "FIN", "DNK", "ISL", "GRL" }),
             ("Osteuropa", new[] { "POL", "UKR", "CZE", "ROU", "HUN", "BLR", "BGR", "SRB", "HRV", "SVK", "LTU", "LVA", "EST", "MDA", "ALB", "MKD", "SVN", "BIH", "MNE" }),
@@ -173,7 +173,7 @@ public partial class WorldMap
             ("Suedostasien", new[] { "IDN", "THA", "VNM", "MYS", "PHL", "MMR", "KHM", "LAO" }),
             ("Suedasien", new[] { "IND", "PAK", "BGD", "NPL", "LKA" }),
             ("Naher Osten", new[] { "SAU", "IRN", "TUR", "IRQ", "SYR", "YEM", "OMN", "ARE", "KWT", "JOR", "ISR", "LBN", "QAT", "BHR", "GEO", "ARM", "AZE" }),
-            ("Nordafrika", new[] { "EGY", "LBY", "TUN", "DZA", "MAR", "SDN", "SSD" }),
+            ("Nordafrika", new[] { "EGY", "LBY", "TUN", "DZA", "MAR", "ESH", "SDN", "SSD" }),
             ("Westafrika", new[] { "NGA", "GHA", "CIV", "SEN", "MLI", "BFA", "NER", "GIN", "BEN", "TGO", "SLE", "LBR", "MRT", "GMB" }),
             ("Zentralafrika", new[] { "COD", "COG", "CMR", "TCD", "CAF", "GAB", "GNQ" }),
             ("Ostafrika", new[] { "ETH", "KEN", "TZA", "UGA", "RWA", "BDI", "SOM", "ERI", "DJI", "MWI", "ZMB", "ZWE", "MOZ", "MDG" }),

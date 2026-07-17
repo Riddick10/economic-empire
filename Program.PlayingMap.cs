@@ -530,7 +530,9 @@ partial class Program
         int panelW = 150;
         int headerH = 24;
         int panelH = headerH + _heatmapFilters.Length * itemH + 12;
-        int panelY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT - panelH - 20;
+        // Platz fuer die Heatmap-Skala unterhalb des Panels reservieren (46px),
+        // sonst verschwindet sie unter der Bottom-Bar
+        int panelY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT - panelH - 66;
 
         // Hintergrund
         Raylib.DrawRectangle(panelX, panelY, panelW, panelH, new Color((byte)30, (byte)30, (byte)40, (byte)220));
@@ -952,9 +954,12 @@ partial class Program
     }
 
     /// <summary>
-    /// Zeichnet eine Info-Box in der Top-Bar (Label + Wert)
+    /// Zeichnet eine Info-Box in der Top-Bar (Label + Wert).
+    /// Boxen die rechts nicht mehr vor maxX passen werden uebersprungen,
+    /// damit sie Datum/Uhrzeit nicht uebermalen (schmale Fenster).
+    /// Gibt zurueck ob die Box gezeichnet wurde.
     /// </summary>
-    static void DrawTopBarInfoBox(ref int x, int rowY, string label, string value, Color? valueColor = null, int extraWidth = 0)
+    static bool DrawTopBarInfoBox(ref int x, int rowY, string label, string value, Color? valueColor = null, int extraWidth = 0, int maxX = int.MaxValue)
     {
         const int boxHeight = 26;
         const int boxPadding = 8;
@@ -965,6 +970,13 @@ partial class Program
         int valueWidth = MeasureTextCached(value, fontSize);
         int boxW = boxPadding + labelWidth + 4 + valueWidth + boxPadding + extraWidth;
 
+        if (x + boxW > maxX)
+        {
+            // Platz trotzdem weiterzaehlen, damit Folge-Boxen ebenfalls draussen bleiben
+            x += boxW + boxSpacing;
+            return false;
+        }
+
         Raylib.DrawRectangle(x, rowY - 2, boxW, boxHeight, ColorPalette.Background);
         Raylib.DrawRectangleLinesEx(new Rectangle(x, rowY - 2, boxW, boxHeight), 1, ColorPalette.PanelLight);
 
@@ -973,6 +985,7 @@ partial class Program
         DrawGameText(value, textX + labelWidth + 4, rowY + 2, fontSize, valueColor ?? ColorPalette.TextWhite);
 
         x += boxW + boxSpacing;
+        return true;
     }
 
     const int RES_BOX_WIDTH = 105;
