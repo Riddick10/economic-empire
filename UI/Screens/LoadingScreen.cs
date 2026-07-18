@@ -8,13 +8,35 @@ using GrandStrategyGame.UI;
 namespace GrandStrategyGame.UI.Screens;
 
 /// <summary>
-/// Ladebildschirm - Zeigt Fortschritt und startet asynchrones Laden
+/// Ladebildschirm - Klassischer Aufbau (Hintergrundbild, zentrierter Titel,
+/// Fortschrittsbalken) mit dezentem Feinschliff: weiche Vignette,
+/// Glas-Fortschrittsbalken mit Glow und rotierende Gameplay-Tipps.
 /// </summary>
 internal class LoadingScreen : IGameScreen
 {
     public GameScreen ScreenType => GameScreen.Loading;
 
-    public void Enter() { }
+    private float _shownProgress; // weich nachgezogener Fortschritt
+
+    private static readonly string[] Tips =
+    {
+        "Tipp: Mit WASD verschiebst du die Karte, das Mausrad zoomt.",
+        "Tipp: F9 speichert dein Spiel blitzschnell.",
+        "Tipp: Fabriken brauchen Rohstoffe - sichere deine Lieferketten.",
+        "Tipp: Der EU-Binnenmarkt gibt Handelsboni zwischen Mitgliedern.",
+        "Tipp: Wahlen gewinnst du mit Stabilitaet und Werbekampagnen.",
+        "Tipp: Forschung ist teuer - aber Rueckstand ist teurer.",
+        "Tipp: Beobachte die Marktpreise, bevor du exportierst.",
+        "Tipp: Ein Krieg ist schnell erklaert und langsam gewonnen.",
+        "Tipp: Alle 90 Spieltage wird automatisch gespeichert.",
+        "Tipp: Rechtsklick auf ein Land zeigt dir alle Details.",
+    };
+
+    public void Enter()
+    {
+        _shownProgress = 0f;
+    }
+
     public void Exit() { }
 
     public void Update()
@@ -67,81 +89,138 @@ internal class LoadingScreen : IGameScreen
 
     public void Draw()
     {
-        // Hole aktuelle Werte thread-sicher
+        float dt = Raylib.GetFrameTime();
+        float time = (float)Raylib.GetTime();
+        int w = Program.ScreenWidth;
+        int h = Program.ScreenHeight;
+
         float progress = Program._loading.Progress;
         string status = Program._loading.Status;
 
-        // Hintergrund-Bild zeichnen (skaliert auf Bildschirmgroesse)
+        // Fortschritt weich nachziehen (keine Spruenge)
+        _shownProgress += (progress - _shownProgress) * Math.Min(1f, dt * 6f);
+
+        // === Hintergrund-Bild (skaliert auf Bildschirmgroesse) ===
         if (Program._loadingScreenTexture != null && Program._loadingScreenTexture.Value.Id != 0)
         {
             var tex = Program._loadingScreenTexture.Value;
-            float scaleX = (float)Program.ScreenWidth / tex.Width;
-            float scaleY = (float)Program.ScreenHeight / tex.Height;
+            float scaleX = (float)w / tex.Width;
+            float scaleY = (float)h / tex.Height;
             float scale = Math.Max(scaleX, scaleY);
             int drawW = (int)(tex.Width * scale);
             int drawH = (int)(tex.Height * scale);
-            int drawX = (Program.ScreenWidth - drawW) / 2;
-            int drawY = (Program.ScreenHeight - drawH) / 2;
+            int drawX = (w - drawW) / 2;
+            int drawY = (h - drawH) / 2;
 
             Raylib.DrawTexturePro(tex,
                 new Rectangle(0, 0, tex.Width, tex.Height),
                 new Rectangle(drawX, drawY, drawW, drawH),
                 new Vector2(0, 0), 0f, Color.White);
 
-            Raylib.DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+            // Weiche Vignette statt flacher Abdunklung:
+            // Grundton + dunklere Raender oben/unten fuer bessere Lesbarkeit
+            Raylib.DrawRectangle(0, 0, w, h, new Color((byte)0, (byte)0, (byte)0, (byte)110));
+            Raylib.DrawRectangleGradientV(0, 0, w, (int)(h * 0.30f),
+                new Color((byte)0, (byte)0, (byte)0, (byte)130), new Color((byte)0, (byte)0, (byte)0, (byte)0));
+            Raylib.DrawRectangleGradientV(0, h - (int)(h * 0.35f), w, (int)(h * 0.35f),
+                new Color((byte)0, (byte)0, (byte)0, (byte)0), new Color((byte)0, (byte)0, (byte)0, (byte)160));
         }
         else
         {
-            Raylib.DrawRectangleGradientV(0, 0, Program.ScreenWidth, Program.ScreenHeight,
+            Raylib.DrawRectangleGradientV(0, 0, w, h,
                 new Color((byte)20, (byte)20, (byte)30, (byte)255),
                 new Color((byte)40, (byte)40, (byte)60, (byte)255));
         }
 
-        // Titel
-        Program.DrawGameTitle(Program.ScreenWidth / 2, Program.ScreenHeight / 2 - 120);
+        // === Titel + Untertitel (zentriert wie vorher) ===
+        Program.DrawGameTitle(w / 2, h / 2 - 120);
 
-        // Untertitel
-        string subtitle = "Build Your Economic Dominance";
+        string subtitle = "Baue dein Wirtschaftsimperium";
         int subWidth = Program.MeasureTextCached(subtitle, GameConfig.FONT_SIZE_LARGE);
-        Program.DrawGameText(subtitle, (Program.ScreenWidth - subWidth) / 2, Program.ScreenHeight / 2 - 50, GameConfig.FONT_SIZE_LARGE, ColorPalette.TextGray);
+        Program.DrawGameText(subtitle, (w - subWidth) / 2, h / 2 - 50, GameConfig.FONT_SIZE_LARGE, ColorPalette.TextGray);
 
-        // Fortschrittsbalken
+        // === Fortschrittsbalken (Glas-Stil mit Glow) ===
         int barWidth = GameConfig.LOADING_BAR_WIDTH;
         int barHeight = GameConfig.LOADING_BAR_HEIGHT;
-        int barX = (Program.ScreenWidth - barWidth) / 2;
-        int barY = Program.ScreenHeight / 2 + 30;
+        int barX = (w - barWidth) / 2;
+        int barY = h / 2 + 30;
 
-        // Dezenter Glow hinter dem Balken
-        float glowAlpha = 0.3f + 0.1f * MathF.Sin((float)Raylib.GetTime() * 2f);
-        byte ga = (byte)(glowAlpha * 255 * progress);
+        // Dezenter Glow hinter dem Balken (pulsiert leicht, waechst mit Fortschritt)
+        float glowAlpha = 0.3f + 0.1f * MathF.Sin(time * 2f);
+        byte ga = (byte)(glowAlpha * 255 * _shownProgress);
         Raylib.DrawRectangle(barX - 8, barY - 6, barWidth + 16, barHeight + 12,
             new Color(ColorPalette.Accent.R, ColorPalette.Accent.G, ColorPalette.Accent.B, (byte)(ga / 4)));
 
-        UIHelper.DrawProgressBar(barX, barY, barWidth, barHeight, progress, ColorPalette.Accent);
+        // Track: dunkles Glas mit feiner heller Oberkante
+        Raylib.DrawRectangle(barX, barY, barWidth, barHeight, new Color((byte)14, (byte)18, (byte)30, (byte)220));
+        Raylib.DrawRectangle(barX, barY, barWidth, 1, new Color((byte)255, (byte)255, (byte)255, (byte)18));
+        Raylib.DrawRectangleLinesEx(new Rectangle(barX - 1, barY - 1, barWidth + 2, barHeight + 2), 1,
+            new Color((byte)90, (byte)98, (byte)120, (byte)160));
+
+        // Fuellung: Accent-Verlauf mit hellem Kopf
+        int fillW = (int)(barWidth * _shownProgress);
+        if (fillW > 2)
+        {
+            Color fillDark = new Color((byte)(ColorPalette.Accent.R * 0.75f), (byte)(ColorPalette.Accent.G * 0.75f),
+                (byte)(ColorPalette.Accent.B * 0.75f), (byte)255);
+            Raylib.DrawRectangleGradientH(barX, barY, fillW, barHeight, fillDark, ColorPalette.Accent);
+
+            // Pulsierender Glow am Fuellungskopf
+            float pulse = 0.6f + 0.4f * MathF.Sin(time * 4f);
+            Raylib.DrawCircleGradient(barX + fillW, barY + barHeight / 2, 14f * pulse,
+                new Color(ColorPalette.Accent.R, ColorPalette.Accent.G, ColorPalette.Accent.B, (byte)80),
+                new Color((byte)0, (byte)0, (byte)0, (byte)0));
+            Raylib.DrawRectangle(barX + fillW - 2, barY, 2, barHeight,
+                new Color((byte)220, (byte)235, (byte)255, (byte)255));
+        }
 
         // Prozentzahl
-        string percent = $"{(int)(progress * 100)}%";
+        string percent = $"{(int)(_shownProgress * 100)}%";
         int percentWidth = Program.MeasureTextCached(percent, GameConfig.FONT_SIZE_NORMAL);
-        Program.DrawGameText(percent, (Program.ScreenWidth - percentWidth) / 2, barY + barHeight + 12, GameConfig.FONT_SIZE_NORMAL, ColorPalette.TextWhite);
+        Program.DrawGameText(percent, (w - percentWidth) / 2, barY + barHeight + 12, GameConfig.FONT_SIZE_NORMAL, ColorPalette.TextWhite);
 
         // Aktueller Ladestatus
         int statusWidth = Program.MeasureTextCached(status, GameConfig.FONT_SIZE_NORMAL);
-        Program.DrawGameText(status, (Program.ScreenWidth - statusWidth) / 2, barY + barHeight + 38, GameConfig.FONT_SIZE_NORMAL, ColorPalette.TextGray);
+        Program.DrawGameText(status, (w - statusWidth) / 2, barY + barHeight + 38, GameConfig.FONT_SIZE_NORMAL, ColorPalette.TextGray);
 
-        // Lade-Animation (rotierende Punkte)
-        float time = (float)Raylib.GetTime();
+        // Lade-Animation (rotierende Punkte, wie vorher)
         int dotCount = 3;
         for (int i = 0; i < dotCount; i++)
         {
             float angle = time * 3 + i * (MathF.PI * 2 / dotCount);
-            float dotX = Program.ScreenWidth / 2 + MathF.Cos(angle) * 15;
+            float dotX = w / 2 + MathF.Cos(angle) * 15;
             float dotY = barY + barHeight + 80 + MathF.Sin(angle) * 15;
             byte alpha = (byte)(150 + 105 * MathF.Sin(time * 5 + i));
             Raylib.DrawCircle((int)dotX, (int)dotY, 4, new Color(ColorPalette.Accent.R, ColorPalette.Accent.G, ColorPalette.Accent.B, alpha));
         }
 
-        // Version unten
-        Program.DrawGameText("v0.1", 11, Program.ScreenHeight - 25, 11, ColorPalette.TextGray);
+        // === Rotierender Gameplay-Tipp unten ===
+        DrawTip(w, h, time);
+
+        // Version unten links (wie vorher)
+        Program.DrawGameText("v0.1", 11, h - 25, 11, ColorPalette.TextGray);
+    }
+
+    /// <summary>
+    /// Rotierender Gameplay-Tipp mit Ein-/Ausblendung
+    /// </summary>
+    private static void DrawTip(int w, int h, float time)
+    {
+        const float cycle = 6f;
+        int idx = (int)(time / cycle) % Tips.Length;
+        float t = time % cycle;
+        float fade = Math.Min(1f, Math.Min(t / 0.7f, (cycle - t) / 0.7f));
+        if (fade <= 0f) return;
+
+        string tip = Tips[idx];
+        int tw = Program.MeasureTextCached(tip, 16);
+        int tx = (w - tw) / 2;
+        int ty = h - 58;
+
+        Raylib.DrawCircleV(new Vector2(tx - 14, ty + 8), 2.5f,
+            new Color(ColorPalette.Accent.R, ColorPalette.Accent.G, ColorPalette.Accent.B, (byte)(200 * fade)));
+        Program.DrawGameText(tip, tx, ty, 16,
+            new Color((byte)200, (byte)205, (byte)218, (byte)(210 * fade)));
     }
 
     /// <summary>

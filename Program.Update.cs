@@ -734,11 +734,8 @@ partial class Program
             _lastAutosaveDay = game.TotalDays;
             if (SaveGameManager.Autosave(game, worldMap))
             {
+                // Bewusst ohne Benachrichtigung - Autosave soll den Spieler nicht stoeren
                 Console.WriteLine($"[Autosave] Automatisch gespeichert (Tag {game.TotalDays})");
-                _mgr.Notif?.AddNotification(
-                    "Automatisch gespeichert",
-                    $"Spielstand wurde automatisch gesichert ({game.GetDateString()}).",
-                    NotificationType.Info);
             }
         }
 

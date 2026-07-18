@@ -280,6 +280,7 @@ class UIState
     public int NewsScrollOffset;
     public int ProductionScrollOffset;
     public int LogisticsScrollOffset;
+    public int BudgetScrollOffset;
     public int MusicTrackListScroll;
     public int EconomyRankingScrollOffset;
 
@@ -325,7 +326,7 @@ class UIState
     public bool IsDraggingMusicSlider;
     public bool IsDraggingSoundSlider;
     public bool IsDraggingDeficitSlider;
-    public bool MainMenuDayNightCycleEnabled = true;
+    public bool MainMenuDayNightCycleEnabled = false; // Standard: aus (in den Optionen aktivierbar)
 
     // Sonstiges
     public int LastNotificationId = -1;
@@ -401,6 +402,7 @@ class UIState
         NewsScrollOffset = 0;
         ProductionScrollOffset = 0;
         LogisticsScrollOffset = 0;
+        BudgetScrollOffset = 0;
         EconomyRankingScrollOffset = 0;
         DecisionScrollOffset = 0;
 

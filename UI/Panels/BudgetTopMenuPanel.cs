@@ -10,12 +10,20 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
     public string Title => "FINANZEN";
     public TopMenuPanel PanelType => TopMenuPanel.Budget;
 
+    // Gemessene Gesamthoehe des Inhalts (vom letzten Frame, fuer Scroll-Clamp)
+    private int _contentHeight = 700;
+
     public void Draw(TopMenuContext ctx)
     {
-        int y = Program.DrawTopMenuPanelHeader("FINANZEN");
-        var (panelX, _, panelW, _) = Program.GetTopMenuPanelRect();
+        int headerBottom = Program.DrawTopMenuPanelHeader("FINANZEN");
+        var (panelX, panelY, panelW, panelH) = Program.GetTopMenuPanelRect();
         int contentX = panelX + 15;
         var player = Program.game.PlayerCountry!;
+
+        // Scrollbarer Bereich unterhalb des Headers
+        int scrollAreaY = headerBottom;
+        int scrollAreaH = panelY + panelH - scrollAreaY - 10;
+        const int scrollBarWidth = 12;
 
         var tradeManager = Program.game.GetSystem<TradeManager>();
         var gameContext = Program.game.GetGameContext();
@@ -31,6 +39,21 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         double monthlyTradeBalance = dailyTradeBalance * 30;
 
         Vector2 mousePos = Program._cachedMousePos;
+
+        // Mausrad-Scrolling (nur wenn Maus ueber dem Panel)
+        Rectangle scrollAreaRect = new Rectangle(panelX, scrollAreaY, panelW, scrollAreaH);
+        bool mouseInArea = Raylib.CheckCollisionPointRec(mousePos, scrollAreaRect);
+        int maxScroll = Math.Max(0, _contentHeight - scrollAreaH);
+        if (mouseInArea)
+        {
+            float wheel = Raylib.GetMouseWheelMove();
+            if (wheel != 0)
+                Program.ui.BudgetScrollOffset -= (int)(wheel * 40);
+        }
+        Program.ui.BudgetScrollOffset = Math.Clamp(Program.ui.BudgetScrollOffset, 0, maxScroll);
+
+        Raylib.BeginScissorMode(panelX, scrollAreaY, panelW - scrollBarWidth, scrollAreaH);
+        int y = scrollAreaY - Program.ui.BudgetScrollOffset;
 
         Program.DrawGameText("UEBERSICHT", contentX, y, 14, ColorPalette.Accent);
         y += 24;
@@ -154,7 +177,8 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         string deficitLabel = deficitPct <= -0.05 ? $"Sparkurs ({deficitPct:F0}%)" :
                               deficitPct < 0.05 ? "Ausgeglichen (0%)" :
                               $"Defizit (+{deficitPct:F0}%)";
-        Program.DrawGameText(deficitLabel, contentX + 130, y, 14, deficitColor);
+        // Etwas weiter rechts, damit das lange Label nicht ueberlappt
+        Program.DrawGameText(deficitLabel, contentX + 160, y, 14, deficitColor);
         y += 20;
 
         int defSliderW = panelW - 60;
@@ -163,7 +187,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         Rectangle defSliderHitbox = new Rectangle(contentX - 4, y - 8, defSliderW + 8, defSliderH + 16);
 
         // Slider-Interaktion
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, defSliderHitbox))
+        if (mouseInArea && Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, defSliderHitbox))
         {
             Program.ui.IsDraggingDeficitSlider = true;
         }
@@ -203,7 +227,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
 
         // +100M
         Rectangle btn100 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hover100 = Raylib.CheckCollisionPointRec(mousePos, btn100);
+        bool hover100 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn100);
         Raylib.DrawRectangleRec(btn100, hover100 ? ColorPalette.Accent : ColorPalette.PanelLight);
         Raylib.DrawRectangleLinesEx(btn100, 1, ColorPalette.Accent);
         Program.DrawGameText("+100M", loanBtnX + 8, y + 4, 14, ColorPalette.TextWhite);
@@ -217,7 +241,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
 
         // +500M
         Rectangle btn500 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hover500 = Raylib.CheckCollisionPointRec(mousePos, btn500);
+        bool hover500 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn500);
         Raylib.DrawRectangleRec(btn500, hover500 ? ColorPalette.Accent : ColorPalette.PanelLight);
         Raylib.DrawRectangleLinesEx(btn500, 1, ColorPalette.Accent);
         Program.DrawGameText("+500M", loanBtnX + 8, y + 4, 14, ColorPalette.TextWhite);
@@ -232,7 +256,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         // +1Mrd
         loanBtnW = 58;
         Rectangle btn1000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hover1000 = Raylib.CheckCollisionPointRec(mousePos, btn1000);
+        bool hover1000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn1000);
         Raylib.DrawRectangleRec(btn1000, hover1000 ? ColorPalette.Accent : ColorPalette.PanelLight);
         Raylib.DrawRectangleLinesEx(btn1000, 1, ColorPalette.Accent);
         Program.DrawGameText("+1Mrd", loanBtnX + 6, y + 4, 14, ColorPalette.TextWhite);
@@ -247,7 +271,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         // +10Mrd
         loanBtnW = 68;
         Rectangle btn10000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hover10000 = Raylib.CheckCollisionPointRec(mousePos, btn10000);
+        bool hover10000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn10000);
         Raylib.DrawRectangleRec(btn10000, hover10000 ? ColorPalette.Accent : ColorPalette.PanelLight);
         Raylib.DrawRectangleLinesEx(btn10000, 1, ColorPalette.Accent);
         Program.DrawGameText("+10Mrd", loanBtnX + 4, y + 4, 14, ColorPalette.TextWhite);
@@ -269,7 +293,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
 
         bool canRepay100 = player.Budget >= 100 && player.NationalDebt >= 100;
         Rectangle repay100 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hoverRepay100 = Raylib.CheckCollisionPointRec(mousePos, repay100);
+        bool hoverRepay100 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, repay100);
         Color repay100Bg = !canRepay100 ? ColorPalette.PanelDark : (hoverRepay100 ? ColorPalette.Green : ColorPalette.PanelLight);
         Raylib.DrawRectangleRec(repay100, repay100Bg);
         Raylib.DrawRectangleLinesEx(repay100, 1, canRepay100 ? ColorPalette.Green : ColorPalette.TextGray);
@@ -284,7 +308,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
 
         bool canRepay500 = player.Budget >= 500 && player.NationalDebt >= 500;
         Rectangle repay500 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hoverRepay500 = Raylib.CheckCollisionPointRec(mousePos, repay500);
+        bool hoverRepay500 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, repay500);
         Color repay500Bg = !canRepay500 ? ColorPalette.PanelDark : (hoverRepay500 ? ColorPalette.Green : ColorPalette.PanelLight);
         Raylib.DrawRectangleRec(repay500, repay500Bg);
         Raylib.DrawRectangleLinesEx(repay500, 1, canRepay500 ? ColorPalette.Green : ColorPalette.TextGray);
@@ -300,7 +324,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         loanBtnW = 58;
         bool canRepay1000 = player.Budget >= 1000 && player.NationalDebt >= 1000;
         Rectangle repay1000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hoverRepay1000 = Raylib.CheckCollisionPointRec(mousePos, repay1000);
+        bool hoverRepay1000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, repay1000);
         Color repay1000Bg = !canRepay1000 ? ColorPalette.PanelDark : (hoverRepay1000 ? ColorPalette.Green : ColorPalette.PanelLight);
         Raylib.DrawRectangleRec(repay1000, repay1000Bg);
         Raylib.DrawRectangleLinesEx(repay1000, 1, canRepay1000 ? ColorPalette.Green : ColorPalette.TextGray);
@@ -316,7 +340,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         loanBtnW = 68;
         bool canRepay10000 = player.Budget >= 10000 && player.NationalDebt >= 10000;
         Rectangle repay10000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
-        bool hoverRepay10000 = Raylib.CheckCollisionPointRec(mousePos, repay10000);
+        bool hoverRepay10000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, repay10000);
         Color repay10000Bg = !canRepay10000 ? ColorPalette.PanelDark : (hoverRepay10000 ? ColorPalette.Green : ColorPalette.PanelLight);
         Raylib.DrawRectangleRec(repay10000, repay10000Bg);
         Raylib.DrawRectangleLinesEx(repay10000, 1, canRepay10000 ? ColorPalette.Green : ColorPalette.TextGray);
@@ -359,5 +383,22 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         Color changeColor = dailyBudgetChange >= 0 ? ColorPalette.Green : ColorPalette.Red;
         Program.DrawGameText("Täglich:", contentX, y, 14, ColorPalette.TextGray);
         Program.DrawGameText(changeSign + Formatting.Money(Math.Abs(dailyBudgetChange)), contentX + 130, y, 14, changeColor);
+        y += 18;
+
+        // Gesamthoehe fuer den Scroll-Clamp im naechsten Frame merken
+        _contentHeight = y + Program.ui.BudgetScrollOffset - scrollAreaY + 6;
+
+        Raylib.EndScissorMode();
+
+        // Scrollbar rechts
+        if (maxScroll > 0)
+        {
+            int sbX = panelX + panelW - scrollBarWidth;
+            Raylib.DrawRectangle(sbX, scrollAreaY, scrollBarWidth, scrollAreaH, ColorPalette.Background);
+            float thumbRatio = (float)scrollAreaH / _contentHeight;
+            int thumbH = Math.Max(20, (int)(scrollAreaH * thumbRatio));
+            int thumbY = scrollAreaY + (int)((float)Program.ui.BudgetScrollOffset / maxScroll * (scrollAreaH - thumbH));
+            Raylib.DrawRectangle(sbX + 2, thumbY, scrollBarWidth - 4, thumbH, ColorPalette.PanelLight);
+        }
     }
 }

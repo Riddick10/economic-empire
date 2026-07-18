@@ -49,7 +49,7 @@ public partial class WorldMap
     public bool ShowGrid { get; set; } = false;
     public bool ShowRivers { get; set; } = true;
     public float BorderWidth { get; set; } = 2.0f;
-    public bool DayNightCycleEnabled { get; set; } = true;
+    public bool DayNightCycleEnabled { get; set; } = false; // Standard: aus (folgt der Options-Einstellung)
 
     // Zeitzone fuer Tag/Nacht-Zyklus (Offset zu UTC in Stunden)
     // Standard: CET (Mitteleuropaeische Zeit, UTC+1)
