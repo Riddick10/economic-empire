@@ -134,6 +134,12 @@ _systemManager.RegisterSystem(new MilitaryManager());
         {
             PlayerCountry = country;
             IsPaused = false;
+
+            // Tageswerte vorbefuellen, sonst zeigt die UI (z.B. Logistik-Panel)
+            // bis zum ersten Tageswechsel ueberall 0 Produktion an
+            if (_gameContext != null)
+                GetSystem<ProductionManager>()?.PrimeDailyEstimates(_gameContext);
+
             return true;
         }
         return false;

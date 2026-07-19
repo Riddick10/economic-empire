@@ -614,10 +614,12 @@ public static class SaveGameManager
                     {
                         if (Enum.TryParse<MineType>(mineSave.Type, out var mineType))
                         {
+                            // ProductionPerDay bewusst NICHT aus dem Save uebernehmen:
+                            // Der Konstruktor setzt den aktuellen Balance-Basiswert,
+                            // damit Balance-Aenderungen auch alte Spielstaende erreichen.
                             var mine = new Mine(mineType)
                             {
-                                Level = mineSave.Level,
-                                ProductionPerDay = mineSave.ProductionPerDay
+                                Level = mineSave.Level
                             };
                             province.Mines.Add(mine);
                         }
@@ -846,6 +848,12 @@ public static class SaveGameManager
             {
                 missionManager.RestoreCompleted(saveData.CompletedMissions);
             }
+
+            // Tageswerte neu berechnen: DailyProduction/DailyConsumption stehen
+            // nicht im Save und waeren sonst bis zum ersten Tageswechsel leer
+            // (Logistik-Panel wuerde 0 Produktion anzeigen)
+            if (productionManager != null && gameContext != null)
+                productionManager.PrimeDailyEstimates(gameContext);
 
             Console.WriteLine($"[SaveGameManager] Spielstand angewendet: {saveData.PlayerCountryId}, {saveData.Year}-{saveData.Month}-{saveData.Day} {saveData.Hour:D2}:{saveData.Minute:D2} (Version {saveData.Version})");
             return true;

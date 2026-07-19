@@ -46,6 +46,11 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
 
         int totalContentHeight = Program._logisticsPanelContentHeight;
         int maxScroll = Math.Max(0, totalContentHeight - scrollAreaH);
+
+        // Offset immer klemmen, nicht nur beim Scrollen - sonst haengt der Inhalt
+        // nach einer Fenstervergroesserung dauerhaft ausserhalb des Sichtbereichs
+        Program.ui.LogisticsScrollOffset = Math.Clamp(Program.ui.LogisticsScrollOffset, 0, maxScroll);
+
         Rectangle scrollAreaRect = new Rectangle(panelX, scrollAreaY, panelW, scrollAreaH);
         bool mouseOverPanel = Raylib.CheckCollisionPointRec(mousePos, scrollAreaRect);
 
@@ -99,8 +104,6 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
         Raylib.DrawLine(contentX, y, panelX + panelW - 15 - scrollBarWidth, y, ColorPalette.PanelLight);
         y += 8;
 
-        double totalProd = 0, totalCons = 0, totalTradeNet = 0;
-
         void DrawLogisticsRow(ResourceType resType, ref int rowY)
         {
             double stock = player.GetResource(resType);
@@ -109,14 +112,12 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
             double trade = tradeNet.GetValueOrDefault(resType, 0);
             double net = prod - cons + trade;
 
-            totalProd += prod;
-            totalCons += cons;
-            totalTradeNet += trade;
-
             Program.DrawResourceIcon(resType, contentX, rowY, 16);
             Program.DrawGameText(GetResName(resType), colName, rowY, 13, ColorPalette.TextWhite);
             Program.DrawGameText(Program.FormatGermanNumber(stock), colStock, rowY, 13, ColorPalette.TextWhite);
-            Program.DrawGameText($"+{Program.FormatGermanNumber(prod)}", colProd, rowY, 13, prod > 0 ? ColorPalette.Green : ColorPalette.TextGray);
+
+            string prodStr = prod > 0 ? $"+{Program.FormatGermanNumber(prod)}" : "0";
+            Program.DrawGameText(prodStr, colProd, rowY, 13, prod > 0 ? ColorPalette.Green : ColorPalette.TextGray);
 
             string consStr = cons > 0 ? $"-{Program.FormatGermanNumber(cons)}" : "0";
             Program.DrawGameText(consStr, colCons, rowY, 13, cons > 0 ? ColorPalette.Red : ColorPalette.TextGray);

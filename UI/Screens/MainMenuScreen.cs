@@ -30,6 +30,11 @@ internal class MainMenuScreen : IGameScreen
     private struct Dust { public float X, Y, Speed, SwayAmp, SwayFreq, Phase, Size; public byte Alpha; }
     private Dust[] _dust = Array.Empty<Dust>();
 
+    // Options-Overlay: Ein-/Ausblenden und weiche Hover-/Schalter-Zustaende
+    private float _optionsAnim;                          // 0..1
+    private float _dayNightToggleAnim;
+    private readonly float[] _optHover = new float[2];   // 0 = Zurueck, 1 = Schliessen
+
     private static readonly (string Text, string Author)[] Quotes =
     {
         ("Der Preis ist, was du zahlst. Der Wert ist, was du bekommst.", "Warren Buffett"),
@@ -56,6 +61,9 @@ internal class MainMenuScreen : IGameScreen
         _quoteTimer = 0f;
         _quoteIndex = _rng.Next(Quotes.Length);
         Array.Clear(_hoverAnim, 0, _hoverAnim.Length);
+        _optionsAnim = 0f;
+        Array.Clear(_optHover, 0, _optHover.Length);
+        _dayNightToggleAnim = Program.ui.MainMenuDayNightCycleEnabled ? 1f : 0f;
         _mapClock = 17.0f + (float)_rng.NextDouble() * 4f; // Abendstimmung ueber Europa
 
         // Partikel initialisieren
@@ -100,6 +108,10 @@ internal class MainMenuScreen : IGameScreen
         }
 
         Vector2 mousePos = Program._cachedMousePos;
+
+        // Options-Overlay weich ein-/ausblenden
+        float optTarget = Program.ui.ShowMainMenuOptions ? 1f : 0f;
+        _optionsAnim += (optTarget - _optionsAnim) * Math.Min(1f, dt * 11f);
 
         if (Program.ui.ShowMainMenuOptions)
         {
@@ -232,7 +244,8 @@ internal class MainMenuScreen : IGameScreen
         int verW = Program.MeasureTextCached(version, 16);
         Program.DrawGameText(version, w - verW - 14, 12, 16, new Color((byte)150, (byte)155, (byte)170, (byte)160));
 
-        if (Program.ui.ShowMainMenuOptions)
+        // Auch waehrend des Ausblendens weiterzeichnen
+        if (Program.ui.ShowMainMenuOptions || _optionsAnim > 0.02f)
         {
             DrawMainMenuOptionsPanel();
         }
@@ -487,83 +500,86 @@ internal class MainMenuScreen : IGameScreen
             (byte)(a.A + (b.A - a.A) * t));
     }
 
+    // === Options-Overlay im Living-World-Stil ===
+
+    /// <summary>
+    /// Gemeinsames Layout fuer Update und Draw (eine Quelle, keine Duplikate)
+    /// </summary>
+    private static (Rectangle Panel, Rectangle Close, Rectangle Back, Rectangle MusicTrack,
+        Rectangle SoundTrack, Rectangle Toggle) GetOptionsLayout()
+    {
+        const int menuW = 520;
+        const int menuH = 500;
+        const int pad = 36;
+        int x = (Program.ScreenWidth - menuW) / 2;
+        int y = (Program.ScreenHeight - menuH) / 2;
+
+        int soundHeaderY = y + 96;
+        int musicTrackY = soundHeaderY + 64;
+        int soundTrackY = musicTrackY + 64;
+        int gfxHeaderY = soundTrackY + 44;
+        int toggleY = gfxHeaderY + 34;
+
+        return (
+            new Rectangle(x, y, menuW, menuH),
+            new Rectangle(x + menuW - 44, y + 12, 32, 32),
+            new Rectangle(x + pad, y + menuH - 74, menuW - pad * 2, 50),
+            new Rectangle(x + pad, musicTrackY, menuW - pad * 2, 10),
+            new Rectangle(x + pad, soundTrackY, menuW - pad * 2, 10),
+            new Rectangle(x + menuW - pad - 58, toggleY, 58, 28));
+    }
+
+    private static Rectangle Inflate(Rectangle r, float dx, float dy) =>
+        new(r.X - dx, r.Y - dy, r.Width + dx * 2, r.Height + dy * 2);
+
     private void UpdateMainMenuOptions(Vector2 mousePos)
     {
-        int menuW = 480;
-        int menuH = 460;
-        int menuX = (Program.ScreenWidth - menuW) / 2;
-        int menuY = (Program.ScreenHeight - menuH) / 2;
+        var l = GetOptionsLayout();
 
-        int closeBtnSize = 30;
-        int closeBtnX = menuX + menuW - closeBtnSize - 10;
-        int closeBtnY = menuY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
-
-        int backBtnW = 360;
-        int backBtnH = 40;
-        int backBtnX = menuX + (menuW - backBtnW) / 2;
-        int backBtnY = menuY + menuH - backBtnH - 20;
-        Rectangle backRect = new Rectangle(backBtnX, backBtnY, backBtnW, backBtnH);
-
-        int sliderX = menuX + 40;
-        int sliderW = menuW - 80;
-        int sliderH = 12;
-
-        int soundSectionY = menuY + 70;
-
-        int musicSliderY = soundSectionY + 68;
-        Rectangle musicSliderRect = new Rectangle(sliderX, musicSliderY - 10, sliderW, sliderH + 20);
-
-        int soundSliderY = soundSectionY + 120;
-        Rectangle soundSliderRect = new Rectangle(sliderX, soundSliderY - 10, sliderW, sliderH + 20);
-
-        int gfxSectionY = soundSectionY + 175;
-        int toggleY = gfxSectionY + 42;
-        int toggleW = 60;
-        int toggleH = 26;
-        int toggleX = menuX + menuW - 40 - toggleW;
-        Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
-
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, musicSliderRect))
+        void Close()
         {
-            Program.ui.IsDraggingMusicSlider = true;
+            SoundManager.Play(SoundEffect.Click);
+            Program.ui.ShowMainMenuOptions = false;
+            Program.ui.IsDraggingMusicSlider = false;
+            Program.ui.IsDraggingSoundSlider = false;
+        }
+
+        // Slider-Drag starten (grosszuegige Hit-Flaeche um die Schiene)
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        {
+            if (Raylib.CheckCollisionPointRec(mousePos, Inflate(l.MusicTrack, 10, 14)))
+                Program.ui.IsDraggingMusicSlider = true;
+            else if (Raylib.CheckCollisionPointRec(mousePos, Inflate(l.SoundTrack, 10, 14)))
+                Program.ui.IsDraggingSoundSlider = true;
         }
         if (Raylib.IsMouseButtonReleased(MouseButton.Left))
         {
             Program.ui.IsDraggingMusicSlider = false;
-        }
-        if (Program.ui.IsDraggingMusicSlider)
-        {
-            float newVolume = (mousePos.X - sliderX) / sliderW;
-            Program.ui.OptionsMusicVolume = Math.Clamp(newVolume, 0f, 1f);
-            Program.musicManager.Volume = Program.ui.OptionsMusicVolume;
+            Program.ui.IsDraggingSoundSlider = false;
         }
 
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, soundSliderRect))
+        if (Program.ui.IsDraggingMusicSlider)
         {
-            Program.ui.IsDraggingSoundSlider = true;
-        }
-        if (Raylib.IsMouseButtonReleased(MouseButton.Left))
-        {
-            Program.ui.IsDraggingSoundSlider = false;
+            Program.ui.OptionsMusicVolume = Math.Clamp((mousePos.X - l.MusicTrack.X) / l.MusicTrack.Width, 0f, 1f);
+            Program.musicManager.Volume = Program.ui.OptionsMusicVolume;
         }
         if (Program.ui.IsDraggingSoundSlider)
         {
-            float newVolume = (mousePos.X - sliderX) / sliderW;
-            Program.ui.OptionsSoundVolume = Math.Clamp(newVolume, 0f, 1f);
+            Program.ui.OptionsSoundVolume = Math.Clamp((mousePos.X - l.SoundTrack.X) / l.SoundTrack.Width, 0f, 1f);
             SoundManager.Volume = Program.ui.OptionsSoundVolume;
         }
 
-        if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+        if (Raylib.IsMouseButtonPressed(MouseButton.Left) &&
+            !Program.ui.IsDraggingMusicSlider && !Program.ui.IsDraggingSoundSlider)
         {
-            if (Raylib.CheckCollisionPointRec(mousePos, closeRect) ||
-                Raylib.CheckCollisionPointRec(mousePos, backRect))
+            if (Raylib.CheckCollisionPointRec(mousePos, l.Close) ||
+                Raylib.CheckCollisionPointRec(mousePos, l.Back) ||
+                !Raylib.CheckCollisionPointRec(mousePos, l.Panel))
             {
-                Program.ui.ShowMainMenuOptions = false;
-                Program.ui.IsDraggingMusicSlider = false;
-                Program.ui.IsDraggingSoundSlider = false;
+                // X, Zurueck oder Klick neben das Panel schliessen
+                Close();
             }
-            else if (Raylib.CheckCollisionPointRec(mousePos, toggleRect))
+            else if (Raylib.CheckCollisionPointRec(mousePos, l.Toggle))
             {
                 Program.ui.MainMenuDayNightCycleEnabled = !Program.ui.MainMenuDayNightCycleEnabled;
                 SoundManager.Play(SoundEffect.Click);
@@ -571,140 +587,214 @@ internal class MainMenuScreen : IGameScreen
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
-        {
-            Program.ui.ShowMainMenuOptions = false;
-            Program.ui.IsDraggingMusicSlider = false;
-            Program.ui.IsDraggingSoundSlider = false;
-        }
+            Close();
     }
 
     private void DrawMainMenuOptionsPanel()
     {
+        float dt = Raylib.GetFrameTime();
         Vector2 mousePos = Program._cachedMousePos;
+        bool open = Program.ui.ShowMainMenuOptions;
 
-        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+        float ease = 1f - MathF.Pow(1f - Math.Clamp(_optionsAnim, 0f, 1f), 3f);
+        if (ease <= 0.01f) return;
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
 
-        int menuW = 480;
-        int menuH = 460;
-        int menuX = (Program.ScreenWidth - menuW) / 2;
-        int menuY = (Program.ScreenHeight - menuH) / 2;
+        // Menue-Szene abdunkeln (Karte lebt dahinter weiter)
+        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight,
+            new Color((byte)2, (byte)3, (byte)7, A(165)));
 
-        Rectangle optionsRect = new(menuX, menuY, menuW, menuH);
-        Rectangle optionsShadow = new(menuX + 3, menuY + 3, menuW, menuH);
-        Raylib.DrawRectangleRounded(optionsShadow, 0.03f, 8, new Color((byte)0, (byte)0, (byte)0, (byte)60));
-        Raylib.DrawRectangleRounded(optionsRect, 0.03f, 8, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(optionsRect, 0.03f, 8, 2, ColorPalette.Accent);
+        var l = GetOptionsLayout();
+        int oy = (int)((1f - ease) * 18f); // Panel gleitet beim Oeffnen leicht nach oben
+        Rectangle Shift(Rectangle r) => new(r.X, r.Y + oy, r.Width, r.Height);
 
-        string title = "OPTIONEN";
-        int titleW = Program.MeasureTextCached(title, 32);
-        Program.DrawGameText(title, menuX + (menuW - titleW) / 2, menuY + 20, 26, ColorPalette.Accent);
+        var panel = Shift(l.Panel);
+        var musicTrack = Shift(l.MusicTrack);
+        var soundTrack = Shift(l.SoundTrack);
+        var toggle = Shift(l.Toggle);
+        var back = Shift(l.Back);
+        var close = Shift(l.Close);
 
-        int closeBtnSize = 30;
-        int closeBtnX = menuX + menuW - closeBtnSize - 10;
-        int closeBtnY = menuY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
-        bool hoverClose = Raylib.CheckCollisionPointRec(mousePos, closeRect);
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+        const int pad = 36;
+        int cx = px + pad;
+        int cw = pw - pad * 2;
+        Color gold = new Color((byte)230, (byte)185, (byte)80, A(255));
 
-        Raylib.DrawRectangleRec(closeRect, hoverClose ? ColorPalette.Red : ColorPalette.PanelLight);
-        Raylib.DrawRectangleLinesEx(closeRect, 1, hoverClose ? ColorPalette.Red : ColorPalette.TextGray);
-        int xTextW = Program.MeasureTextCached("X", 20);
-        Program.DrawGameText("X", closeBtnX + (closeBtnSize - xTextW) / 2, closeBtnY + 5, 11, ColorPalette.TextWhite);
+        // Schatten + dunkles Glas + Lichtkante + Rand (wie die Menue-Buttons)
+        Raylib.DrawRectangle(px + 4, py + 6, pw, ph, new Color((byte)0, (byte)0, (byte)0, A(90)));
+        Raylib.DrawRectangleRec(panel, new Color((byte)12, (byte)16, (byte)27, A(238)));
+        Raylib.DrawRectangle(px, py + 3, pw, 1, new Color((byte)255, (byte)255, (byte)255, A(22)));
+        Raylib.DrawRectangleLinesEx(panel, 1, new Color((byte)80, (byte)88, (byte)110, A(170)));
 
-        int contentX = menuX + 30;
-        int contentW = menuW - 60;
-        int sliderX = menuX + 40;
-        int sliderW = menuW - 80;
-        int sliderH = 12;
-        int knobSize = 20;
+        // Goldene Kante oben
+        Raylib.DrawRectangle(px, py, pw, 3, new Color((byte)230, (byte)185, (byte)80, A(210)));
 
-        int soundSectionY = menuY + 70;
+        // === Titel mit Zahnrad ===
+        const string title = "OPTIONEN";
+        int titleW = Program.MeasureTextCached(title, 30);
+        int titleX = px + (pw - titleW) / 2 + 14; // +14 macht Platz fuers Zahnrad
+        int titleY = py + 24;
+        DrawButtonIcon(2, titleX - 30, titleY + 16, gold);
+        Program.DrawGameText(title, titleX, titleY, 30, new Color((byte)245, (byte)240, (byte)228, A(255)));
 
-        Raylib.DrawRectangle(contentX, soundSectionY, contentW, 28, new Color((byte)30, (byte)35, (byte)50, (byte)255));
-        Raylib.DrawRectangleLinesEx(new Rectangle(contentX, soundSectionY, contentW, 28), 1, ColorPalette.Accent);
-        Program.DrawGameText("Sound-Einstellungen", contentX + 10, soundSectionY + 5, 18, ColorPalette.Accent);
+        // Trennlinie unterm Titel
+        Raylib.DrawRectangle(cx, py + 72, cw, 1, new Color((byte)255, (byte)255, (byte)255, A(24)));
 
-        int musicLabelY = soundSectionY + 40;
-        Program.DrawGameText("Musik-Lautstaerke", sliderX, musicLabelY, 18, ColorPalette.TextWhite);
+        // === Sound ===
+        DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
+        DrawOptionSlider("Musik-Lautstaerke", musicTrack, Program.ui.OptionsMusicVolume,
+            Program.ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(musicTrack, 10, 14)), ease);
+        DrawOptionSlider("Sound-Lautstaerke", soundTrack, Program.ui.OptionsSoundVolume,
+            Program.ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(soundTrack, 10, 14)), ease);
 
-        string musicPercent = $"{(int)(Program.ui.OptionsMusicVolume * 100)}%";
-        int musicPercentW = Program.MeasureTextCached(musicPercent, 18);
-        Program.DrawGameText(musicPercent, menuX + menuW - 40 - musicPercentW, musicLabelY, 18, ColorPalette.Accent);
+        // === Grafik ===
+        DrawOptionsSection("GRAFIK", cx, (int)toggle.Y - 34, cw, ease);
 
-        int musicSliderY = soundSectionY + 68;
-
-        Raylib.DrawRectangle(sliderX, musicSliderY, sliderW, sliderH, ColorPalette.Background);
-        Raylib.DrawRectangleLinesEx(new Rectangle(sliderX, musicSliderY, sliderW, sliderH), 1, ColorPalette.PanelLight);
-
-        int musicFillW = (int)(sliderW * Program.ui.OptionsMusicVolume);
-        if (musicFillW > 0)
-            Raylib.DrawRectangle(sliderX, musicSliderY, musicFillW, sliderH, ColorPalette.Accent);
-
-        int musicKnobX = sliderX + musicFillW - knobSize / 2;
-        int musicKnobY = musicSliderY + sliderH / 2 - knobSize / 2;
-        Rectangle musicKnobRect = new Rectangle(musicKnobX, musicKnobY, knobSize, knobSize);
-        bool hoverMusicKnob = Raylib.CheckCollisionPointRec(mousePos, musicKnobRect) || Program.ui.IsDraggingMusicSlider;
-        Raylib.DrawRectangleRec(musicKnobRect, hoverMusicKnob ? ColorPalette.Accent : ColorPalette.TextWhite);
-        Raylib.DrawRectangleLinesEx(musicKnobRect, 1, ColorPalette.Accent);
-
-        int soundLabelY = soundSectionY + 92;
-        Program.DrawGameText("Sound-Lautstaerke", sliderX, soundLabelY, 18, ColorPalette.TextWhite);
-
-        string soundPercent = $"{(int)(Program.ui.OptionsSoundVolume * 100)}%";
-        int soundPercentW = Program.MeasureTextCached(soundPercent, 18);
-        Program.DrawGameText(soundPercent, menuX + menuW - 40 - soundPercentW, soundLabelY, 18, ColorPalette.Accent);
-
-        int soundSliderY = soundSectionY + 120;
-
-        Raylib.DrawRectangle(sliderX, soundSliderY, sliderW, sliderH, ColorPalette.Background);
-        Raylib.DrawRectangleLinesEx(new Rectangle(sliderX, soundSliderY, sliderW, sliderH), 1, ColorPalette.PanelLight);
-
-        int soundFillW = (int)(sliderW * Program.ui.OptionsSoundVolume);
-        if (soundFillW > 0)
-            Raylib.DrawRectangle(sliderX, soundSliderY, soundFillW, sliderH, ColorPalette.Accent);
-
-        int soundKnobX = sliderX + soundFillW - knobSize / 2;
-        int soundKnobY = soundSliderY + sliderH / 2 - knobSize / 2;
-        Rectangle soundKnobRect = new Rectangle(soundKnobX, soundKnobY, knobSize, knobSize);
-        bool hoverSoundKnob = Raylib.CheckCollisionPointRec(mousePos, soundKnobRect) || Program.ui.IsDraggingSoundSlider;
-        Raylib.DrawRectangleRec(soundKnobRect, hoverSoundKnob ? ColorPalette.Accent : ColorPalette.TextWhite);
-        Raylib.DrawRectangleLinesEx(soundKnobRect, 1, ColorPalette.Accent);
-
-        int gfxSectionY = soundSectionY + 175;
-
-        Raylib.DrawRectangle(contentX, gfxSectionY, contentW, 28, new Color((byte)30, (byte)35, (byte)50, (byte)255));
-        Raylib.DrawRectangleLinesEx(new Rectangle(contentX, gfxSectionY, contentW, 28), 1, ColorPalette.Accent);
-        Program.DrawGameText("Grafik-Einstellungen", contentX + 10, gfxSectionY + 5, 18, ColorPalette.Accent);
-
-        int toggleY = gfxSectionY + 42;
-        Program.DrawGameText("Tag/Nacht-Zyklus", sliderX, toggleY, 18, ColorPalette.TextWhite);
-
-        int toggleW = 60;
-        int toggleH = 26;
-        int toggleX = menuX + menuW - 40 - toggleW;
-        Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
-        bool hoverToggle = Raylib.CheckCollisionPointRec(mousePos, toggleRect);
         bool dayNightOn = Program.ui.MainMenuDayNightCycleEnabled;
+        _dayNightToggleAnim += ((dayNightOn ? 1f : 0f) - _dayNightToggleAnim) * Math.Min(1f, dt * 14f);
+        float t = _dayNightToggleAnim;
 
-        Color toggleBg = dayNightOn ? ColorPalette.Accent : ColorPalette.Background;
-        Raylib.DrawRectangleRec(toggleRect, toggleBg);
-        Raylib.DrawRectangleLinesEx(toggleRect, 1, dayNightOn ? ColorPalette.Accent : ColorPalette.PanelLight);
+        Program.DrawGameText("Tag/Nacht-Zyklus auf der Karte", cx, (int)toggle.Y + 5, 17,
+            new Color((byte)210, (byte)215, (byte)228, A(235)));
 
-        int knobW = 26;
-        int knobX = dayNightOn ? toggleX + toggleW - knobW : toggleX;
-        Raylib.DrawRectangle(knobX, (int)toggleRect.Y, knobW, toggleH, hoverToggle ? ColorPalette.TextWhite : ColorPalette.PanelLight);
-        Raylib.DrawRectangleLinesEx(new Rectangle(knobX, toggleRect.Y, knobW, toggleH), 1, ColorPalette.TextWhite);
+        string status = dayNightOn ? "AN" : "AUS";
+        int statusW = Program.MeasureTextCached(status, 15);
+        Program.DrawGameText(status, (int)toggle.X - statusW - 12, (int)toggle.Y + 6, 15,
+            dayNightOn ? gold : new Color((byte)140, (byte)146, (byte)162, A(200)));
 
-        string toggleStatus = dayNightOn ? "AN" : "AUS";
-        Color toggleStatusColor = dayNightOn ? new Color((byte)100, (byte)255, (byte)100, (byte)255) : ColorPalette.TextGray;
-        int statusW = Program.MeasureTextCached(toggleStatus, 16);
-        Program.DrawGameText(toggleStatus, toggleX - statusW - 10, toggleY + 1, 16, toggleStatusColor);
+        // Schalter-Pille mit gleitendem Knopf
+        Raylib.DrawRectangleRounded(toggle, 1f, 10,
+            LerpColor(new Color((byte)10, (byte)13, (byte)22, A(230)),
+                      new Color((byte)176, (byte)136, (byte)52, A(240)), t));
+        Raylib.DrawRectangleRoundedLinesEx(toggle, 1f, 10, 1,
+            LerpColor(new Color((byte)70, (byte)78, (byte)100, A(180)), gold, t));
+        float knobX = toggle.X + 14 + (toggle.Width - 28) * t;
+        Raylib.DrawCircleV(new Vector2(knobX, toggle.Y + toggle.Height / 2f), 10,
+            new Color((byte)240, (byte)243, (byte)250, A(255)));
 
-        int backBtnW = 360;
-        int backBtnH = 40;
-        int backBtnX = menuX + (menuW - backBtnW) / 2;
-        int backBtnY = menuY + menuH - backBtnH - 20;
-        Rectangle backRect = new Rectangle(backBtnX, backBtnY, backBtnW, backBtnH);
-        bool hoverBack = Raylib.CheckCollisionPointRec(mousePos, backRect);
-        Program.DrawMenuButton(backRect, "Zurueck", hoverBack);
+        // === Zurueck-Button + Schliessen-Kreuz ===
+        bool hoverBack = open && Raylib.CheckCollisionPointRec(mousePos, back);
+        _optHover[0] += ((hoverBack ? 1f : 0f) - _optHover[0]) * Math.Min(1f, dt * 12f);
+        DrawBackButton(back, _optHover[0], ease);
+
+        bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
+        _optHover[1] += ((hoverClose ? 1f : 0f) - _optHover[1]) * Math.Min(1f, dt * 12f);
+        DrawCloseButton(close, _optHover[1], ease);
+
+        // ESC-Hinweis unter dem Panel
+        string hint = "ESC zum Schliessen";
+        int hintW = Program.MeasureTextCached(hint, 13);
+        Program.DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
+            new Color((byte)150, (byte)155, (byte)170, A(150)));
+    }
+
+    /// <summary>
+    /// Abschnitts-Ueberschrift: goldene Marke + Titel + feine Linie
+    /// </summary>
+    private static void DrawOptionsSection(string title, int x, int y, int width, float a)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
+        Raylib.DrawRectangle(x, y + 2, 4, 13, new Color((byte)230, (byte)185, (byte)80, A(220)));
+        Program.DrawGameText(title, x + 12, y, 15, new Color((byte)230, (byte)185, (byte)80, A(235)));
+        int tw = Program.MeasureTextCached(title, 15);
+        Raylib.DrawRectangle(x + 12 + tw + 12, y + 8, Math.Max(0, width - tw - 24), 1,
+            new Color((byte)255, (byte)255, (byte)255, A(22)));
+    }
+
+    /// <summary>
+    /// Slider mit goldener Fuellung und rundem Knauf (Glow bei Hover/Drag)
+    /// </summary>
+    private static void DrawOptionSlider(string label, Rectangle track, float value, bool active, float a)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
+        Color gold = new Color((byte)230, (byte)185, (byte)80, A(255));
+
+        int labelY = (int)track.Y - 30;
+        Program.DrawGameText(label, (int)track.X, labelY, 17,
+            new Color((byte)210, (byte)215, (byte)228, A(235)));
+
+        string pct = $"{(int)(value * 100)}%";
+        int pctW = Program.MeasureTextCached(pct, 17);
+        Program.DrawGameText(pct, (int)(track.X + track.Width) - pctW, labelY, 17, gold);
+
+        Raylib.DrawRectangleRounded(track, 0.5f, 6, new Color((byte)5, (byte)7, (byte)13, A(235)));
+        Raylib.DrawRectangleRoundedLinesEx(track, 0.5f, 6, 1, new Color((byte)70, (byte)78, (byte)100, A(160)));
+
+        int fillW = (int)(track.Width * value);
+        if (fillW > 3)
+        {
+            Raylib.DrawRectangleRounded(new Rectangle(track.X, track.Y, fillW, track.Height), 0.5f, 6,
+                new Color((byte)230, (byte)185, (byte)80, A(235)));
+        }
+
+        float kx = track.X + fillW;
+        float ky = track.Y + track.Height / 2f;
+        if (active)
+            Raylib.DrawCircleV(new Vector2(kx, ky), 14, new Color((byte)230, (byte)185, (byte)80, A(55)));
+        Raylib.DrawCircleV(new Vector2(kx, ky), 8, new Color((byte)244, (byte)246, (byte)252, A(255)));
+        Raylib.DrawCircleLines((int)kx, (int)ky, 8, gold);
+    }
+
+    /// <summary>
+    /// Zurueck-Button im Stil der Hauptmenue-Buttons (Glas, Goldbalken, Chevron links)
+    /// </summary>
+    private static void DrawBackButton(Rectangle r, float hover, float a)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
+
+        Raylib.DrawRectangle((int)r.X + 3, (int)r.Y + 4, (int)r.Width, (int)r.Height,
+            new Color((byte)0, (byte)0, (byte)0, A(70)));
+
+        Color bg = LerpColor(new Color((byte)14, (byte)18, (byte)30, A(210)),
+                             new Color((byte)36, (byte)46, (byte)72, A(245)), hover);
+        Raylib.DrawRectangleRec(r, bg);
+        Raylib.DrawRectangle((int)r.X, (int)r.Y, (int)r.Width, 1,
+            new Color((byte)255, (byte)255, (byte)255, A(18 + hover * 25)));
+
+        Color border = LerpColor(new Color((byte)80, (byte)88, (byte)110, A(150)), ColorPalette.Accent, hover);
+        border.A = A(150 + hover * 105);
+        Raylib.DrawRectangleLinesEx(r, 1, border);
+
+        int barW = (int)(4 + hover * 5);
+        Raylib.DrawRectangle((int)r.X, (int)r.Y, barW, (int)r.Height,
+            new Color((byte)230, (byte)185, (byte)80, A(190 + hover * 65)));
+
+        const string label = "ZURUECK";
+        int textW = Program.MeasureTextCached(label, GameConfig.FONT_SIZE_LARGE);
+        int textX = (int)(r.X + (r.Width - textW) / 2f + 8);
+        int textY = (int)(r.Y + (r.Height - GameConfig.FONT_SIZE_LARGE) / 2f);
+
+        // Chevron zeigt nach links (zurueck), rueckt beim Hover weiter raus
+        float chx = textX - 20 - hover * 4;
+        float chy = r.Y + r.Height / 2f;
+        Color chev = new Color((byte)255, (byte)215, (byte)130, A(160 + hover * 95));
+        Raylib.DrawLineEx(new Vector2(chx + 5, chy - 7), new Vector2(chx - 2, chy), 2.5f, chev);
+        Raylib.DrawLineEx(new Vector2(chx - 2, chy), new Vector2(chx + 5, chy + 7), 2.5f, chev);
+
+        Color textColor = LerpColor(new Color((byte)205, (byte)210, (byte)222, A(235)),
+                                    new Color((byte)255, (byte)255, (byte)255, A(255)), hover);
+        Program.DrawGameText(label, textX, textY, GameConfig.FONT_SIZE_LARGE, textColor);
+    }
+
+    /// <summary>
+    /// Rundes Schliessen-Kreuz oben rechts (rot beim Hover)
+    /// </summary>
+    private static void DrawCloseButton(Rectangle r, float hover, float a)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
+        var center = new Vector2(r.X + r.Width / 2f, r.Y + r.Height / 2f);
+
+        if (hover > 0.02f)
+            Raylib.DrawCircleV(center, r.Width / 2f, new Color((byte)205, (byte)80, (byte)70, A(60 + hover * 120)));
+        Raylib.DrawRing(center, r.Width / 2f - 1, r.Width / 2f, 0, 360, 28,
+            LerpColor(new Color((byte)110, (byte)118, (byte)140, A(170)),
+                      new Color((byte)235, (byte)110, (byte)100, A(255)), hover));
+
+        Color x = LerpColor(new Color((byte)190, (byte)196, (byte)210, A(220)),
+                            new Color((byte)255, (byte)255, (byte)255, A(255)), hover);
+        const float s = 5.5f;
+        Raylib.DrawLineEx(new Vector2(center.X - s, center.Y - s), new Vector2(center.X + s, center.Y + s), 2.2f, x);
+        Raylib.DrawLineEx(new Vector2(center.X - s, center.Y + s), new Vector2(center.X + s, center.Y - s), 2.2f, x);
     }
 }

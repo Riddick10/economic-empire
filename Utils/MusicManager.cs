@@ -251,12 +251,13 @@ public class MusicManager
 
         if (_currentMusic.HasValue)
         {
-            Raylib.UpdateMusicStream(_currentMusic.Value);
-
-            // Track-Ende erkennen: IsMusicStreamPlaying wird false wenn nicht-loopender Track endet
-            // WICHTIG: Nicht wenn pausiert, sonst springt es zum naechsten Track!
+            // Zeit VOR UpdateMusicStream lesen: Beim Track-Ende ruft Raylib intern
+            // StopMusicStream auf und setzt framesProcessed auf 0 - danach waere
+            // played == 0 und die Wechsel-Bedingung (played > 0.5f) nie erfuellt.
             float played = Raylib.GetMusicTimePlayed(_currentMusic.Value);
             float length = Raylib.GetMusicTimeLength(_currentMusic.Value);
+
+            Raylib.UpdateMusicStream(_currentMusic.Value);
 
             // Preload starten wenn Track zu ~80% gespielt ist
             if (length > 0 && played >= length * 0.8f && !_playingMainTheme && !IsPaused)

@@ -42,8 +42,8 @@ public class Mine
         {
             MineType.OilWell => 10,      // Oel
             MineType.GasDrill => 6,      // Erdgas
-            MineType.CoalMine => 7,      // Kohle
-            MineType.IronMine => 6,      // Eisen
+            MineType.CoalMine => 525,    // Kohle
+            MineType.IronMine => 36,     // Eisen
             MineType.CopperMine => 4,    // Kupfer
             MineType.UraniumMine => 0.2, // Uran (selten)
             _ => 5

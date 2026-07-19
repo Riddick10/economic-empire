@@ -116,8 +116,10 @@
     },
     "populationConsumption": {
       "ConsumerGoods": 0.3,
+      "Electronics": 0.1,
       "Oil": 0.1,
       "NaturalGas": 0.08,
+      "Machinery": 0.05,
       "Coal": 0.05
     }
   },

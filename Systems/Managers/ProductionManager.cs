@@ -162,6 +162,42 @@ public class ProductionManager : GameSystemBase
         }
     }
 
+    /// <summary>
+    /// Befuellt DailyProduction/DailyConsumption aller Laender mit einer Vorschau
+    /// des naechsten Tages-Ticks, ohne Lagerbestaende oder Politik zu veraendern.
+    /// Noetig nach Spielstart und Save-Load: Bis zum ersten Tageswechsel waeren
+    /// die Werte sonst leer und die UI (z.B. Logistik-Panel) zeigt faelschlich 0.
+    /// </summary>
+    public void PrimeDailyEstimates(GameContext context)
+    {
+        _lastContext = context;
+        EnsureRecipesLoaded();
+
+        if (!_provincesInitialized)
+            InitializeFromProvinces(context);
+
+        foreach (var country in context.Countries.Values)
+        {
+            country.DailyProduction.Clear();
+            country.DailyConsumption.Clear();
+        }
+
+        ProcessMineProduction(context, applyEffects: false);
+
+        foreach (var (countryId, industry) in _industryData)
+        {
+            if (!context.Countries.TryGetValue(countryId, out var country))
+                continue;
+
+            // Nahrungsverbrauch der Bevoelkerung (macht im Tages-Tick der PopulationManager)
+            country.DailyConsumption[ResourceType.Food] =
+                country.Population * GameConfig.FOOD_PER_PERSON_PER_DAY;
+
+            ProcessResourceConversion(country, industry, context, applyEffects: false);
+            ProcessPopulationConsumption(country, applyEffects: false);
+        }
+    }
+
     private void ProcessProduction(GameContext context)
     {
         // DailyProduction/DailyConsumption werden in Game.SimulateDayInternal()
@@ -190,7 +226,7 @@ public class ProductionManager : GameSystemBase
     /// Berechnet den Ressourcenverbrauch durch die Bevoelkerung
     /// und wendet Zufriedenheits-Effekte bei Engpaessen an
     /// </summary>
-    private void ProcessPopulationConsumption(Country country)
+    private void ProcessPopulationConsumption(Country country, bool applyEffects = true)
     {
         double populationMillions = country.Population / 1_000_000.0;
         double totalSatisfactionPenalty = 0;
@@ -205,7 +241,8 @@ public class ProductionManager : GameSystemBase
 
             if (actualConsumption > 0)
             {
-                country.UseResource(resourceType, actualConsumption);
+                if (applyEffects)
+                    country.UseResource(resourceType, actualConsumption);
 
                 // Tracke Verbrauch
                 if (!country.DailyConsumption.ContainsKey(resourceType))
@@ -223,8 +260,10 @@ public class ProductionManager : GameSystemBase
                 {
                     ResourceType.Food => 3.0,           // Nahrungsmangel sehr kritisch
                     ResourceType.ConsumerGoods => 1.5,   // Konsumguetermangel spuerbar
+                    ResourceType.Electronics => 0.7,     // Elektronikmangel aergerlich
                     ResourceType.Oil => 0.8,             // Energiemangel moderat
                     ResourceType.NaturalGas => 0.6,
+                    ResourceType.Machinery => 0.5,       // Maschinenmangel (Haushaltsgeraete)
                     ResourceType.Coal => 0.4,
                     _ => 0.5
                 };
@@ -234,7 +273,7 @@ public class ProductionManager : GameSystemBase
         }
 
         // Zufriedenheits-Effekte auf Stabilitaet und oeffentliche Unterstuetzung anwenden
-        if (totalSatisfactionPenalty > 0 && _politicsManager != null)
+        if (applyEffects && totalSatisfactionPenalty > 0 && _politicsManager != null)
         {
             var politics = _politicsManager.GetPolitics(country.Id);
             if (politics != null)
@@ -252,7 +291,7 @@ public class ProductionManager : GameSystemBase
     /// <summary>
     /// Berechnet die Produktion aller Minen und fügt sie den Ländern hinzu
     /// </summary>
-    private void ProcessMineProduction(GameContext context)
+    private void ProcessMineProduction(GameContext context, bool applyEffects = true)
     {
         if (context.WorldMap == null) return;
 
@@ -279,13 +318,16 @@ public class ProductionManager : GameSystemBase
                 double production = mine.ProductionPerDay * mine.Level;
 
                 // Produktion skaliert mit Ressourcenvorkommen der Provinz (0.0-1.0)
-                // Hohe Vorkommen (1.0) = volle Produktion, niedrige (0.05) = kaum Produktion
+                // Hohe Vorkommen (1.0) = volle Produktion, niedrige = weniger.
+                // WICHTIG: Mindestens 25% Basisleistung, sonst produzieren Minen in
+                // Laendern mit Abundanz 0.0 (z.B. Eisen in DEU) gar nichts -
+                // eine gebaute Mine muss sich immer zumindest etwas lohnen.
                 float abundanceValue = 0.05f;
                 foreach (var (type, _, value) in provinceResValues)
                 {
                     if (type == resourceType) { abundanceValue = value; break; }
                 }
-                production *= abundanceValue;
+                production *= Math.Max(abundanceValue, 0.25f);
 
                 if (!mineProduction[province.CountryId].ContainsKey(resourceType))
                     mineProduction[province.CountryId][resourceType] = 0;
@@ -316,7 +358,8 @@ public class ProductionManager : GameSystemBase
                 }
 
                 // Ressource zum Lager hinzufügen
-                country.AddResource(resourceType, finalAmount);
+                if (applyEffects)
+                    country.AddResource(resourceType, finalAmount);
 
                 // Tägliche Produktion tracken
                 if (!country.DailyProduction.ContainsKey(resourceType))
@@ -345,9 +388,12 @@ public class ProductionManager : GameSystemBase
         return bonus;
     }
 
-    private void ProcessResourceConversion(Country country, IndustryData industry, GameContext context)
+    private void ProcessResourceConversion(Country country, IndustryData industry, GameContext context, bool applyEffects = true)
     {
         double efficiency = industry.IndustrialEfficiency;
+
+        // Vorschau-Modus: Lagerbewegungen nur virtuell verbuchen
+        var virtualDelta = applyEffects ? null : new Dictionary<ResourceType, double>();
 
         // Fabrik-Oelverbrauch: 0.01 Oel pro Fabrik pro Tag
         int totalFactories = industry.CivilianFactories + industry.MilitaryFactories + industry.Dockyards;
@@ -358,7 +404,8 @@ public class ProductionManager : GameSystemBase
             double oilConsumed = Math.Min(oilNeeded, oilAvailable);
             if (oilConsumed > 0)
             {
-                country.UseResource(ResourceType.Oil, oilConsumed);
+                if (applyEffects)
+                    country.UseResource(ResourceType.Oil, oilConsumed);
                 if (!country.DailyConsumption.ContainsKey(ResourceType.Oil))
                     country.DailyConsumption[ResourceType.Oil] = 0;
                 country.DailyConsumption[ResourceType.Oil] += oilConsumed;
@@ -400,7 +447,7 @@ public class ProductionManager : GameSystemBase
             _factoryAssignments[country.Id] = civAssignments;
         }
 
-        RunRecipes(country, CivilianRecipes, civAssignments, efficiency, factoryTechBonus, electronicsTechBonus);
+        RunRecipes(country, CivilianRecipes, civAssignments, efficiency, factoryTechBonus, electronicsTechBonus, virtualDelta);
 
         // === Militaerische Produktion (Militaerfabriken) ===
         if (!_militaryAssignments.TryGetValue(country.Id, out var milAssignments))
@@ -416,16 +463,19 @@ public class ProductionManager : GameSystemBase
             _militaryAssignments[country.Id] = milAssignments;
         }
 
-        RunRecipes(country, MilitaryRecipes, milAssignments, efficiency, factoryTechBonus, electronicsTechBonus);
+        RunRecipes(country, MilitaryRecipes, milAssignments, efficiency, factoryTechBonus, electronicsTechBonus, virtualDelta);
     }
 
     /// <summary>
     /// Fuehrt Produktionsrezepte mit zugewiesenen Fabriken aus.
     /// techFactoryBonus und techElectronicsBonus kommen aus abgeschlossenen Technologien.
+    /// virtualDelta != null = Vorschau-Modus: Lagerbewegungen werden nur im
+    /// Delta-Konto verbucht statt am echten Lager, das Tracking laeuft normal.
     /// </summary>
     private static void RunRecipes(Country country, Dictionary<ResourceType, ProductionRecipe> recipes,
         Dictionary<ResourceType, int> assignments, double efficiency,
-        double techFactoryBonus = 0, double techElectronicsBonus = 0)
+        double techFactoryBonus = 0, double techElectronicsBonus = 0,
+        Dictionary<ResourceType, double>? virtualDelta = null)
     {
         foreach (var (outputType, recipe) in recipes)
         {
@@ -439,7 +489,9 @@ public class ProductionManager : GameSystemBase
                 bool canProduce = true;
                 foreach (var (inputType, amount) in recipe.Inputs)
                 {
-                    if (country.GetResource(inputType) < amount)
+                    double available = country.GetResource(inputType)
+                        + (virtualDelta?.GetValueOrDefault(inputType) ?? 0);
+                    if (available < amount)
                     {
                         canProduce = false;
                         break;
@@ -450,7 +502,11 @@ public class ProductionManager : GameSystemBase
                 {
                     foreach (var (inputType, amount) in recipe.Inputs)
                     {
-                        country.UseResource(inputType, amount);
+                        if (virtualDelta == null)
+                            country.UseResource(inputType, amount);
+                        else
+                            virtualDelta[inputType] = virtualDelta.GetValueOrDefault(inputType) - amount;
+
                         if (!country.DailyConsumption.ContainsKey(inputType))
                             country.DailyConsumption[inputType] = 0;
                         country.DailyConsumption[inputType] += amount;
@@ -465,7 +521,11 @@ public class ProductionManager : GameSystemBase
                         techBonus += techElectronicsBonus;
                     outputAmount *= (1.0 + techBonus);
 
-                    country.AddResource(outputType, outputAmount);
+                    if (virtualDelta == null)
+                        country.AddResource(outputType, outputAmount);
+                    else
+                        virtualDelta[outputType] = virtualDelta.GetValueOrDefault(outputType) + outputAmount;
+
                     if (!country.DailyProduction.ContainsKey(outputType))
                         country.DailyProduction[outputType] = 0;
                     country.DailyProduction[outputType] += outputAmount;
