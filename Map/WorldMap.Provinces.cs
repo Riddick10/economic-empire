@@ -120,12 +120,24 @@ public partial class WorldMap
             // Alle Ringe zeichnen (GeoJsonLoader extrahiert nur aeussere Ringe,
             // daher sind alle Ringe legitime Grenzen - wichtig fuer MultiPolygon-Provinzen
             // wie z.B. zusammengefuehrte tuerkische Regionen oder Inseln)
-            foreach (var transformedPoints in province.TransformedRings)
+            for (int ringIndex = 0; ringIndex < province.TransformedRings.Count; ringIndex++)
             {
+                var transformedPoints = province.TransformedRings[ringIndex];
                 if (transformedPoints.Length < 3) continue;
+
+                // Aussenkanten (auf der Landeskontur) ueberspringen - dort
+                // zeichnet bereits die Landesgrenze, eine zweite leicht
+                // versetzte Provinzlinie waere nur haesslich
+                bool[]? outerFlags = province.OuterEdgeFlags != null &&
+                                     ringIndex < province.OuterEdgeFlags.Count
+                    ? province.OuterEdgeFlags[ringIndex]
+                    : null;
 
                 for (int i = 0; i < transformedPoints.Length; i++)
                 {
+                    if (outerFlags != null && i < outerFlags.Length && outerFlags[i])
+                        continue;
+
                     int next = (i + 1) % transformedPoints.Length;
 
                     float dx = transformedPoints[next].X - transformedPoints[i].X;

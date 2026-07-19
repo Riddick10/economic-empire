@@ -18,6 +18,14 @@ public class Province
     public float CachedArea { get; private set; }
     public List<(int, int, int)[]> TrianglesPerRing { get; private set; } = new();
 
+    /// <summary>
+    /// Aussenkanten-Markierung pro Ring (parallel zu PolygonRings):
+    /// true = Kante liegt auf der Landeskontur (Kueste/Landesgrenze) und wird
+    /// nicht als Provinzgrenze gezeichnet - dort zeichnet die Landesgrenze.
+    /// Null wenn kein Snapping stattgefunden hat.
+    /// </summary>
+    public List<bool[]>? OuterEdgeFlags { get; private set; }
+
     // Fabriken in dieser Provinz
     public int CivilianFactories { get; set; }
     public int MilitaryFactories { get; set; }
@@ -68,20 +76,28 @@ public class Province
         TransformedLabelPos = mapToScreen(LabelPosition);
     }
 
-    public Province(string id, string name, string countryId, List<Vector2[]> polygonRings)
+    public Province(string id, string name, string countryId, List<Vector2[]> polygonRings,
+        List<bool[]>? outerEdgeFlags = null)
     {
         Id = id;
         Name = name;
         CountryId = countryId;
 
-        // Filtere und sortiere Ringe - berechne Flaeche nur einmal pro Ring
+        // Filtere und sortiere Ringe - berechne Flaeche nur einmal pro Ring.
+        // Aussenkanten-Flags muessen Filter und Sortierung synchron mitmachen.
         var ringsWithArea = polygonRings
-            .Where(r => r.Length >= 3)
-            .Select(r => (Ring: r, Area: PolygonUtils.CalculateRingArea(r)))
+            .Select((r, idx) => (
+                Ring: r,
+                Flags: outerEdgeFlags != null && idx < outerEdgeFlags.Count ? outerEdgeFlags[idx] : null,
+                Area: PolygonUtils.CalculateRingArea(r)))
+            .Where(x => x.Ring.Length >= 3)
             .OrderByDescending(x => x.Area)
             .ToList();
 
         PolygonRings = ringsWithArea.Select(x => x.Ring).ToList();
+        OuterEdgeFlags = outerEdgeFlags != null
+            ? ringsWithArea.Select(x => x.Flags ?? new bool[x.Ring.Length]).ToList()
+            : null;
         CachedArea = ringsWithArea.Sum(x => x.Area);
 
         LabelPosition = PolygonRings.Count > 0

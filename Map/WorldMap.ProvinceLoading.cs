@@ -661,6 +661,14 @@ public partial class WorldMap
     }
 
     /// <summary>
+    /// Snap-Radius fuer die Ausrichtung der Provinzgrenzen an der Landeskontur,
+    /// in Map-Koordinaten (2000x1000). 1.4 entspricht ca. 0.25 Grad - deckt
+    /// Douglas-Peucker-Vereinfachung plus Aufloesungsunterschiede der
+    /// verschiedenen GeoJSON-Quellen ab.
+    /// </summary>
+    private const float ProvinceSnapRadius = 1.4f;
+
+    /// <summary>
     /// Generische Methode zum Laden von Provinzen aus einer GeoJSON-Datei
     /// </summary>
     private void LoadCountryProvinces(string filename, string prefix, double tolerance,
@@ -679,6 +687,13 @@ public partial class WorldMap
             ? GeoJsonLoader.LoadGermanStates(geoJsonPath)
             : GeoJsonLoader.LoadProvinces(geoJsonPath, prefix);
 
+        // Landeskontur fuer das Grenz-Snapping (Regions sind zu diesem
+        // Zeitpunkt bereits geladen, siehe Initialize-Reihenfolge).
+        // Der Index wird einmal pro Land aufgebaut, nicht pro Provinz.
+        ProvinceBorderSnapper? snapper = null;
+        if (Regions.TryGetValue(prefix, out var countryRegion))
+            snapper = new ProvinceBorderSnapper(countryRegion.PolygonRings, ProvinceSnapRadius);
+
         foreach (var (id, data) in regions)
         {
             var polys = data.Polygons
@@ -688,7 +703,18 @@ public partial class WorldMap
 
             if (polys.Count > 0)
             {
-                var province = new Province(id, data.Name, prefix, polys);
+                // Provinzgrenzen exakt auf die Landeskontur ziehen, damit
+                // Kueste und Landesgrenze nicht doppelt/versetzt erscheinen.
+                // NICHT nachfiltern: polys und outerFlags muessen index-parallel
+                // bleiben, der Province-Konstruktor filtert beide paarweise.
+                List<bool[]>? outerFlags = null;
+                if (snapper != null)
+                {
+                    polys = snapper.Snap(polys, out outerFlags);
+                    if (!polys.Any(p => p.Length >= 3)) continue;
+                }
+
+                var province = new Province(id, data.Name, prefix, polys, outerFlags);
 
                 if (factories != null && factories.TryGetValue(id, out var fac))
                 {
