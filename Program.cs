@@ -370,6 +370,8 @@ class UIState
         ShowPauseMenu = false;
         ShowOptionsMenu = false;
         ShowSavePanel = false;
+        Program._pauseMenuAnim = 0f; // sonst blendet das Pause-Menue beim naechsten Spielstart kurz nach
+        Program._savePanelAnim = 0f;
         ShowTechTree = false;
         ShowMusicTrackList = false;
         ShowTradeCreatePanel = false;

@@ -476,14 +476,14 @@ partial class Program
             DrawEconomyRankingPanel();
         }
 
-        // Pause-Menü (ueber allem)
-        if (ui.ShowPauseMenu)
+        // Pause-Menü (ueber allem; auch waehrend des Ausblendens weiterzeichnen)
+        if (ui.ShowPauseMenu || _pauseMenuAnim > 0.02f)
         {
             DrawPauseMenu();
         }
 
-        // Speichern-Panel (hoechste Prioritaet)
-        if (ui.ShowSavePanel)
+        // Speichern-Panel (hoechste Prioritaet; auch beim Ausblenden weiterzeichnen)
+        if (ui.ShowSavePanel || _savePanelAnim > 0.02f)
         {
             DrawSavePanelOverlay();
         }

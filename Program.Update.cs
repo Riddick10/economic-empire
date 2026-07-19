@@ -256,64 +256,39 @@ partial class Program
     }
 
     /// <summary>
-    /// Update fuer Save Panel Overlay (im Spiel als Panel)
+    /// Update fuer Save Panel Overlay (im Spiel als Panel).
+    /// Layout kommt aus GetSavePanelLayout - dieselbe Quelle wie das Zeichnen.
     /// </summary>
     static void UpdateSavePanelOverlay()
     {
         Vector2 mousePos = _cachedMousePos;
-
-        // Panel-Dimensionen (zentriert)
-        int panelWidth = 620;
-        int panelHeight = 520;
-        int panelX = (ScreenWidth - panelWidth) / 2;
-        int panelY = (ScreenHeight - panelHeight) / 2;
-
-        // X-Button (oben rechts im Panel)
-        int closeBtnSize = 30;
-        int closeBtnX = panelX + panelWidth - closeBtnSize - 10;
-        int closeBtnY = panelY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
-        bool hoverClose = Raylib.CheckCollisionPointRec(mousePos, closeRect);
-
-        // Speicherslot-Positionen (relativ zum Panel)
-        int slotWidth = 480;
-        int slotHeight = 100;
-        int slotStartY = panelY + 70;
-        int slotSpacing = 15;
-        int slotX = panelX + (panelWidth - slotWidth) / 2;
+        var l = GetSavePanelLayout();
 
         for (int i = 0; i < 3; i++)
         {
-            ui.SaveSlotRects[i] = new Rectangle(
-                slotX,
-                slotStartY + i * (slotHeight + slotSpacing),
-                slotWidth,
-                slotHeight
-            );
-
+            ui.SaveSlotRects[i] = l.Slots[i];
             ui.DeleteSlotRects[i] = new Rectangle(
-                ui.SaveSlotRects[i].X + slotWidth - 40,
-                ui.SaveSlotRects[i].Y + 10,
-                30, 30
-            );
+                l.Slots[i].X + l.Slots[i].Width - 46,
+                l.Slots[i].Y + 12,
+                32, 32);
 
-            ui.SaveSlotHovered[i] = Raylib.CheckCollisionPointRec(mousePos, ui.SaveSlotRects[i]);
+            ui.SaveSlotHovered[i] = Raylib.CheckCollisionPointRec(mousePos, l.Slots[i]);
             ui.DeleteSlotHovered[i] = ui.SaveSlots[i] != null &&
                 Raylib.CheckCollisionPointRec(mousePos, ui.DeleteSlotRects[i]);
         }
 
-        // Speichern-Button (nur wenn Slot ausgewaehlt)
-        ui.ConfirmSaveButtonRect.X = panelX + (panelWidth - ui.ConfirmSaveButtonRect.Width) / 2;
-        ui.ConfirmSaveButtonRect.Y = slotStartY + 3 * (slotHeight + slotSpacing) + 10;
+        ui.ConfirmSaveButtonRect = l.Confirm;
         ui.ConfirmSaveButtonHovered = ui.SelectedSaveSlot >= 0 &&
-            Raylib.CheckCollisionPointRec(mousePos, ui.ConfirmSaveButtonRect);
+            Raylib.CheckCollisionPointRec(mousePos, l.Confirm);
 
         // Klick-Erkennung
         if (Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
-            // X-Button schliesst Panel
-            if (hoverClose)
+            // X oder Klick neben das Panel schliesst
+            if (Raylib.CheckCollisionPointRec(mousePos, l.Close) ||
+                !Raylib.CheckCollisionPointRec(mousePos, l.Panel))
             {
+                SoundManager.Play(SoundEffect.Click);
                 ui.ShowSavePanel = false;
                 return;
             }
@@ -323,6 +298,7 @@ partial class Program
             {
                 SaveGameManager.SaveGame(game, worldMap, ui.SelectedSaveSlot + 1);
                 ui.SaveSlots = SaveGameManager.GetAllSlots();
+                SoundManager.Play(SoundEffect.NotificationSuccess);
                 ui.ShowSavePanel = false;
                 return;
             }
@@ -332,6 +308,7 @@ partial class Program
                 // Loeschen-Button
                 if (ui.DeleteSlotHovered[i])
                 {
+                    SoundManager.Play(SoundEffect.Click);
                     SaveGameManager.DeleteSlot(i + 1);
                     ui.SaveSlots = SaveGameManager.GetAllSlots();
                     if (ui.SelectedSaveSlot == i) ui.SelectedSaveSlot = -1;
@@ -341,6 +318,7 @@ partial class Program
                 // Slot auswaehlen
                 if (ui.SaveSlotHovered[i])
                 {
+                    SoundManager.Play(SoundEffect.Click);
                     ui.SelectedSaveSlot = i;
                     return;
                 }
@@ -350,6 +328,7 @@ partial class Program
         // ESC schliesst Panel
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
+            SoundManager.Play(SoundEffect.Click);
             ui.ShowSavePanel = false;
         }
     }
@@ -793,118 +772,72 @@ partial class Program
     }
 
     /// <summary>
-    /// Update-Logik fuer das Pause-Menü
+    /// Update-Logik fuer das Pause-Menü.
+    /// Layout kommt aus GetPauseMenuLayout/GetPauseOptionsLayout - dieselbe
+    /// Quelle wie das Zeichnen, damit Klickflaechen exakt stimmen.
     /// </summary>
     static void UpdatePauseMenu()
     {
         Vector2 mousePos = _cachedMousePos;
 
-        // ESC schliesst das Menü
+        // ESC schliesst das Menü (bzw. die Options-Ansicht)
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
+            SoundManager.Play(SoundEffect.Click);
             if (ui.ShowOptionsMenu)
-            {
                 ui.ShowOptionsMenu = false;
-            }
             else
-            {
                 ui.ShowPauseMenu = false;
-            }
             return;
         }
-
-        // Menü-Dimensionen
-        int menuW = 480;
-        int menuH = ui.ShowOptionsMenu ? 460 : 305;
-        int menuX = (ScreenWidth - menuW) / 2;
-        int menuY = (ScreenHeight - menuH) / 2;
-
-        // X-Button (oben rechts im Menü)
-        int closeBtnSize = 30;
-        int closeBtnX = menuX + menuW - closeBtnSize - 10;
-        int closeBtnY = menuY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
 
         if (ui.ShowOptionsMenu)
         {
             // === OPTIONEN-ANSICHT ===
+            var l = GetPauseOptionsLayout();
 
-            // Zurueck-Button
-            int backBtnW = 360;
-            int backBtnH = 40;
-            int backBtnX = menuX + (menuW - backBtnW) / 2;
-            int backBtnY = menuY + menuH - backBtnH - 20;
-            Rectangle backRect = new Rectangle(backBtnX, backBtnY, backBtnW, backBtnH);
-
-            // Slider-Dimensionen (passend zu DrawOptionsMenu)
-            int sliderX = menuX + 40;
-            int sliderW = menuW - 80;
-            int sliderH = 12;
-
-            // Sound-Sektion startet bei menuY + 70
-            int soundSectionY = menuY + 70;
-
-            // Musik-Slider (soundSectionY + 68)
-            int musicSliderY = soundSectionY + 68;
-            Rectangle musicSliderRect = new Rectangle(sliderX, musicSliderY - 10, sliderW, sliderH + 20);
-
-            // Sound-Slider (soundSectionY + 120)
-            int soundSliderY = soundSectionY + 120;
-            Rectangle soundSliderRect = new Rectangle(sliderX, soundSliderY - 10, sliderW, sliderH + 20);
-
-            // Tag/Nacht Toggle (gfxSectionY + 42)
-            int gfxSectionY = soundSectionY + 175;
-            int toggleY = gfxSectionY + 42;
-            int toggleW = 60;
-            int toggleH = 26;
-            int toggleX = menuX + menuW - 40 - toggleW;
-            Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
-
-            // Musik-Slider-Interaktion
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, musicSliderRect))
+            // Slider-Drag starten (grosszuegige Hit-Flaeche um die Schiene)
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
-                ui.IsDraggingMusicSlider = true;
+                if (Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(l.MusicTrack, 10, 14)))
+                    ui.IsDraggingMusicSlider = true;
+                else if (Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(l.SoundTrack, 10, 14)))
+                    ui.IsDraggingSoundSlider = true;
             }
             if (Raylib.IsMouseButtonReleased(MouseButton.Left))
             {
                 ui.IsDraggingMusicSlider = false;
-            }
-            if (ui.IsDraggingMusicSlider)
-            {
-                float newVolume = (mousePos.X - sliderX) / sliderW;
-                ui.OptionsMusicVolume = Math.Clamp(newVolume, 0f, 1f);
-                musicManager.Volume = ui.OptionsMusicVolume;
+                ui.IsDraggingSoundSlider = false;
             }
 
-            // Sound-Slider-Interaktion
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Raylib.CheckCollisionPointRec(mousePos, soundSliderRect))
+            if (ui.IsDraggingMusicSlider)
             {
-                ui.IsDraggingSoundSlider = true;
-            }
-            if (Raylib.IsMouseButtonReleased(MouseButton.Left))
-            {
-                ui.IsDraggingSoundSlider = false;
+                ui.OptionsMusicVolume = Math.Clamp((mousePos.X - l.MusicTrack.X) / l.MusicTrack.Width, 0f, 1f);
+                musicManager.Volume = ui.OptionsMusicVolume;
             }
             if (ui.IsDraggingSoundSlider)
             {
-                float newVolume = (mousePos.X - sliderX) / sliderW;
-                ui.OptionsSoundVolume = Math.Clamp(newVolume, 0f, 1f);
+                ui.OptionsSoundVolume = Math.Clamp((mousePos.X - l.SoundTrack.X) / l.SoundTrack.Width, 0f, 1f);
                 SoundManager.Volume = ui.OptionsSoundVolume;
             }
 
-            // Klicks
-            if (Raylib.IsMouseButtonPressed(MouseButton.Left))
+            if (Raylib.IsMouseButtonPressed(MouseButton.Left) &&
+                !ui.IsDraggingMusicSlider && !ui.IsDraggingSoundSlider)
             {
-                if (Raylib.CheckCollisionPointRec(mousePos, closeRect))
+                if (Raylib.CheckCollisionPointRec(mousePos, l.Close))
                 {
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ShowPauseMenu = false;
                     ui.ShowOptionsMenu = false;
                 }
-                else if (Raylib.CheckCollisionPointRec(mousePos, backRect))
+                else if (Raylib.CheckCollisionPointRec(mousePos, l.Back) ||
+                         !Raylib.CheckCollisionPointRec(mousePos, l.Panel))
                 {
+                    // Zurueck oder Klick neben das Panel: zur Pause-Ansicht
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ShowOptionsMenu = false;
                 }
-                else if (Raylib.CheckCollisionPointRec(mousePos, toggleRect))
+                else if (Raylib.CheckCollisionPointRec(mousePos, l.Toggle))
                 {
                     worldMap.DayNightCycleEnabled = !worldMap.DayNightCycleEnabled;
                     SoundManager.Play(SoundEffect.Click);
@@ -913,39 +846,37 @@ partial class Program
         }
         else
         {
-            // === HAUPTMENÜ-ANSICHT ===
-            int btnW = 420;
-            int btnH = 45;
-            int btnX = menuX + (menuW - btnW) / 2;
-            int btnStartY = menuY + 70;
-            int btnSpacing = 55;
-
-            Rectangle saveRect = new Rectangle(btnX, btnStartY, btnW, btnH);
-            Rectangle optionsRect = new Rectangle(btnX, btnStartY + btnSpacing, btnW, btnH);
-            Rectangle mainMenuRect = new Rectangle(btnX, btnStartY + btnSpacing * 2, btnW, btnH);
+            // === HAUPTANSICHT ===
+            var l = GetPauseMenuLayout();
 
             if (Raylib.IsMouseButtonPressed(MouseButton.Left))
             {
-                if (Raylib.CheckCollisionPointRec(mousePos, closeRect))
+                if (Raylib.CheckCollisionPointRec(mousePos, l.Close) ||
+                    !Raylib.CheckCollisionPointRec(mousePos, l.Panel))
                 {
+                    // X oder Klick neben das Panel: weiterspielen
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ShowPauseMenu = false;
                 }
-                else if (Raylib.CheckCollisionPointRec(mousePos, saveRect))
+                else if (Raylib.CheckCollisionPointRec(mousePos, l.Save))
                 {
                     // Speicher-Panel oeffnen (Overlay im Spiel)
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ShowPauseMenu = false;
                     ui.SaveSlots = SaveGameManager.GetAllSlots();
                     ui.SelectedSaveSlot = -1;
                     ui.ShowSavePanel = true;
                 }
-                else if (Raylib.CheckCollisionPointRec(mousePos, optionsRect))
+                else if (Raylib.CheckCollisionPointRec(mousePos, l.Options))
                 {
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ShowOptionsMenu = true;
                     ui.OptionsMusicVolume = musicManager.Volume;
                     ui.OptionsSoundVolume = SoundManager.Volume;
                 }
-                else if (Raylib.CheckCollisionPointRec(mousePos, mainMenuRect))
+                else if (Raylib.CheckCollisionPointRec(mousePos, l.MainMenu))
                 {
+                    SoundManager.Play(SoundEffect.Click);
                     ui.ResetPlayingState();
                     currentScreen = GameScreen.MainMenu;
                 }

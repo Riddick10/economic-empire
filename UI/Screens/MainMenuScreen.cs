@@ -642,14 +642,14 @@ internal class MainMenuScreen : IGameScreen
         Raylib.DrawRectangle(cx, py + 72, cw, 1, new Color((byte)255, (byte)255, (byte)255, A(24)));
 
         // === Sound ===
-        DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
-        DrawOptionSlider("Musik-Lautstaerke", musicTrack, Program.ui.OptionsMusicVolume,
+        MenuStyle.DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
+        MenuStyle.DrawOptionSlider("Musik-Lautstaerke", musicTrack, Program.ui.OptionsMusicVolume,
             Program.ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(musicTrack, 10, 14)), ease);
-        DrawOptionSlider("Sound-Lautstaerke", soundTrack, Program.ui.OptionsSoundVolume,
+        MenuStyle.DrawOptionSlider("Sound-Lautstaerke", soundTrack, Program.ui.OptionsSoundVolume,
             Program.ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(soundTrack, 10, 14)), ease);
 
         // === Grafik ===
-        DrawOptionsSection("GRAFIK", cx, (int)toggle.Y - 34, cw, ease);
+        MenuStyle.DrawOptionsSection("GRAFIK", cx, (int)toggle.Y - 34, cw, ease);
 
         bool dayNightOn = Program.ui.MainMenuDayNightCycleEnabled;
         _dayNightToggleAnim += ((dayNightOn ? 1f : 0f) - _dayNightToggleAnim) * Math.Min(1f, dt * 14f);
@@ -664,14 +664,7 @@ internal class MainMenuScreen : IGameScreen
             dayNightOn ? gold : new Color((byte)140, (byte)146, (byte)162, A(200)));
 
         // Schalter-Pille mit gleitendem Knopf
-        Raylib.DrawRectangleRounded(toggle, 1f, 10,
-            LerpColor(new Color((byte)10, (byte)13, (byte)22, A(230)),
-                      new Color((byte)176, (byte)136, (byte)52, A(240)), t));
-        Raylib.DrawRectangleRoundedLinesEx(toggle, 1f, 10, 1,
-            LerpColor(new Color((byte)70, (byte)78, (byte)100, A(180)), gold, t));
-        float knobX = toggle.X + 14 + (toggle.Width - 28) * t;
-        Raylib.DrawCircleV(new Vector2(knobX, toggle.Y + toggle.Height / 2f), 10,
-            new Color((byte)240, (byte)243, (byte)250, A(255)));
+        MenuStyle.DrawTogglePill(toggle, t, ease);
 
         // === Zurueck-Button + Schliessen-Kreuz ===
         bool hoverBack = open && Raylib.CheckCollisionPointRec(mousePos, back);
@@ -680,7 +673,7 @@ internal class MainMenuScreen : IGameScreen
 
         bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
         _optHover[1] += ((hoverClose ? 1f : 0f) - _optHover[1]) * Math.Min(1f, dt * 12f);
-        DrawCloseButton(close, _optHover[1], ease);
+        MenuStyle.DrawCloseButton(close, _optHover[1], ease);
 
         // ESC-Hinweis unter dem Panel
         string hint = "ESC zum Schliessen";
@@ -689,71 +682,4 @@ internal class MainMenuScreen : IGameScreen
             new Color((byte)150, (byte)155, (byte)170, A(150)));
     }
 
-    /// <summary>
-    /// Abschnitts-Ueberschrift: goldene Marke + Titel + feine Linie
-    /// </summary>
-    private static void DrawOptionsSection(string title, int x, int y, int width, float a)
-    {
-        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
-        Raylib.DrawRectangle(x, y + 2, 4, 13, new Color((byte)230, (byte)185, (byte)80, A(220)));
-        Program.DrawGameText(title, x + 12, y, 15, new Color((byte)230, (byte)185, (byte)80, A(235)));
-        int tw = Program.MeasureTextCached(title, 15);
-        Raylib.DrawRectangle(x + 12 + tw + 12, y + 8, Math.Max(0, width - tw - 24), 1,
-            new Color((byte)255, (byte)255, (byte)255, A(22)));
-    }
-
-    /// <summary>
-    /// Slider mit goldener Fuellung und rundem Knauf (Glow bei Hover/Drag)
-    /// </summary>
-    private static void DrawOptionSlider(string label, Rectangle track, float value, bool active, float a)
-    {
-        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
-        Color gold = new Color((byte)230, (byte)185, (byte)80, A(255));
-
-        int labelY = (int)track.Y - 30;
-        Program.DrawGameText(label, (int)track.X, labelY, 17,
-            new Color((byte)210, (byte)215, (byte)228, A(235)));
-
-        string pct = $"{(int)(value * 100)}%";
-        int pctW = Program.MeasureTextCached(pct, 17);
-        Program.DrawGameText(pct, (int)(track.X + track.Width) - pctW, labelY, 17, gold);
-
-        Raylib.DrawRectangleRounded(track, 0.5f, 6, new Color((byte)5, (byte)7, (byte)13, A(235)));
-        Raylib.DrawRectangleRoundedLinesEx(track, 0.5f, 6, 1, new Color((byte)70, (byte)78, (byte)100, A(160)));
-
-        int fillW = (int)(track.Width * value);
-        if (fillW > 3)
-        {
-            Raylib.DrawRectangleRounded(new Rectangle(track.X, track.Y, fillW, track.Height), 0.5f, 6,
-                new Color((byte)230, (byte)185, (byte)80, A(235)));
-        }
-
-        float kx = track.X + fillW;
-        float ky = track.Y + track.Height / 2f;
-        if (active)
-            Raylib.DrawCircleV(new Vector2(kx, ky), 14, new Color((byte)230, (byte)185, (byte)80, A(55)));
-        Raylib.DrawCircleV(new Vector2(kx, ky), 8, new Color((byte)244, (byte)246, (byte)252, A(255)));
-        Raylib.DrawCircleLines((int)kx, (int)ky, 8, gold);
-    }
-
-    /// <summary>
-    /// Rundes Schliessen-Kreuz oben rechts (rot beim Hover)
-    /// </summary>
-    private static void DrawCloseButton(Rectangle r, float hover, float a)
-    {
-        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
-        var center = new Vector2(r.X + r.Width / 2f, r.Y + r.Height / 2f);
-
-        if (hover > 0.02f)
-            Raylib.DrawCircleV(center, r.Width / 2f, new Color((byte)205, (byte)80, (byte)70, A(60 + hover * 120)));
-        Raylib.DrawRing(center, r.Width / 2f - 1, r.Width / 2f, 0, 360, 28,
-            LerpColor(new Color((byte)110, (byte)118, (byte)140, A(170)),
-                      new Color((byte)235, (byte)110, (byte)100, A(255)), hover));
-
-        Color x = LerpColor(new Color((byte)190, (byte)196, (byte)210, A(220)),
-                            new Color((byte)255, (byte)255, (byte)255, A(255)), hover);
-        const float s = 5.5f;
-        Raylib.DrawLineEx(new Vector2(center.X - s, center.Y - s), new Vector2(center.X + s, center.Y + s), 2.2f, x);
-        Raylib.DrawLineEx(new Vector2(center.X - s, center.Y + s), new Vector2(center.X + s, center.Y - s), 2.2f, x);
-    }
 }

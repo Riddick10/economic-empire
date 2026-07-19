@@ -14,384 +14,470 @@ namespace GrandStrategyGame;
 /// </summary>
 partial class Program
 {
+    // === Speichern-Panel im Living-World-Stil ===
+
+    // Ein-/Ausblenden und weiche Hover-/Auswahl-Zustaende
+    internal static float _savePanelAnim;
+    static readonly float[] _saveSlotAnim = new float[3];
+    static float _saveConfirmHover;
+    static float _saveCloseHover;
+
+    /// <summary>
+    /// Gemeinsames Layout des Speichern-Panels fuer Update und Draw
+    /// </summary>
+    internal static (Rectangle Panel, Rectangle Close, Rectangle[] Slots, Rectangle Confirm)
+        GetSavePanelLayout()
+    {
+        const int panelW = 620;
+        const int panelH = 560;
+        const int pad = 36;
+        int x = (ScreenWidth - panelW) / 2;
+        int y = (ScreenHeight - panelH) / 2;
+
+        const int slotH = 110;
+        const int slotSpacing = 16;
+        int slotW = panelW - pad * 2;
+        int startY = y + 92;
+
+        var slots = new Rectangle[3];
+        for (int i = 0; i < 3; i++)
+            slots[i] = new Rectangle(x + pad, startY + i * (slotH + slotSpacing), slotW, slotH);
+
+        return (
+            new Rectangle(x, y, panelW, panelH),
+            new Rectangle(x + panelW - 44, y + 12, 32, 32),
+            slots,
+            new Rectangle(x + (panelW - 360) / 2, startY + 3 * (slotH + slotSpacing) + 6, 360, 52));
+    }
+
     /// <summary>
     /// Zeichnet das Speichern-Panel als Overlay im Spiel
     /// </summary>
     static void DrawSavePanelOverlay()
     {
-        // Hintergrund abdunkeln
-        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)180));
+        float dt = Raylib.GetFrameTime();
+        Vector2 mousePos = _cachedMousePos;
+        bool open = ui.ShowSavePanel;
 
-        // Panel-Dimensionen
-        int panelWidth = 620;
-        int panelHeight = 520;
-        int panelX = (ScreenWidth - panelWidth) / 2;
-        int panelY = (ScreenHeight - panelHeight) / 2;
+        float target = open ? 1f : 0f;
+        _savePanelAnim += (target - _savePanelAnim) * Math.Min(1f, dt * 11f);
+        float ease = 1f - MathF.Pow(1f - Math.Clamp(_savePanelAnim, 0f, 1f), 3f);
+        if (ease <= 0.01f) return;
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
 
-        // Panel-Hintergrund (abgerundet)
-        Rectangle savePanelRect = new(panelX, panelY, panelWidth, panelHeight);
-        Rectangle savePanelShadow = new(panelX + 3, panelY + 3, panelWidth, panelHeight);
-        Raylib.DrawRectangleRounded(savePanelShadow, 0.03f, 8, new Color((byte)0, (byte)0, (byte)0, (byte)60));
-        Raylib.DrawRectangleRounded(savePanelRect, 0.03f, 8, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(savePanelRect, 0.03f, 8, 2, ColorPalette.Accent);
+        // Spielszene abdunkeln
+        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight,
+            new Color((byte)2, (byte)3, (byte)7, A(175)));
 
-        // Titel
-        string title = "SPIEL SPEICHERN";
-        int titleWidth = MeasureTextCached(title, 32);
-        DrawGameText(title, (ScreenWidth - titleWidth) / 2, panelY + 20, 26, ColorPalette.Accent);
+        var l = GetSavePanelLayout();
+        int oy = (int)((1f - ease) * 18f);
+        Rectangle Shift(Rectangle r) => new(r.X, r.Y + oy, r.Width, r.Height);
 
-        // Hinweis
-        string hint = "F9 = Schnellspeichern (Slot 1)";
-        int hintWidth = MeasureTextCached(hint, 14);
-        DrawGameText(hint, (ScreenWidth - hintWidth) / 2, panelY + 52, 11, ColorPalette.TextGray);
+        var panel = Shift(l.Panel);
+        var close = Shift(l.Close);
+        var confirm = Shift(l.Confirm);
 
-        // X-Button (oben rechts)
-        int closeBtnSize = 30;
-        int closeBtnX = panelX + panelWidth - closeBtnSize - 10;
-        int closeBtnY = panelY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
-        bool hoverClose = Raylib.CheckCollisionPointRec(_cachedMousePos, closeRect);
+        DrawGlassPanelFrame(panel, ease);
 
-        Raylib.DrawRectangleRounded(closeRect, 0.2f, 6, hoverClose ? ColorPalette.Red : ColorPalette.PanelLight);
-        Raylib.DrawRectangleRoundedLinesEx(closeRect, 0.2f, 6, 1, hoverClose ? ColorPalette.Red : ColorPalette.TextGray);
-        int xTextW = MeasureTextCached("X", 20);
-        DrawGameText("X", closeBtnX + (closeBtnSize - xTextW) / 2, closeBtnY + 5, 11, ColorPalette.TextWhite);
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+        Color gold = MenuStyle.Gold(A(255));
 
-        // Speicherplaetze zeichnen
+        // Titel mit Disketten-Icon
+        const string title = "SPIEL SPEICHERN";
+        int titleW = MeasureTextCached(title, 30);
+        int titleX = px + (pw - titleW) / 2 + 14;
+        int titleY = py + 24;
+        float icx = titleX - 32, icy = titleY + 15;
+        Raylib.DrawRectangleLinesEx(new Rectangle(icx - 9, icy - 9, 18, 18), 2, gold);
+        Raylib.DrawRectangle((int)icx - 4, (int)icy - 9, 8, 5, gold);
+        Raylib.DrawRectangle((int)icx - 5, (int)icy + 1, 10, 6, gold);
+        DrawGameText(title, titleX, titleY, 30, new Color((byte)245, (byte)240, (byte)228, A(255)));
+
+        // Trennlinie unterm Titel
+        Raylib.DrawRectangle(px + 36, py + 72, pw - 72, 1, new Color((byte)255, (byte)255, (byte)255, A(24)));
+
+        // Slot-Karten
         for (int i = 0; i < 3; i++)
         {
+            var slotRect = Shift(l.Slots[i]);
             bool isSelected = ui.SelectedSaveSlot == i;
-            DrawSaveSlotOverlay(i, ui.SaveSlotRects[i], ui.SaveSlots[i], ui.SaveSlotHovered[i] || isSelected, ui.DeleteSlotHovered[i], isSelected);
+            bool hovered = open && ui.SaveSlotHovered[i];
+
+            float t = isSelected ? 1f : (hovered ? 0.55f : 0f);
+            _saveSlotAnim[i] += (t - _saveSlotAnim[i]) * Math.Min(1f, dt * 12f);
+
+            DrawSaveSlotCard(i, slotRect, ui.SaveSlots[i], _saveSlotAnim[i], isSelected,
+                open && ui.DeleteSlotHovered[i], ease, oy);
         }
 
-        // Speichern-Button
+        // Bestaetigen-Button (nur wenn Slot ausgewaehlt)
         if (ui.SelectedSaveSlot >= 0)
         {
-            Color btnColor = ui.ConfirmSaveButtonHovered ? ColorPalette.ButtonHover : ColorPalette.ButtonNormal;
-            Color borderColor = ui.ConfirmSaveButtonHovered ? ColorPalette.Accent : new Color((byte)80, (byte)80, (byte)100, (byte)255);
-            Raylib.DrawRectangleRounded(ui.ConfirmSaveButtonRect, GameConfig.BUTTON_ROUNDNESS, 6, btnColor);
-            Raylib.DrawRectangleRoundedLinesEx(ui.ConfirmSaveButtonRect, GameConfig.BUTTON_ROUNDNESS, 6, 2, borderColor);
-
-            string saveText = ui.SaveSlots[ui.SelectedSaveSlot] != null ? "Ueberschreiben" : "Speichern";
-            int saveTextWidth = MeasureTextCached(saveText, 22);
-            int saveTextX = (int)(ui.ConfirmSaveButtonRect.X + (ui.ConfirmSaveButtonRect.Width - saveTextWidth) / 2);
-            int saveTextY = (int)(ui.ConfirmSaveButtonRect.Y + (ui.ConfirmSaveButtonRect.Height - 22) / 2);
-            DrawGameText(saveText, saveTextX, saveTextY, 18, ui.ConfirmSaveButtonHovered ? ColorPalette.Accent : ColorPalette.TextWhite);
+            bool hoverConfirm = open && ui.ConfirmSaveButtonHovered;
+            _saveConfirmHover += ((hoverConfirm ? 1f : 0f) - _saveConfirmHover) * Math.Min(1f, dt * 12f);
+            string saveText = ui.SaveSlots[ui.SelectedSaveSlot] != null ? "UEBERSCHREIBEN" : "SPEICHERN";
+            DrawPauseButton(confirm, saveText, null, _saveConfirmHover, ease);
         }
+
+        // Schliessen-Kreuz
+        bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
+        _saveCloseHover += ((hoverClose ? 1f : 0f) - _saveCloseHover) * Math.Min(1f, dt * 12f);
+        MenuStyle.DrawCloseButton(close, _saveCloseHover, ease);
+
+        // Hinweis unter dem Panel
+        string hint = "F9 = Schnellspeichern (Slot 1)   |   ESC = Zurueck";
+        int hintW = MeasureTextCached(hint, 13);
+        DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
+            new Color((byte)150, (byte)155, (byte)170, A(150)));
     }
 
     /// <summary>
-    /// Zeichnet einen Speicherslot im Overlay-Panel
+    /// Glas-Slotkarte im Stil des Lade-Screens, mit Auswahl-Zustand
     /// </summary>
-    static void DrawSaveSlotOverlay(int index, Rectangle rect, SaveSlotInfo? slotInfo, bool isHovered, bool deleteHovered, bool isSelected)
+    static void DrawSaveSlotCard(int index, Rectangle r, SaveSlotInfo? slot, float hover,
+        bool isSelected, bool deleteHovered, float ease, int oy)
     {
-        // Hintergrundfarbe
-        Color bgColor = isSelected ? new Color((byte)60, (byte)70, (byte)90, (byte)255) :
-                        (isHovered ? ColorPalette.ButtonHover : ColorPalette.ButtonNormal);
-        Color borderColor = isSelected ? ColorPalette.Accent :
-                           (isHovered ? ColorPalette.Accent : ColorPalette.TextGray);
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
+        bool empty = slot == null;
 
-        Raylib.DrawRectangleRounded(rect, 0.05f, 6, bgColor);
-        Raylib.DrawRectangleRoundedLinesEx(rect, 0.05f, 6, isSelected ? 3 : 2, borderColor);
+        // Leere Slots gedimmt, ausser sie sind ausgewaehlt (Speicherziel)
+        MenuStyle.DrawGlassCard(r, hover, empty && !isSelected ? ease * 0.7f : ease);
 
-        int x = (int)rect.X + 15;
-        int y = (int)rect.Y + 10;
+        // Slot-Badge oben links
+        DrawGameText($"SLOT {index + 1}", (int)r.X + 18, (int)r.Y + 12, 13, MenuStyle.Gold(A(230)));
 
-        // Slot-Nummer
-        string slotNumber = $"Slot {index + 1}";
-        DrawGameText(slotNumber, x, y, 18, ColorPalette.Accent);
-
-        if (slotInfo != null)
+        // Auswahl-Markierung oben rechts (links neben dem Loeschen-Kreuz)
+        if (isSelected)
         {
-            // Spielstand vorhanden
-            y += 24;
-
-            // Flagge (falls vorhanden)
-            var flagTexture = TextureManager.GetFlag(slotInfo.CountryId);
-            if (flagTexture.HasValue)
-            {
-                float flagScale = 30f / flagTexture.Value.Height;
-                Raylib.DrawTextureEx(flagTexture.Value, new System.Numerics.Vector2(x, y), 0, flagScale, Color.White);
-                x += (int)(flagTexture.Value.Width * flagScale) + 10;
-            }
-
-            // Spielstand-Name
-            DrawGameText(slotInfo.Name, x, y, 11, ColorPalette.TextWhite);
-            y += 22;
-
-            // Spieldatum und Budget
-            string infoLine = $"{slotInfo.GameDate}  |  {Formatting.Money(slotInfo.Budget)}";
-            DrawGameText(infoLine, x, y, 11, ColorPalette.TextGray);
-
-            // Gespeichert am (rechts unten)
-            string savedAt = $"{slotInfo.SavedAt:dd.MM.yyyy HH:mm}";
-            int savedAtWidth = MeasureTextCached(savedAt, 12);
-            DrawGameText(savedAt, (int)(rect.X + rect.Width - savedAtWidth - 15),
-                (int)(rect.Y + rect.Height - 18), 11, ColorPalette.TextGray);
-
-            // Loeschen-Button (X)
-            Rectangle deleteRect = ui.DeleteSlotRects[index];
-            Color deleteColor = deleteHovered ? new Color((byte)200, (byte)60, (byte)60, (byte)255) : ColorPalette.TextGray;
-            DrawGameText("X", (int)deleteRect.X + 8, (int)deleteRect.Y + 4, 11, deleteColor);
+            const string sel = "AUSGEWAEHLT";
+            int selW = MeasureTextCached(sel, 12);
+            DrawGameText(sel, (int)(r.X + r.Width - selW - 58), (int)r.Y + 14, 12, MenuStyle.Gold(A(220)));
         }
-        else
+
+        if (empty)
         {
-            // Leerer Slot
-            y += 35;
-            string emptyText = "- Leer -";
-            int emptyWidth = MeasureTextCached(emptyText, 18);
-            DrawGameText(emptyText, (int)(rect.X + (rect.Width - emptyWidth) / 2), y, 18, ColorPalette.TextGray);
+            const string emptyText = "- LEER -";
+            int tw = MeasureTextCached(emptyText, 18);
+            DrawGameText(emptyText, (int)(r.X + (r.Width - tw) / 2), (int)(r.Y + (r.Height - 18) / 2 + 6),
+                18, new Color((byte)150, (byte)156, (byte)172, A(190)));
+            return;
         }
+
+        int x = (int)r.X + 18;
+        int y = (int)r.Y + 34;
+
+        // Flagge mit feinem Rand
+        var flag = TextureManager.GetFlag(slot!.CountryId);
+        if (flag.HasValue)
+        {
+            float scale = 40f / flag.Value.Height;
+            int fw = (int)(flag.Value.Width * scale);
+            Raylib.DrawTextureEx(flag.Value, new Vector2(x, y), 0, scale,
+                new Color((byte)255, (byte)255, (byte)255, A(255)));
+            Raylib.DrawRectangleLines(x, y, fw, 40, new Color((byte)255, (byte)255, (byte)255, A(50)));
+            x += fw + 14;
+        }
+
+        // Name + Spieldatum + Budget
+        DrawGameText(slot.Name, x, y, 18, new Color((byte)240, (byte)243, (byte)250, A(255)));
+        DrawGameText(slot.GameDate, x, y + 24, 13, MenuStyle.Gold(A(210)));
+        DrawGameText(Formatting.Money(slot.Budget), x, y + 42, 12,
+            new Color((byte)165, (byte)172, (byte)188, A(220)));
+
+        // Zeitstempel unten rechts
+        string savedAt = $"{slot.SavedAt:dd.MM.yyyy HH:mm}";
+        int saW = MeasureTextCached(savedAt, 12);
+        DrawGameText(savedAt, (int)(r.X + r.Width - saW - 18), (int)(r.Y + r.Height - 22), 12,
+            new Color((byte)140, (byte)146, (byte)162, A(190)));
+
+        // Loeschen-Kreuz (roter Kreis beim Hover)
+        var del = ui.DeleteSlotRects[index];
+        var delCenter = new Vector2(del.X + del.Width / 2f, del.Y + del.Height / 2f + oy);
+        if (deleteHovered)
+            Raylib.DrawCircleV(delCenter, del.Width / 2f, new Color((byte)205, (byte)80, (byte)70, A(150)));
+        Color xc = deleteHovered
+            ? new Color((byte)255, (byte)255, (byte)255, A(255))
+            : new Color((byte)150, (byte)156, (byte)172, A(200));
+        const float s = 4.5f;
+        Raylib.DrawLineEx(new Vector2(delCenter.X - s, delCenter.Y - s), new Vector2(delCenter.X + s, delCenter.Y + s), 2f, xc);
+        Raylib.DrawLineEx(new Vector2(delCenter.X - s, delCenter.Y + s), new Vector2(delCenter.X + s, delCenter.Y - s), 2f, xc);
+    }
+
+    // === Pause-Menue im Living-World-Stil ===
+
+    // Ein-/Ausblenden und weiche Hover-/Schalter-Zustaende
+    internal static float _pauseMenuAnim;
+    static readonly float[] _pauseBtnHover = new float[3];
+    static float _pauseCloseHover;
+    static float _pauseBackHover;
+    static float _pauseDayNightAnim;
+
+    /// <summary>
+    /// Gemeinsames Layout der Pause-Hauptansicht fuer Update und Draw
+    /// (eine Quelle - vorher wichen Klickflaechen und Zeichnung voneinander ab)
+    /// </summary>
+    internal static (Rectangle Panel, Rectangle Close, Rectangle Save, Rectangle Options, Rectangle MainMenu)
+        GetPauseMenuLayout()
+    {
+        const int menuW = 480;
+        const int menuH = 340;
+        const int pad = 36;
+        int x = (ScreenWidth - menuW) / 2;
+        int y = (ScreenHeight - menuH) / 2;
+
+        int btnW = menuW - pad * 2;
+        const int btnH = 54;
+        const int spacing = 66;
+        int startY = y + 96;
+
+        return (
+            new Rectangle(x, y, menuW, menuH),
+            new Rectangle(x + menuW - 44, y + 12, 32, 32),
+            new Rectangle(x + pad, startY, btnW, btnH),
+            new Rectangle(x + pad, startY + spacing, btnW, btnH),
+            new Rectangle(x + pad, startY + spacing * 2, btnW, btnH));
     }
 
     /// <summary>
-    /// Zeichnet das Pause-Menü als Overlay
+    /// Gemeinsames Layout der Pause-Optionen (wie Hauptmenue-Optionen,
+    /// plus Zeile fuer den aktuellen Musik-Track)
+    /// </summary>
+    internal static (Rectangle Panel, Rectangle Close, Rectangle Back, Rectangle MusicTrack,
+        Rectangle SoundTrack, Rectangle Toggle) GetPauseOptionsLayout()
+    {
+        const int menuW = 520;
+        const int menuH = 520;
+        const int pad = 36;
+        int x = (ScreenWidth - menuW) / 2;
+        int y = (ScreenHeight - menuH) / 2;
+
+        int soundHeaderY = y + 96;
+        int musicTrackY = soundHeaderY + 64;
+        int soundTrackY = musicTrackY + 64;
+        int gfxHeaderY = soundTrackY + 78;   // +Track-Namen-Zeile
+        int toggleY = gfxHeaderY + 34;
+
+        return (
+            new Rectangle(x, y, menuW, menuH),
+            new Rectangle(x + menuW - 44, y + 12, 32, 32),
+            new Rectangle(x + pad, y + menuH - 74, menuW - pad * 2, 50),
+            new Rectangle(x + pad, musicTrackY, menuW - pad * 2, 10),
+            new Rectangle(x + pad, soundTrackY, menuW - pad * 2, 10),
+            new Rectangle(x + menuW - pad - 58, toggleY, 58, 28));
+    }
+
+    /// <summary>
+    /// Glas-Panel-Rahmen: Schatten, dunkles Glas, Lichtkante, Rand, Goldkante
+    /// </summary>
+    static void DrawGlassPanelFrame(Rectangle panel, float ease)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+
+        Raylib.DrawRectangle(px + 4, py + 6, pw, ph, new Color((byte)0, (byte)0, (byte)0, A(90)));
+        Raylib.DrawRectangleRec(panel, new Color((byte)12, (byte)16, (byte)27, A(238)));
+        Raylib.DrawRectangle(px, py + 3, pw, 1, new Color((byte)255, (byte)255, (byte)255, A(22)));
+        Raylib.DrawRectangleLinesEx(panel, 1, new Color((byte)80, (byte)88, (byte)110, A(170)));
+        Raylib.DrawRectangle(px, py, pw, 3, MenuStyle.Gold(A(210)));
+    }
+
+    /// <summary>
+    /// Zeichnet das Pause-Menü als Overlay (mit Ein-/Ausblend-Animation)
     /// </summary>
     static void DrawPauseMenu()
     {
+        float dt = Raylib.GetFrameTime();
         Vector2 mousePos = _cachedMousePos;
+        bool open = ui.ShowPauseMenu;
 
-        // Hintergrund abdunkeln
-        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+        float target = open ? 1f : 0f;
+        _pauseMenuAnim += (target - _pauseMenuAnim) * Math.Min(1f, dt * 11f);
+        float ease = 1f - MathF.Pow(1f - Math.Clamp(_pauseMenuAnim, 0f, 1f), 3f);
+        if (ease <= 0.01f) return;
 
-        // Menü-Dimensionen
-        int menuW = 480;
-        int menuH = ui.ShowOptionsMenu ? 460 : 305;
-        int menuX = (ScreenWidth - menuW) / 2;
-        int menuY = (ScreenHeight - menuH) / 2;
-
-        // Menü-Hintergrund (abgerundet)
-        Rectangle pauseMenuRect = new(menuX, menuY, menuW, menuH);
-        Rectangle pauseMenuShadow = new(menuX + 3, menuY + 3, menuW, menuH);
-        Raylib.DrawRectangleRounded(pauseMenuShadow, 0.03f, 8, new Color((byte)0, (byte)0, (byte)0, (byte)60));
-        Raylib.DrawRectangleRounded(pauseMenuRect, 0.03f, 8, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(pauseMenuRect, 0.03f, 8, 2, ColorPalette.Accent);
-
-        // X-Button (oben rechts)
-        int closeBtnSize = 30;
-        int closeBtnX = menuX + menuW - closeBtnSize - 10;
-        int closeBtnY = menuY + 10;
-        Rectangle closeRect = new Rectangle(closeBtnX, closeBtnY, closeBtnSize, closeBtnSize);
-        bool hoverClose = Raylib.CheckCollisionPointRec(mousePos, closeRect);
-
-        Raylib.DrawRectangleRounded(closeRect, 0.2f, 6, hoverClose ? ColorPalette.Red : ColorPalette.PanelLight);
-        Raylib.DrawRectangleRoundedLinesEx(closeRect, 0.2f, 6, 1, hoverClose ? ColorPalette.Red : ColorPalette.TextGray);
-        int xTextW = MeasureTextCached("X", 20);
-        DrawGameText("X", closeBtnX + (closeBtnSize - xTextW) / 2, closeBtnY + 5, 11, ColorPalette.TextWhite);
+        // Spielszene abdunkeln
+        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight,
+            new Color((byte)2, (byte)3, (byte)7, (byte)Math.Clamp(165 * ease, 0, 255)));
 
         if (ui.ShowOptionsMenu)
-        {
-            DrawOptionsMenu(menuX, menuY, menuW, menuH, mousePos);
-        }
+            DrawPauseOptionsView(dt, mousePos, ease, open);
         else
-        {
-            DrawPauseMainMenu(menuX, menuY, menuW, menuH, mousePos);
-        }
+            DrawPauseMainView(dt, mousePos, ease, open);
     }
 
     /// <summary>
-    /// Zeichnet die Hauptansicht des Pause-Menüs
+    /// Hauptansicht: Titel + drei Glas-Buttons
     /// </summary>
-    static void DrawPauseMainMenu(int menuX, int menuY, int menuW, int menuH, Vector2 mousePos)
+    static void DrawPauseMainView(float dt, Vector2 mousePos, float ease, bool open)
     {
-        // Titel
-        string title = "PAUSE";
-        int titleW = MeasureTextCached(title, 36);
-        DrawGameText(title, menuX + (menuW - titleW) / 2, menuY + 20, 32, ColorPalette.Accent);
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
+
+        var l = GetPauseMenuLayout();
+        int oy = (int)((1f - ease) * 18f);
+        Rectangle Shift(Rectangle r) => new(r.X, r.Y + oy, r.Width, r.Height);
+
+        var panel = Shift(l.Panel);
+        var close = Shift(l.Close);
+        var buttons = new[] { Shift(l.Save), Shift(l.Options), Shift(l.MainMenu) };
+
+        DrawGlassPanelFrame(panel, ease);
+
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+
+        // Titel mit Pause-Balken
+        const string title = "PAUSE";
+        int titleW = MeasureTextCached(title, 30);
+        int titleX = px + (pw - titleW) / 2 + 12;
+        int titleY = py + 24;
+        Color gold = MenuStyle.Gold(A(255));
+        Raylib.DrawRectangle(titleX - 30, titleY + 6, 6, 20, gold);
+        Raylib.DrawRectangle(titleX - 19, titleY + 6, 6, 20, gold);
+        DrawGameText(title, titleX, titleY, 30, new Color((byte)245, (byte)240, (byte)228, A(255)));
+
+        // Trennlinie unterm Titel
+        Raylib.DrawRectangle(px + 36, py + 72, pw - 72, 1, new Color((byte)255, (byte)255, (byte)255, A(24)));
 
         // Buttons
-        int btnW = 420;
-        int btnH = 50;
-        int btnX = menuX + (menuW - btnW) / 2;
-        int btnStartY = menuY + 80;
-        int btnSpacing = 60;
+        (string Label, string? Shortcut)[] entries =
+        {
+            ("SPIEL SPEICHERN", "F5"),
+            ("OPTIONEN", null),
+            ("ZURUECK ZUM HAUPTMENUE", null),
+        };
+        for (int i = 0; i < buttons.Length; i++)
+        {
+            bool hovered = open && Raylib.CheckCollisionPointRec(mousePos, buttons[i]);
+            _pauseBtnHover[i] += ((hovered ? 1f : 0f) - _pauseBtnHover[i]) * Math.Min(1f, dt * 12f);
+            DrawPauseButton(buttons[i], entries[i].Label, entries[i].Shortcut, _pauseBtnHover[i], ease);
+        }
 
-        // "Speichern" Button
-        Rectangle saveRect = new Rectangle(btnX, btnStartY, btnW, btnH);
-        bool hoverSave = Raylib.CheckCollisionPointRec(mousePos, saveRect);
-        DrawPauseMenuButton(saveRect, "Spiel Speichern (F5)", hoverSave);
+        // Schliessen-Kreuz
+        bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
+        _pauseCloseHover += ((hoverClose ? 1f : 0f) - _pauseCloseHover) * Math.Min(1f, dt * 12f);
+        MenuStyle.DrawCloseButton(close, _pauseCloseHover, ease);
 
-        // "Optionen" Button
-        Rectangle optionsRect = new Rectangle(btnX, btnStartY + btnSpacing, btnW, btnH);
-        bool hoverOptions = Raylib.CheckCollisionPointRec(mousePos, optionsRect);
-        DrawPauseMenuButton(optionsRect, "Optionen", hoverOptions);
-
-        // "Zurueck zum Hauptmenue" Button
-        Rectangle mainMenuRect = new Rectangle(btnX, btnStartY + btnSpacing * 2, btnW, btnH);
-        bool hoverMainMenu = Raylib.CheckCollisionPointRec(mousePos, mainMenuRect);
-        DrawPauseMenuButton(mainMenuRect, "Zurueck zum Hauptmenue", hoverMainMenu);
+        // ESC-Hinweis unter dem Panel
+        string hint = "ESC = Fortsetzen";
+        int hintW = MeasureTextCached(hint, 13);
+        DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
+            new Color((byte)150, (byte)155, (byte)170, A(150)));
     }
 
     /// <summary>
-    /// Zeichnet das Optionen-Untermenü
+    /// Pause-Button: Glas-Karte, zentrierter Text, optionales Tastenkuerzel,
+    /// Hover-Chevron rechts (Stil der Hauptmenue-Buttons)
     /// </summary>
-    static void DrawOptionsMenu(int menuX, int menuY, int menuW, int menuH, Vector2 mousePos)
+    static void DrawPauseButton(Rectangle r, string text, string? shortcut, float hover, float ease)
     {
-        // Titel
-        string title = "OPTIONEN";
-        int titleW = MeasureTextCached(title, 36);
-        DrawGameText(title, menuX + (menuW - titleW) / 2, menuY + 20, 32, ColorPalette.Accent);
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
 
-        int contentX = menuX + 30;
-        int contentW = menuW - 60;
-        int sliderX = menuX + 40;
-        int sliderW = menuW - 80;
-        int sliderH = 12;
-        int knobSize = 20;
+        MenuStyle.DrawGlassCard(r, hover, ease);
 
-        // ========================================
-        // === SOUND-EINSTELLUNGEN (Kategorie) ===
-        // ========================================
-        int soundSectionY = menuY + 70;
+        const int fontSize = 19;
+        int textW = MeasureTextCached(text, fontSize);
+        int textX = (int)(r.X + (r.Width - textW) / 2f + hover * 3);
+        int textY = (int)(r.Y + (r.Height - fontSize) / 2f);
+        Color textColor = MenuStyle.Lerp(new Color((byte)205, (byte)210, (byte)222, A(235)),
+                                         new Color((byte)255, (byte)255, (byte)255, A(255)), hover);
+        DrawGameText(text, textX, textY, fontSize, textColor);
 
-        // Kategorie-Header
-        Raylib.DrawRectangle(contentX, soundSectionY, contentW, 28, new Color((byte)30, (byte)35, (byte)50, (byte)255));
-        Raylib.DrawRectangleLinesEx(new Rectangle(contentX, soundSectionY, contentW, 28), 1, ColorPalette.Accent);
-        DrawGameText("Sound-Einstellungen", contentX + 10, soundSectionY + 5, 18, ColorPalette.Accent);
+        if (shortcut != null)
+        {
+            int scW = MeasureTextCached(shortcut, 13);
+            DrawGameText(shortcut, (int)(r.X + r.Width - scW - 40), textY + 4, 13,
+                new Color((byte)140, (byte)146, (byte)162, A(180)));
+        }
 
-        // === MUSIK-LAUTSTÄRKE ===
-        int musicLabelY = soundSectionY + 40;
-        DrawGameText("Musik-Lautstaerke", sliderX, musicLabelY, 18, ColorPalette.TextWhite);
+        if (hover > 0.05f)
+        {
+            MenuStyle.DrawChevron(r.X + r.Width - 22 + hover * 4, r.Y + r.Height / 2f, 1,
+                new Color((byte)255, (byte)215, (byte)130, A(230 * hover)));
+        }
+    }
 
-        string musicPercent = $"{(int)(ui.OptionsMusicVolume * 100)}%";
-        int musicPercentW = MeasureTextCached(musicPercent, 18);
-        DrawGameText(musicPercent, menuX + menuW - 40 - musicPercentW, musicLabelY, 18, ColorPalette.Accent);
+    /// <summary>
+    /// Options-Ansicht des Pause-Menues (gleicher Stil wie im Hauptmenue)
+    /// </summary>
+    static void DrawPauseOptionsView(float dt, Vector2 mousePos, float ease, bool open)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
 
-        int musicSliderY = soundSectionY + 68;
+        var l = GetPauseOptionsLayout();
+        int oy = (int)((1f - ease) * 18f);
+        Rectangle Shift(Rectangle r) => new(r.X, r.Y + oy, r.Width, r.Height);
 
-        // Slider-Hintergrund
-        Raylib.DrawRectangle(sliderX, musicSliderY, sliderW, sliderH, ColorPalette.Background);
-        Raylib.DrawRectangleLinesEx(new Rectangle(sliderX, musicSliderY, sliderW, sliderH), 1, ColorPalette.PanelLight);
+        var panel = Shift(l.Panel);
+        var close = Shift(l.Close);
+        var back = Shift(l.Back);
+        var musicTrack = Shift(l.MusicTrack);
+        var soundTrack = Shift(l.SoundTrack);
+        var toggle = Shift(l.Toggle);
 
-        // Slider-Fuellung
-        int musicFillW = (int)(sliderW * ui.OptionsMusicVolume);
-        if (musicFillW > 0)
-            Raylib.DrawRectangle(sliderX, musicSliderY, musicFillW, sliderH, ColorPalette.Accent);
+        DrawGlassPanelFrame(panel, ease);
 
-        // Slider-Knopf
-        int musicKnobX = sliderX + musicFillW - knobSize / 2;
-        int musicKnobY = musicSliderY + sliderH / 2 - knobSize / 2;
-        Rectangle musicKnobRect = new Rectangle(musicKnobX, musicKnobY, knobSize, knobSize);
-        bool hoverMusicKnob = Raylib.CheckCollisionPointRec(mousePos, musicKnobRect) || ui.IsDraggingMusicSlider;
-        Raylib.DrawRectangleRec(musicKnobRect, hoverMusicKnob ? ColorPalette.Accent : ColorPalette.TextWhite);
-        Raylib.DrawRectangleLinesEx(musicKnobRect, 1, ColorPalette.Accent);
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+        const int pad = 36;
+        int cx = px + pad;
+        int cw = pw - pad * 2;
+        Color gold = MenuStyle.Gold(A(255));
 
-        // === SOUND-LAUTSTÄRKE ===
-        int soundLabelY = soundSectionY + 92;
-        DrawGameText("Sound-Lautstaerke", sliderX, soundLabelY, 18, ColorPalette.TextWhite);
+        // Titel mit Zahnrad
+        const string title = "OPTIONEN";
+        int titleW = MeasureTextCached(title, 30);
+        int titleX = px + (pw - titleW) / 2 + 14;
+        int titleY = py + 24;
+        MenuStyle.DrawGearIcon(titleX - 30, titleY + 16, gold);
+        DrawGameText(title, titleX, titleY, 30, new Color((byte)245, (byte)240, (byte)228, A(255)));
 
-        string soundPercent = $"{(int)(ui.OptionsSoundVolume * 100)}%";
-        int soundPercentW = MeasureTextCached(soundPercent, 18);
-        DrawGameText(soundPercent, menuX + menuW - 40 - soundPercentW, soundLabelY, 18, ColorPalette.Accent);
+        // Trennlinie unterm Titel
+        Raylib.DrawRectangle(cx, py + 72, cw, 1, new Color((byte)255, (byte)255, (byte)255, A(24)));
 
-        int soundSliderY = soundSectionY + 120;
+        // === Sound ===
+        MenuStyle.DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
+        MenuStyle.DrawOptionSlider("Musik-Lautstaerke", musicTrack, ui.OptionsMusicVolume,
+            ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(musicTrack, 10, 14)), ease);
+        MenuStyle.DrawOptionSlider("Sound-Lautstaerke", soundTrack, ui.OptionsSoundVolume,
+            ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(soundTrack, 10, 14)), ease);
 
-        // Slider-Hintergrund
-        Raylib.DrawRectangle(sliderX, soundSliderY, sliderW, sliderH, ColorPalette.Background);
-        Raylib.DrawRectangleLinesEx(new Rectangle(sliderX, soundSliderY, sliderW, sliderH), 1, ColorPalette.PanelLight);
-
-        // Slider-Fuellung
-        int soundFillW = (int)(sliderW * ui.OptionsSoundVolume);
-        if (soundFillW > 0)
-            Raylib.DrawRectangle(sliderX, soundSliderY, soundFillW, sliderH, ColorPalette.Accent);
-
-        // Slider-Knopf
-        int soundKnobX = sliderX + soundFillW - knobSize / 2;
-        int soundKnobY = soundSliderY + sliderH / 2 - knobSize / 2;
-        Rectangle soundKnobRect = new Rectangle(soundKnobX, soundKnobY, knobSize, knobSize);
-        bool hoverSoundKnob = Raylib.CheckCollisionPointRec(mousePos, soundKnobRect) || ui.IsDraggingSoundSlider;
-        Raylib.DrawRectangleRec(soundKnobRect, hoverSoundKnob ? ColorPalette.Accent : ColorPalette.TextWhite);
-        Raylib.DrawRectangleLinesEx(soundKnobRect, 1, ColorPalette.Accent);
-
-        // Aktueller Track-Name
+        // Aktueller Musik-Track
         string? trackName = musicManager.CurrentTrackName;
         if (trackName != null)
         {
             string trackLabel = $"Aktueller Track: {trackName}";
-            int trackLabelW = MeasureTextCached(trackLabel, 14);
-            DrawGameText(trackLabel, menuX + (menuW - trackLabelW) / 2, soundSectionY + 145, 14, ColorPalette.TextGray);
+            int trackLabelW = MeasureTextCached(trackLabel, 13);
+            DrawGameText(trackLabel, px + (pw - trackLabelW) / 2, (int)soundTrack.Y + 28, 13,
+                new Color((byte)140, (byte)146, (byte)162, A(190)));
         }
 
-        // ===========================================
-        // === GRAFIK-EINSTELLUNGEN (Kategorie) ===
-        // ===========================================
-        int gfxSectionY = soundSectionY + 175;
+        // === Grafik ===
+        MenuStyle.DrawOptionsSection("GRAFIK", cx, (int)toggle.Y - 34, cw, ease);
 
-        // Kategorie-Header
-        Raylib.DrawRectangle(contentX, gfxSectionY, contentW, 28, new Color((byte)30, (byte)35, (byte)50, (byte)255));
-        Raylib.DrawRectangleLinesEx(new Rectangle(contentX, gfxSectionY, contentW, 28), 1, ColorPalette.Accent);
-        DrawGameText("Grafik-Einstellungen", contentX + 10, gfxSectionY + 5, 18, ColorPalette.Accent);
-
-        // Tag/Nacht-Zyklus Toggle
-        int toggleY = gfxSectionY + 42;
-        DrawGameText("Tag/Nacht-Zyklus", sliderX, toggleY, 18, ColorPalette.TextWhite);
-
-        // Toggle-Button
-        int toggleW = 60;
-        int toggleH = 26;
-        int toggleX = menuX + menuW - 40 - toggleW;
-        Rectangle toggleRect = new Rectangle(toggleX, toggleY - 2, toggleW, toggleH);
-        bool hoverToggle = Raylib.CheckCollisionPointRec(mousePos, toggleRect);
         bool dayNightOn = worldMap.DayNightCycleEnabled;
+        _pauseDayNightAnim += ((dayNightOn ? 1f : 0f) - _pauseDayNightAnim) * Math.Min(1f, dt * 14f);
 
-        Color toggleBg = dayNightOn ? ColorPalette.Accent : ColorPalette.Background;
-        Raylib.DrawRectangleRec(toggleRect, toggleBg);
-        Raylib.DrawRectangleLinesEx(toggleRect, 1, dayNightOn ? ColorPalette.Accent : ColorPalette.PanelLight);
+        DrawGameText("Tag/Nacht-Zyklus auf der Karte", cx, (int)toggle.Y + 5, 17,
+            new Color((byte)210, (byte)215, (byte)228, A(235)));
 
-        // Toggle-Knopf (Schieber)
-        int knobW = 26;
-        int knobX = dayNightOn ? toggleX + toggleW - knobW : toggleX;
-        Raylib.DrawRectangle(knobX, (int)toggleRect.Y, knobW, toggleH, hoverToggle ? ColorPalette.TextWhite : ColorPalette.PanelLight);
-        Raylib.DrawRectangleLinesEx(new Rectangle(knobX, toggleRect.Y, knobW, toggleH), 1, ColorPalette.TextWhite);
+        string status = dayNightOn ? "AN" : "AUS";
+        int statusW = MeasureTextCached(status, 15);
+        DrawGameText(status, (int)toggle.X - statusW - 12, (int)toggle.Y + 6, 15,
+            dayNightOn ? gold : new Color((byte)140, (byte)146, (byte)162, A(200)));
 
-        // Status-Text
-        string toggleStatus = dayNightOn ? "AN" : "AUS";
-        Color toggleStatusColor = dayNightOn ? new Color((byte)100, (byte)255, (byte)100, (byte)255) : ColorPalette.TextGray;
-        int statusW = MeasureTextCached(toggleStatus, 16);
-        DrawGameText(toggleStatus, toggleX - statusW - 10, toggleY + 1, 16, toggleStatusColor);
+        MenuStyle.DrawTogglePill(toggle, _pauseDayNightAnim, ease);
 
-        // Zurueck-Button
-        int backBtnW = 360;
-        int backBtnH = 50;
-        int backBtnX = menuX + (menuW - backBtnW) / 2;
-        int backBtnY = menuY + menuH - backBtnH - 20;
-        Rectangle backRect = new Rectangle(backBtnX, backBtnY, backBtnW, backBtnH);
-        bool hoverBack = Raylib.CheckCollisionPointRec(mousePos, backRect);
-        DrawPauseMenuButton(backRect, "Zurueck", hoverBack);
+        // Zurueck + Schliessen
+        bool hoverBack = open && Raylib.CheckCollisionPointRec(mousePos, back);
+        _pauseBackHover += ((hoverBack ? 1f : 0f) - _pauseBackHover) * Math.Min(1f, dt * 12f);
+        MenuStyle.DrawBackButton(back, _pauseBackHover, ease);
+
+        bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
+        _pauseCloseHover += ((hoverClose ? 1f : 0f) - _pauseCloseHover) * Math.Min(1f, dt * 12f);
+        MenuStyle.DrawCloseButton(close, _pauseCloseHover, ease);
+
+        // ESC-Hinweis unter dem Panel
+        string hint = "ESC = Zurueck";
+        int hintW = MeasureTextCached(hint, 13);
+        DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
+            new Color((byte)150, (byte)155, (byte)170, A(150)));
     }
-
-    /// <summary>
-    /// Zeichnet einen Button im Pause-Menü
-    /// </summary>
-    static void DrawPauseMenuButton(Rectangle rect, string text, bool isHovered)
-    {
-        float roundness = GameConfig.BUTTON_ROUNDNESS;
-        int segments = 6;
-
-        Color bgColor = isHovered ? ColorPalette.PanelLight : ColorPalette.Background;
-        Color borderColor = isHovered ? ColorPalette.Accent : ColorPalette.PanelLight;
-        Color textColor = isHovered ? ColorPalette.TextWhite : new Color((byte)200, (byte)200, (byte)210, (byte)255);
-
-        // Schatten
-        Rectangle shadowRect = new(rect.X + 1, rect.Y + 2, rect.Width, rect.Height);
-        Raylib.DrawRectangleRounded(shadowRect, roundness, segments, new Color((byte)0, (byte)0, (byte)0, (byte)40));
-
-        Raylib.DrawRectangleRounded(rect, roundness, segments, bgColor);
-
-        // Obere Haelfte heller
-        if (isHovered)
-        {
-            Rectangle topHalf = new(rect.X + 2, rect.Y + 2, rect.Width - 4, rect.Height / 2 - 2);
-            Raylib.DrawRectangleRounded(topHalf, roundness, segments, new Color((byte)255, (byte)255, (byte)255, (byte)12));
-        }
-
-        Raylib.DrawRectangleRoundedLinesEx(rect, roundness, segments, 1, borderColor);
-
-        int fontSize = 22;
-        int textWidth = MeasureTextCached(text, fontSize);
-        int textX = (int)(rect.X + (rect.Width - textWidth) / 2);
-        int textY = (int)(rect.Y + (rect.Height - fontSize) / 2);
-        DrawGameText(text, textX, textY, fontSize, textColor);
-    }
-
 }
