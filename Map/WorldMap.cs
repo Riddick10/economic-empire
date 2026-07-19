@@ -36,6 +36,11 @@ public partial class WorldMap
     public const int MAP_WIDTH = 2000;
     public const int MAP_HEIGHT = 1000;
 
+    // Provinzgrenzen blenden beim Reinzoomen weich ein:
+    // ab FADE_START leicht transparent sichtbar, ab FADE_END voll deckend
+    public const float PROVINCE_BORDER_FADE_START = 6.0f;
+    public const float PROVINCE_BORDER_FADE_END = 10.0f;
+
     // Geografische Grenzen (Lon/Lat)
     private const double MIN_LON = -180;
     private const double MAX_LON = 180;
@@ -359,7 +364,7 @@ public partial class WorldMap
 
         // Sammle sichtbare Provinzen und aktualisiere deren Caches (wiederverwendbare Liste)
         _visibleProvincesCache.Clear();
-        if (Zoom >= 8.0f || viewMode == MapViewMode.Resources)
+        if (Zoom >= PROVINCE_BORDER_FADE_START || viewMode == MapViewMode.Resources)
         {
             foreach (var province in Provinces.Values)
             {
@@ -431,9 +436,6 @@ public partial class WorldMap
         // Hover-Hervorhebung deaktiviert - Provinzen werden nur bei Klick hervorgehoben
 
         // Dann Grenzen aller sichtbaren Laender zeichnen (ohne spezielle Laender)
-        // Laender mit Provinzen: Bei hohem Zoom nur aeussere Grenze zeichnen (Provinzgrenzen uebernehmen)
-        var countriesWithProvinces = CountriesWithProvinces;
-
         MapRegion? playerRegion = null;
         MapRegion? selectedRegion = null;
         MapRegion? hoveredRegion = null;
@@ -455,16 +457,10 @@ public partial class WorldMap
                 // Normale Grenze trotzdem zeichnen, Hover-Overlay kommt danach
             }
 
-            // Bei Zoom >= 8: Ueberspringe interne Grenzen fuer Laender mit Provinzen
-            // (Provinzgrenzen werden separat gezeichnet)
-            if (Zoom >= 8.0f && countriesWithProvinces.Contains(countryId))
-            {
-                DrawCountryBorderOuterOnly(region);
-            }
-            else
-            {
-                DrawCountryBorder(region, false, false, false);
-            }
+            // Landesgrenzen immer vollstaendig zeichnen: Seit dem Grenzen-Snapping
+            // zeichnen Provinzgrenzen keine Kuesten/Aussengrenzen mehr - die
+            // Landesgrenze (inkl. Inselringe) ist auf jeder Zoomstufe zustaendig
+            DrawCountryBorder(region, false, false, false);
         }
 
         // Spezielle Grenzen zuletzt zeichnen (ueber allen anderen Grenzen)

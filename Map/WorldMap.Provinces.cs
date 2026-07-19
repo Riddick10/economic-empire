@@ -101,13 +101,20 @@ public partial class WorldMap
     /// </summary>
     private void DrawAllProvinceBorders(IEnumerable<Province> provinces)
     {
+        // Sanftes Einblenden beim Reinzoomen: erst leicht transparent,
+        // ab PROVINCE_BORDER_FADE_END voll deckend (kein hartes Aufpoppen)
+        float fade = Math.Clamp(
+            (Zoom - PROVINCE_BORDER_FADE_START) / (PROVINCE_BORDER_FADE_END - PROVINCE_BORDER_FADE_START),
+            0f, 1f);
+        if (fade <= 0.01f) return;
+
         // HashSet fuer bereits gezeichnete Kanten zuruecksetzen
         _drawnProvinceEdges ??= new HashSet<long>();
         _drawnProvinceEdges.Clear();
 
         // Provinzgrenzen sind duenner und heller als Landesgrenzen
         float borderWidth = GetAdaptiveBorderWidth(0.25f);  // 25% der Landesgrenz-Dicke
-        Color borderColor = new Color((byte)100, (byte)100, (byte)120, (byte)255);  // Hellgrau, voll sichtbar
+        Color borderColor = new Color((byte)100, (byte)100, (byte)120, (byte)(255 * fade));  // Hellgrau, eingeblendet
 
         // Maximale Linienlaenge um Artefakte zu vermeiden
         float maxLineLength = MAP_WIDTH * Zoom * 0.45f;

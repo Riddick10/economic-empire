@@ -657,41 +657,6 @@ public partial class WorldMap
     }
 
     /// <summary>
-    /// Zeichnet nur die aeussere Landesgrenze (ersten Ring) ohne interne Provinzgrenzen
-    /// Wird verwendet fuer Laender mit Provinzen bei hohem Zoom, um interne Unterteilungen zu verstecken
-    /// </summary>
-    private void DrawCountryBorderOuterOnly(MapRegion region)
-    {
-        if (region.PolygonRings.Count == 0) return;
-        if (region.TransformedRings == null || region.TransformedRings.Count == 0) return;
-
-        // Nur den ersten (aeussersten) Ring zeichnen
-        var transformedPoints = region.TransformedRings[0];
-        if (transformedPoints.Length < 3) return;
-
-        // Standard dunkle Grenze
-        float baseWidth = GetAdaptiveBorderWidth(1.0f);
-        Color borderColor = new Color((byte)20, (byte)20, (byte)30, (byte)255);
-
-        // Maximale Linienlaenge um Artefakte bei Kartenrand-Ueberquerung zu vermeiden
-        float maxLineLength = MAP_WIDTH * Zoom * 0.45f;
-        float maxLineLengthSq = maxLineLength * maxLineLength;
-
-        for (int i = 0; i < transformedPoints.Length; i++)
-        {
-            int next = (i + 1) % transformedPoints.Length;
-
-            // Ueberspringe Linien die zu lang sind (Kartenrand-Artefakte)
-            float dx = transformedPoints[next].X - transformedPoints[i].X;
-            float dy = transformedPoints[next].Y - transformedPoints[i].Y;
-            if (dx * dx + dy * dy > maxLineLengthSq)
-                continue;
-
-            Raylib.DrawLineEx(transformedPoints[i], transformedPoints[next], baseWidth, borderColor);
-        }
-    }
-
-    /// <summary>
     /// Zeichnet die Spieler-Grenze als Overlay ueber alle anderen Grenzen
     /// Mit leichter Transparenz und dickerer Linie fuer bessere Sichtbarkeit
     /// </summary>

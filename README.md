@@ -36,7 +36,6 @@ Unter Linux alternativ einfach `./start-linux.sh` ausführen (nutzt das SDK unte
 ## Features (Auswahl)
 
 - **Autosave**: Alle 90 Spieltage wird automatisch in einen eigenen Autosave-Slot gespeichert (im Lade-Menü sichtbar)
-- **Missionen**: 10 Ziele (Wirtschaft, Bildung, Militär, Forschung …) mit Erfolgs-Benachrichtigungen
 - **Haushaltspolitik**: Defizit-Slider im Finanzen-Panel — von Sparkurs (Überschuss tilgt Schulden) bis expansiv
 - **Vollständige Spielstände**: Eroberungen, Kriege, Politik-Stabilität, Demografie und Diagramm-Historie werden gespeichert (Save-Version 3, alte Spielstände bleiben ladbar)
 

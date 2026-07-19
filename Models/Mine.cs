@@ -33,19 +33,22 @@ public class Mine
     }
 
     /// <summary>
-    /// Gibt die Basis-Produktion pro Tag zurueck
-    /// Werte sind so balanciert, dass eine Mine ca. 3-5 Fabriken versorgen kann
+    /// Gibt die Basis-Produktion pro Tag zurueck.
+    /// Datengetrieben balanciert: Die Weltproduktion aller Startminen
+    /// (gewichtet mit max(Abundance, 0.25) aus der Ressourcen-Map) deckt den
+    /// globalen Tagesbedarf (Bevoelkerung + Fabrik-Rezepte) mit ~15% Ueberschuss.
+    /// Formel je Rohstoff: 1.15 x Weltbedarf / Summe der Minen-Multiplikatoren.
     /// </summary>
     public static double GetBaseProduction(MineType type)
     {
         return type switch
         {
-            MineType.OilWell => 10,      // Oel
-            MineType.GasDrill => 6,      // Erdgas
-            MineType.CoalMine => 525,    // Kohle
-            MineType.IronMine => 36,     // Eisen
-            MineType.CopperMine => 4,    // Kupfer
-            MineType.UraniumMine => 0.2, // Uran (selten)
+            MineType.OilWell => 46,      // Oel     (Weltbedarf ~950/Tag, 68 Minen)
+            MineType.GasDrill => 39,     // Erdgas  (Weltbedarf ~630/Tag, 55 Minen)
+            MineType.CoalMine => 36,     // Kohle   (Weltbedarf ~560/Tag, 47 Minen)
+            MineType.IronMine => 29,     // Eisen   (Weltbedarf ~225/Tag, 30 Minen)
+            MineType.CopperMine => 24,   // Kupfer  (Weltbedarf ~180/Tag, 30 Minen)
+            MineType.UraniumMine => 0.5, // Uran    (bisher ohne Verbraucher, nur Handel)
             _ => 5
         };
     }

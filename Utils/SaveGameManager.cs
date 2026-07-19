@@ -482,13 +482,6 @@ public static class SaveGameManager
                 }).ToList();
         }
 
-        // Abgeschlossene Missionen
-        var missionManager = game.GetSystem<MissionManager>();
-        if (missionManager != null)
-        {
-            data.CompletedMissions = missionManager.CompletedMissionIds.ToList();
-        }
-
         return data;
     }
 
@@ -842,13 +835,6 @@ public static class SaveGameManager
                 economyManager.RestoreMoneyHistory(history);
             }
 
-            // Abgeschlossene Missionen wiederherstellen
-            var missionManager = game.GetSystem<MissionManager>();
-            if (missionManager != null && saveData.CompletedMissions != null)
-            {
-                missionManager.RestoreCompleted(saveData.CompletedMissions);
-            }
-
             // Tageswerte neu berechnen: DailyProduction/DailyConsumption stehen
             // nicht im Save und waeren sonst bis zum ersten Tageswechsel leer
             // (Logistik-Panel wuerde 0 Produktion anzeigen)
@@ -952,7 +938,6 @@ public class SaveGameData
     public List<MoneySnapshotSaveData>? MoneyHistory { get; set; }
 
     // Abgeschlossene Missionen
-    public List<string>? CompletedMissions { get; set; }
 }
 
 public class CountrySaveData

@@ -1,21 +1,65 @@
 using Raylib_cs;
 using System.Numerics;
-using GrandStrategyGame.Data;
-using GrandStrategyGame.Map;
 using GrandStrategyGame.Models;
-using GrandStrategyGame.Systems.Managers;
 using GrandStrategyGame.UI;
-using GrandStrategyGame.UI.Panels;
 
 namespace GrandStrategyGame;
 
 /// <summary>
-/// Program - Benachrichtigungs-Popups (Smartphone/X-Twitter-Stil)
+/// Program - Benachrichtigungs-Popups als Smartphone mit X-App (Dark Mode).
+/// Zeigt die neueste Meldung als grossen Post, aeltere Meldungen darunter
+/// als scrollbaren Feed - wie eine echte Timeline.
 /// </summary>
 partial class Program
 {
+    // === X Dark-Mode Farbpalette ===
+    static readonly Color XBg = new(0, 0, 0, 255);
+    static readonly Color XBorder = new((byte)47, (byte)51, (byte)54, (byte)255);
+    static readonly Color XText = new((byte)231, (byte)233, (byte)234, (byte)255);
+    static readonly Color XGray = new((byte)113, (byte)118, (byte)123, (byte)255);
+    static readonly Color XBlue = new((byte)29, (byte)155, (byte)240, (byte)255);
+    static readonly Color XLikePink = new((byte)249, (byte)24, (byte)128, (byte)255);
+    static readonly Color XRepostGreen = new((byte)0, (byte)186, (byte)124, (byte)255);
+
+    static Color NotificationTypeColor(NotificationType type) => type switch
+    {
+        NotificationType.Info => XBlue,
+        NotificationType.Warning => new Color((byte)255, (byte)212, (byte)0, (byte)255),
+        NotificationType.Danger => new Color((byte)244, (byte)33, (byte)46, (byte)255),
+        NotificationType.Success => XRepostGreen,
+        _ => XGray
+    };
+
+    static string NotificationDisplayName(NotificationType type) => type switch
+    {
+        NotificationType.Info => "Weltnachrichten",
+        NotificationType.Warning => "Weltnachrichten",
+        NotificationType.Danger => "Weltnachrichten",
+        NotificationType.Success => "Weltnachrichten",
+        _ => "News"
+    };
+
+    static string? NotificationTypeChip(NotificationType type) => type switch
+    {
+        NotificationType.Warning => "WARNUNG",
+        NotificationType.Danger => "EILMELDUNG",
+        NotificationType.Success => "ERFOLG",
+        _ => null
+    };
+
     /// <summary>
-    /// Zeichnet aktive Popup-Nachrichten als Smartphone mit X/Twitter-App (scrollbar)
+    /// Formatiert Zahlen im X-Stil: 843, 12,4K, 1,3M
+    /// </summary>
+    static string FormatXCount(int n)
+    {
+        if (n >= 1_000_000) return $"{n / 1_000_000.0:0.#}M".Replace('.', ',');
+        if (n >= 10_000) return $"{n / 1000}K";
+        if (n >= 1_000) return $"{n / 1000.0:0.#}K".Replace('.', ',');
+        return n.ToString();
+    }
+
+    /// <summary>
+    /// Zeichnet aktive Popup-Nachrichten als Smartphone mit X-App (scrollbar)
     /// </summary>
     static void DrawNotificationPopups()
     {
@@ -37,302 +81,145 @@ partial class Program
 
         Vector2 mousePos = _cachedMousePos;
 
-        // === SMARTPHONE-DIMENSIONEN (angepasst fuer VCR OSD Mono) ===
-        int phoneW = 360;
-        int phoneH = 640;
+        // === SMARTPHONE-DIMENSIONEN (modernes 19.5:9-Format) ===
+        int phoneW = 370;
+        int phoneH = 730;
         int phoneX = (ScreenWidth - phoneW) / 2;
         int phoneY = (ScreenHeight - phoneH) / 2;
-        int bezelWidth = 12;
-
-        // Bildschirm-Bereich innerhalb des Handys
-        int screenX = phoneX + bezelWidth;
-        int screenY = phoneY + bezelWidth + 30; // +30 fuer Notch-Bereich
-        int screenW = phoneW - bezelWidth * 2;
-        int screenH = phoneH - bezelWidth * 2 - 60; // -60 fuer Notch + Home-Button
 
         // Hintergrund abdunkeln
-        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)165));
 
-        // === SMARTPHONE-RAHMEN ===
-        // Aeusserer Rahmen (Silber/Grau)
-        Raylib.DrawRectangleRounded(new Rectangle(phoneX - 4, phoneY - 4, phoneW + 8, phoneH + 8), 0.08f, 11,
-            new Color((byte)80, (byte)80, (byte)85, (byte)255));
+        // === RAHMEN (Titan-Look mit Seitentasten) ===
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX - 3, phoneY - 3, phoneW + 6, phoneH + 6), 0.09f, 12,
+            new Color((byte)96, (byte)96, (byte)100, (byte)255));
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX, phoneY, phoneW, phoneH), 0.088f, 12,
+            new Color((byte)12, (byte)12, (byte)14, (byte)255));
 
-        // Handy-Koerper (Schwarz)
-        Raylib.DrawRectangleRounded(new Rectangle(phoneX, phoneY, phoneW, phoneH), 0.07f, 11,
-            new Color((byte)20, (byte)20, (byte)22, (byte)255));
+        // Seitentasten (links: Lautstaerke, rechts: Power)
+        Color buttonColor = new((byte)70, (byte)70, (byte)74, (byte)255);
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX - 5, phoneY + 130, 3, 34), 0.5f, 4, buttonColor);
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX - 5, phoneY + 175, 3, 54), 0.5f, 4, buttonColor);
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX + phoneW + 2, phoneY + 160, 3, 70), 0.5f, 4, buttonColor);
 
-        // === NOTCH (Kamera/Lautsprecher) ===
-        int notchW = 120;
-        int notchH = 28;
-        int notchX = phoneX + (phoneW - notchW) / 2;
-        int notchY = phoneY + 8;
-        Raylib.DrawRectangleRounded(new Rectangle(notchX, notchY, notchW, notchH), 0.5f, 8,
-            new Color((byte)10, (byte)10, (byte)12, (byte)255));
+        // === DISPLAY ===
+        int screenX = phoneX + 8;
+        int screenY = phoneY + 8;
+        int screenW = phoneW - 16;
+        int screenH = phoneH - 16;
+        Raylib.DrawRectangleRounded(new Rectangle(screenX, screenY, screenW, screenH), 0.07f, 12, XBg);
 
-        // Kamera-Punkt
-        Raylib.DrawCircle(notchX + 30, notchY + notchH / 2, 6, new Color((byte)30, (byte)30, (byte)35, (byte)255));
-        Raylib.DrawCircle(notchX + 30, notchY + notchH / 2, 3, new Color((byte)20, (byte)40, (byte)60, (byte)255));
+        // === STATUSLEISTE (Spielzeit + Empfang/Akku) ===
+        int statusY = screenY + 10;
+        string clock = $"{game.Hour:D2}:{game.Minute:D2}";
+        DrawGameText(clock, screenX + 24, statusY, 13, XText);
 
-        // Lautsprecher
-        Raylib.DrawRectangleRounded(new Rectangle(notchX + 50, notchY + 10, 40, 8), 0.5f, 4,
-            new Color((byte)40, (byte)40, (byte)45, (byte)255));
-
-        // === BILDSCHIRM-HINTERGRUND (X/Twitter Dark Mode) ===
-        Raylib.DrawRectangle(screenX, screenY, screenW, screenH, new Color((byte)0, (byte)0, (byte)0, (byte)255));
-
-        // Farbe je nach Typ
-        Color typeColor = popup.Type switch
+        // Empfangsbalken
+        int sigX = screenX + screenW - 88;
+        for (int i = 0; i < 4; i++)
         {
-            NotificationType.Info => new Color((byte)29, (byte)155, (byte)240, (byte)255),    // Twitter-Blau
-            NotificationType.Warning => new Color((byte)255, (byte)212, (byte)0, (byte)255),  // Gelb
-            NotificationType.Danger => new Color((byte)244, (byte)33, (byte)46, (byte)255),   // Rot
-            NotificationType.Success => new Color((byte)0, (byte)186, (byte)124, (byte)255),  // Gruen
-            _ => ColorPalette.TextGray
-        };
+            int barH = 4 + i * 2;
+            Raylib.DrawRectangle(sigX + i * 5, statusY + 11 - barH, 3, barH, i < 3 ? XText : XGray);
+        }
 
-        // === APP-HEADER (oben im Screen) ===
-        int appHeaderH = 50;
-        Raylib.DrawRectangle(screenX, screenY, screenW, appHeaderH, new Color((byte)0, (byte)0, (byte)0, (byte)255));
-        Raylib.DrawLine(screenX, screenY + appHeaderH, screenX + screenW, screenY + appHeaderH,
-            new Color((byte)47, (byte)51, (byte)54, (byte)255));
+        // Akku (Umriss + Fuellstand + Nase)
+        int batX = screenX + screenW - 52;
+        Raylib.DrawRectangleRoundedLinesEx(new Rectangle(batX, statusY + 1, 24, 11), 0.3f, 4, 1, XGray);
+        Raylib.DrawRectangleRounded(new Rectangle(batX + 2, statusY + 3, 15, 7), 0.3f, 4, XText);
+        Raylib.DrawRectangle(batX + 25, statusY + 4, 2, 5, XGray);
 
-        // X-Logo (links)
-        DrawGameText("X", screenX + 15, screenY + 12, 18, Color.White);
+        // Dynamic Island (Pille mit Kamera)
+        int islandW = 92;
+        int islandH = 24;
+        int islandX = screenX + (screenW - islandW) / 2;
+        Raylib.DrawRectangleRounded(new Rectangle(islandX, screenY + 6, islandW, islandH), 1f, 10,
+            new Color((byte)8, (byte)8, (byte)10, (byte)255));
+        Raylib.DrawCircle(islandX + islandW - 16, screenY + 6 + islandH / 2, 5,
+            new Color((byte)26, (byte)30, (byte)38, (byte)255));
 
-        // Titel in der Mitte
-        string headerTitle = "Fuer dich";
-        int headerTitleW = MeasureTextCached(headerTitle, 12);
-        DrawGameText(headerTitle, screenX + (screenW - headerTitleW) / 2, screenY + 18, 12, Color.White);
+        // === APP-HEADER: Avatar links, X-Logo mittig ===
+        int headerY = screenY + 38;
+        int headerH = 42;
 
-        // === SCROLLBARER CONTENT-BEREICH ===
-        int contentY = screenY + appHeaderH;
-        int contentH = screenH - appHeaderH - 50; // -50 fuer Bottom-Nav
-        int contentPadding = 15;
+        // Spieler-Avatar (eigene Flagge, rund maskiert)
+        string? playerId = game.PlayerCountry?.Id;
+        DrawRoundAvatar(screenX + 26, headerY + headerH / 2 - 2, 15, playerId, XGray);
 
-        // Scissor-Modus fuer Clipping
+        // X-Logo (zwei kraeftige Diagonalstriche)
+        DrawXLogo(screenX + screenW / 2, headerY + headerH / 2 - 2, 11, XText);
+
+        // === TABS: "Für dich" | "Folge ich" ===
+        int tabsY = headerY + headerH;
+        int tabsH = 36;
+        string tab1 = "Für dich";
+        int tab1W = MeasureTextCached(tab1, 14);
+        int tab1X = screenX + screenW / 4 - tab1W / 2;
+        DrawGameText(tab1, tab1X, tabsY + 8, 14, XText);
+        // Aktiver Tab: blauer Unterstrich (Pille)
+        Raylib.DrawRectangleRounded(new Rectangle(tab1X - 4, tabsY + tabsH - 4, tab1W + 8, 3), 0.5f, 4, XBlue);
+
+        string tab2 = "Folge ich";
+        int tab2W = MeasureTextCached(tab2, 14);
+        DrawGameText(tab2, screenX + screenW * 3 / 4 - tab2W / 2, tabsY + 8, 14, XGray);
+
+        Raylib.DrawLine(screenX, tabsY + tabsH, screenX + screenW, tabsY + tabsH, XBorder);
+
+        // === SCROLLBARER FEED ===
+        int navH = 46;
+        int contentY = tabsY + tabsH + 1;
+        int contentH = screenH - (contentY - screenY) - navH - 16;
+
+        var contentClip = new Rectangle(screenX, contentY, screenW, contentH);
         Raylib.BeginScissorMode(screenX, contentY, screenW, contentH);
 
-        // Scroll-Offset anwenden
         int scrollY = contentY - ui.NotificationScrollOffset;
+        int cursorY = scrollY;
 
-        // === TWEET/POST KARTE ===
-        int postX = screenX + contentPadding;
-        int postY = scrollY + 15;
-        int postW = screenW - contentPadding * 2;
+        // Hauptpost (die aktuelle Meldung, gross)
+        cursorY = DrawXPost(popup, screenX, cursorY, screenW, isMainPost: true, contentClip);
 
-        // Profilbild
-        int avatarSize = 44;
-        int avatarX = postX;
-        int avatarY = postY;
-
-        if (popup.RelatedCountryId != null)
+        // Aeltere Meldungen als kompakte Feed-Posts darunter
+        var all = notifMgr.Notifications;
+        int shown = 0;
+        for (int i = all.Count - 1; i >= 0 && shown < 6; i--)
         {
-            var flagTex = GetFlagTexture(popup.RelatedCountryId);
-            if (flagTex != null)
-            {
-                Raylib.DrawCircle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2 + 2, typeColor);
-                var tex = flagTex.Value;
-                float scale = (float)(avatarSize - 4) / Math.Max(tex.Width, tex.Height);
-                int drawW = (int)(tex.Width * scale);
-                int drawH = (int)(tex.Height * scale);
-                Rectangle src = new(0, 0, tex.Width, tex.Height);
-                Rectangle dst = new(avatarX + (avatarSize - drawW) / 2, avatarY + (avatarSize - drawH) / 2, drawW, drawH);
-                Raylib.DrawTexturePro(tex, src, dst, Vector2.Zero, 0, Color.White);
-            }
-        }
-        else
-        {
-            Raylib.DrawCircle(avatarX + avatarSize / 2, avatarY + avatarSize / 2, avatarSize / 2, typeColor);
-            string sym = popup.Type == NotificationType.Danger ? "!" : "i";
-            int symW = MeasureTextCached(sym, 18);
-            DrawGameText(sym, avatarX + (avatarSize - symW) / 2, avatarY + 12, 18, Color.White);
+            var n = all[i];
+            if (n.Id == popup.Id) continue;
+            cursorY = DrawXPost(n, screenX, cursorY, screenW, isMainPost: false, contentClip);
+            shown++;
         }
 
-        // Name und Handle
-        int textX = avatarX + avatarSize + 10;
-        int nameY = postY + 2;
-
-        string displayName = popup.Type switch
-        {
-            NotificationType.Info => "Weltnachrichten",
-            NotificationType.Warning => "WARNUNG",
-            NotificationType.Danger => "EILMELDUNG",
-            NotificationType.Success => "Erfolg",
-            _ => "News"
-        };
-        DrawGameText(displayName, textX, nameY, 16, Color.White);
-
-        // Verifiziert-Badge
-        int nameW = MeasureTextCached(displayName, 16);
-        Raylib.DrawCircle(textX + nameW + 10, nameY + 8, 6, typeColor);
-        DrawGameText("*", textX + nameW + 7, nameY, 12, Color.White);
-
-        // Handle
-        string handle = popup.RelatedCountryId != null ? $"@{popup.RelatedCountryId}" : "@EconomicEmpire";
-        DrawGameText(handle, textX, nameY + 20, 12, new Color((byte)113, (byte)118, (byte)123, (byte)255));
-
-        // Datum
-        DrawGameText(popup.DateString, textX + 110, nameY + 20, 12, new Color((byte)113, (byte)118, (byte)123, (byte)255));
-
-        // === TITEL (gross, farbig) ===
-        int titleY = postY + avatarSize + 22;
-        DrawGameText(popup.Title, postX, titleY, 16, typeColor);
-
-        // === NACHRICHTENTEXT mit Bild nach erstem Satz ===
-        int msgY = titleY + 28;
-        int maxMsgW = postW - 10;
-        int lineHeight = 22;
-        Color textColor = new Color((byte)231, (byte)233, (byte)234, (byte)255);
-
-        // Text in ersten Satz und Rest aufteilen (wenn Bild vorhanden)
-        string fullMsg = popup.Message;
-        string firstSentence = "";
-        string restText = "";
-
-        if (!string.IsNullOrEmpty(popup.ImageName))
-        {
-            // Suche nach dem ersten Satzende (. gefolgt von Leerzeichen oder Ende)
-            int dotIndex = fullMsg.IndexOf(". ");
-            if (dotIndex > 0)
-            {
-                firstSentence = fullMsg.Substring(0, dotIndex + 1);
-                restText = fullMsg.Substring(dotIndex + 2).Trim();
-            }
-            else
-            {
-                firstSentence = fullMsg;
-                restText = "";
-            }
-        }
-        else
-        {
-            // Kein Bild - gesamten Text anzeigen
-            firstSentence = fullMsg;
-            restText = "";
-        }
-
-        // Ersten Satz umbrechen und zeichnen
-        List<string> firstLines = WrapText(firstSentence, maxMsgW, 15);
-        for (int i = 0; i < firstLines.Count; i++)
-        {
-            DrawGameText(firstLines[i], postX, msgY + i * lineHeight, 15, textColor);
-        }
-
-        int currentY = msgY + firstLines.Count * lineHeight;
-
-        // === BILD (nach erstem Satz, wenn vorhanden) ===
-        if (!string.IsNullOrEmpty(popup.ImageName))
-        {
-            var newsImage = LoadNewsImage(popup.ImageName);
-            if (newsImage.HasValue && newsImage.Value.Id != 0)
-            {
-                int imgY = currentY + 15;
-                int imgMaxW = postW;
-                int imgMaxH = 180;
-
-                var tex = newsImage.Value;
-                float scale = Math.Min((float)imgMaxW / tex.Width, (float)imgMaxH / tex.Height);
-                int drawW = (int)(tex.Width * scale);
-                int drawH = (int)(tex.Height * scale);
-                int imgX = postX + (postW - drawW) / 2;
-
-                // Abgerundeter Rahmen
-                Raylib.DrawRectangleRounded(new Rectangle(imgX - 2, imgY - 2, drawW + 4, drawH + 4), 0.05f, 8,
-                    new Color((byte)47, (byte)51, (byte)54, (byte)255));
-
-                // Bild zeichnen
-                Rectangle src = new(0, 0, tex.Width, tex.Height);
-                Rectangle dst = new(imgX, imgY, drawW, drawH);
-                Raylib.DrawTexturePro(tex, src, dst, System.Numerics.Vector2.Zero, 0, Color.White);
-
-                currentY = imgY + drawH + 15;
-            }
-        }
-
-        // === REST DES TEXTES (nach dem Bild) ===
-        if (!string.IsNullOrEmpty(restText))
-        {
-            List<string> restLines = WrapText(restText, maxMsgW, 15);
-            for (int i = 0; i < restLines.Count; i++)
-            {
-                DrawGameText(restLines[i], postX, currentY + i * lineHeight, 15, textColor);
-            }
-            currentY += restLines.Count * lineHeight;
-        }
-
-        int imageEndY = currentY;
-
-        // === INTERAKTIONS-LEISTE ===
-        int interactionY = imageEndY + 25;
-        Color iconColor = new Color((byte)113, (byte)118, (byte)123, (byte)255);
-        int iconSize = 18;
-        int iconCenterY = interactionY + iconSize / 2;
-
-        // Kommentar-Icon (Sprechblase)
-        int commentX = postX;
-        DrawCommentIcon(commentX, iconCenterY, iconSize, iconColor);
-        DrawGameText("12", commentX + iconSize + 6, interactionY + 2, 12, iconColor);
-
-        // Retweet-Icon (zwei Pfeile)
-        int retweetX = postX + 75;
-        DrawRetweetIcon(retweetX, iconCenterY, iconSize, iconColor);
-        DrawGameText("48", retweetX + iconSize + 6, interactionY + 2, 12, iconColor);
-
-        // Heart-Icon (Herz)
-        int heartX = postX + 150;
-        DrawHeartIcon(heartX, iconCenterY, iconSize, iconColor);
-        int likes = popup.Id * 234 + 156;
-        DrawGameText($"{likes}", heartX + iconSize + 6, interactionY + 2, 12, iconColor);
-
-        // Views-Icon (Balkendiagramm)
-        int viewsX = postX + 230;
-        DrawViewsIcon(viewsX, iconCenterY, iconSize, iconColor);
-        int views = popup.Id * 1234 + 5000;
-        DrawGameText($"{views:N0}", viewsX + iconSize + 6, interactionY + 2, 12, iconColor);
-
-        // Trennlinie
-        int separatorY = interactionY + 35;
-        Raylib.DrawLine(screenX, separatorY, screenX + screenW, separatorY, new Color((byte)47, (byte)51, (byte)54, (byte)255));
-
-        // Gesamt-Content-Hoehe fuer Scroll-Berechnung
-        int totalContentH = separatorY - scrollY + 20;
+        int totalContentH = cursorY - scrollY + 10;
         int maxScroll = Math.Max(0, totalContentH - contentH);
 
         Raylib.EndScissorMode();
 
-        // === SCROLL-INDIKATOR (rechts) ===
+        // Scroll-Indikator (rechts)
         if (maxScroll > 0)
         {
             int scrollBarH = contentH - 20;
             int scrollThumbH = Math.Max(30, scrollBarH * contentH / totalContentH);
             int scrollThumbY = contentY + 10 + (int)((scrollBarH - scrollThumbH) * ((float)ui.NotificationScrollOffset / maxScroll));
-
             Raylib.DrawRectangleRounded(new Rectangle(screenX + screenW - 6, scrollThumbY, 4, scrollThumbH), 0.5f, 4,
                 new Color((byte)100, (byte)100, (byte)110, (byte)150));
         }
 
-        // === BOTTOM NAVIGATION BAR ===
-        int bottomNavY = screenY + screenH - 50;
-        Raylib.DrawRectangle(screenX, bottomNavY, screenW, 50, new Color((byte)0, (byte)0, (byte)0, (byte)255));
-        Raylib.DrawLine(screenX, bottomNavY, screenX + screenW, bottomNavY, new Color((byte)47, (byte)51, (byte)54, (byte)255));
+        // === BOTTOM-NAVIGATION (Home, Suche, Glocke, Post) ===
+        int bottomNavY = screenY + screenH - navH - 14;
+        Raylib.DrawRectangle(screenX, bottomNavY, screenW, navH, XBg);
+        Raylib.DrawLine(screenX, bottomNavY, screenX + screenW, bottomNavY, XBorder);
 
-        // Nav-Icons (vereinfacht)
-        int navIconSpacing = screenW / 5;
-        Color navColor = new Color((byte)200, (byte)200, (byte)200, (byte)255);
-        DrawGameText("@", screenX + navIconSpacing * 0 + 28, bottomNavY + 16, 12, navColor);
-        DrawGameText("O", screenX + navIconSpacing * 1 + 28, bottomNavY + 16, 12, navColor);
-        DrawGameText("+", screenX + navIconSpacing * 2 + 28, bottomNavY + 16, 12, navColor);
-        DrawGameText("#", screenX + navIconSpacing * 3 + 28, bottomNavY + 16, 12, navColor);
-        DrawGameText("*", screenX + navIconSpacing * 4 + 28, bottomNavY + 16, 12, navColor);
+        int navCy = bottomNavY + navH / 2;
+        int navStep = screenW / 4;
+        DrawHouseIcon(screenX + navStep / 2, navCy, 9, XText);           // Home (aktiv)
+        DrawSearchIcon(screenX + navStep + navStep / 2, navCy, 8, XGray);
+        DrawBellIcon(screenX + navStep * 2 + navStep / 2, navCy, 9, XGray);
+        DrawMailIcon(screenX + navStep * 3 + navStep / 2, navCy, 9, XGray);
 
-        // === HOME-BUTTON/INDICATOR (unten am Handy) ===
-        int homeBarW = 120;
-        int homeBarH = 5;
-        int homeBarX = phoneX + (phoneW - homeBarW) / 2;
-        int homeBarY = phoneY + phoneH - 20;
-        Raylib.DrawRectangleRounded(new Rectangle(homeBarX, homeBarY, homeBarW, homeBarH), 0.5f, 4,
-            new Color((byte)180, (byte)180, (byte)180, (byte)255));
+        // Home-Indikator
+        int homeBarW = 110;
+        Raylib.DrawRectangleRounded(new Rectangle(phoneX + (phoneW - homeBarW) / 2, phoneY + phoneH - 12, homeBarW, 4),
+            0.5f, 4, new Color((byte)190, (byte)190, (byte)195, (byte)255));
 
         // === SCHLIESSEN-BUTTON (ausserhalb des Handys) ===
         int closeBtnX = phoneX + phoneW + 15;
@@ -346,24 +233,15 @@ partial class Program
         int xW = MeasureTextCached("X", 16);
         DrawGameText("X", closeBtnX + (closeBtnSize - xW) / 2, closeBtnY + 11, 16, Color.White);
 
-        // === SCROLL-HINWEIS ===
+        // Scroll-Hinweis
         if (maxScroll > 0 && ui.NotificationScrollOffset < maxScroll)
         {
-            string scrollHint = "Scrollen zum Weiterlesen";
+            string scrollHint = "Scrollen für ältere Meldungen";
             int hintW = MeasureTextCached(scrollHint, 12);
             DrawGameText(scrollHint, phoneX + (phoneW - hintW) / 2, phoneY + phoneH + 10, 12, ColorPalette.TextGray);
-
-            // Pfeil nach unten
-            Raylib.DrawTriangle(
-                new Vector2(phoneX + phoneW / 2, phoneY + phoneH + 35),
-                new Vector2(phoneX + phoneW / 2 - 8, phoneY + phoneH + 28),
-                new Vector2(phoneX + phoneW / 2 + 8, phoneY + phoneH + 28),
-                ColorPalette.TextGray
-            );
         }
 
         // === INPUT-HANDLING ===
-        // Mausrad zum Scrollen (nur wenn Maus ueber Handy-Screen)
         Rectangle screenRect = new Rectangle(screenX, contentY, screenW, contentH);
         if (Raylib.CheckCollisionPointRec(mousePos, screenRect))
         {
@@ -375,17 +253,11 @@ partial class Program
             }
         }
 
-        // Pfeiltasten zum Scrollen
         if (Raylib.IsKeyDown(KeyboardKey.Down) || Raylib.IsKeyDown(KeyboardKey.S))
-        {
             ui.NotificationScrollOffset = Math.Min(ui.NotificationScrollOffset + 5, maxScroll);
-        }
         if (Raylib.IsKeyDown(KeyboardKey.Up) || Raylib.IsKeyDown(KeyboardKey.W))
-        {
             ui.NotificationScrollOffset = Math.Max(ui.NotificationScrollOffset - 5, 0);
-        }
 
-        // Schliessen
         if (Raylib.IsMouseButtonPressed(MouseButton.Left) && closeHover)
         {
             notifMgr.DismissPopup(popup.Id);
@@ -401,7 +273,294 @@ partial class Program
     }
 
     /// <summary>
-    /// Zeichnet ein Kommentar-Icon (Sprechblase) im X/Twitter-Stil
+    /// Zeichnet einen einzelnen X-Post und gibt die End-Y-Position zurueck.
+    /// Hauptpost: gross, mit Typ-Chip, Bild und voller Interaktionsleiste.
+    /// Feed-Post: kompakt (kleinere Schrift, gekuerzter Text, kleine Leiste).
+    /// </summary>
+    static int DrawXPost(GameNotification post, int screenX, int y, int screenW, bool isMainPost,
+        Rectangle contentClip)
+    {
+        int pad = 14;
+        int postX = screenX + pad;
+        int postW = screenW - pad * 2;
+        int avatarSize = isMainPost ? 44 : 36;
+        int nameSize = isMainPost ? 15 : 13;
+        int textSize = isMainPost ? 14 : 13;
+        int lineHeight = textSize + 6;
+        int topY = y + 12;
+
+        Color typeColor = NotificationTypeColor(post.Type);
+
+        // Avatar (Flagge rund maskiert oder Typ-Kreis)
+        DrawRoundAvatar(postX + avatarSize / 2, topY + avatarSize / 2, avatarSize / 2,
+            post.RelatedCountryId, typeColor, contentClip);
+
+        // Name + Verifiziert-Haken
+        int textX = postX + avatarSize + 10;
+        string displayName = NotificationDisplayName(post.Type);
+        DrawGameText(displayName, textX, topY, nameSize, XText);
+        int nameW = MeasureTextCached(displayName, nameSize);
+        DrawVerifiedBadge(textX + nameW + 12, topY + nameSize / 2 + 1, isMainPost ? 7 : 6);
+
+        // Handle + Datum
+        string handle = post.RelatedCountryId != null ? $"@{post.RelatedCountryId}" : "@EconomicEmpire";
+        DrawGameText($"{handle} · {post.DateString}", textX, topY + nameSize + 5, 12, XGray);
+
+        int cursorY = topY + avatarSize + 12;
+
+        // Typ-Chip (WARNUNG/EILMELDUNG/ERFOLG) - nur wenn kein normaler Info-Post
+        string? chip = NotificationTypeChip(post.Type);
+        if (chip != null)
+        {
+            int chipW = MeasureTextCached(chip, 11) + 14;
+            Raylib.DrawRectangleRounded(new Rectangle(postX, cursorY, chipW, 18), 0.5f, 6,
+                new Color(typeColor.R, typeColor.G, typeColor.B, (byte)45));
+            DrawGameText(chip, postX + 7, cursorY + 3, 11, typeColor);
+            cursorY += 24;
+        }
+
+        // Titel (weiss, wie fetter Post-Anfang)
+        var titleLines = WrapText(post.Title, postW, isMainPost ? 16 : 14);
+        foreach (var line in titleLines)
+        {
+            DrawGameText(line, postX, cursorY, isMainPost ? 16 : 14, XText);
+            cursorY += (isMainPost ? 16 : 14) + 6;
+        }
+        cursorY += 4;
+
+        // Nachrichtentext (Feed-Posts: auf 3 Zeilen gekuerzt)
+        string fullMsg = post.Message;
+        string firstPart = fullMsg;
+        string restPart = "";
+
+        if (isMainPost && !string.IsNullOrEmpty(post.ImageName))
+        {
+            int dotIndex = fullMsg.IndexOf(". ");
+            if (dotIndex > 0)
+            {
+                firstPart = fullMsg.Substring(0, dotIndex + 1);
+                restPart = fullMsg.Substring(dotIndex + 2).Trim();
+            }
+        }
+
+        var msgLines = WrapText(firstPart, postW, textSize);
+        if (!isMainPost && msgLines.Count > 3)
+        {
+            msgLines = msgLines.GetRange(0, 3);
+            msgLines[2] += " …";
+        }
+        foreach (var line in msgLines)
+        {
+            DrawGameText(line, postX, cursorY, textSize, XText);
+            cursorY += lineHeight;
+        }
+
+        // Bild (nur Hauptpost, mit abgerundetem Rahmen)
+        if (isMainPost && !string.IsNullOrEmpty(post.ImageName))
+        {
+            var newsImage = LoadNewsImage(post.ImageName);
+            if (newsImage.HasValue && newsImage.Value.Id != 0)
+            {
+                int imgY = cursorY + 10;
+                var tex = newsImage.Value;
+                float scale = Math.Min((float)postW / tex.Width, 180f / tex.Height);
+                int drawW = (int)(tex.Width * scale);
+                int drawH = (int)(tex.Height * scale);
+                int imgX = postX + (postW - drawW) / 2;
+
+                Raylib.DrawRectangleRounded(new Rectangle(imgX - 2, imgY - 2, drawW + 4, drawH + 4), 0.08f, 8, XBorder);
+                Raylib.DrawTexturePro(tex, new Rectangle(0, 0, tex.Width, tex.Height),
+                    new Rectangle(imgX, imgY, drawW, drawH), Vector2.Zero, 0, Color.White);
+
+                cursorY = imgY + drawH + 12;
+            }
+
+            // Rest des Textes nach dem Bild
+            if (!string.IsNullOrEmpty(restPart))
+            {
+                foreach (var line in WrapText(restPart, postW, textSize))
+                {
+                    DrawGameText(line, postX, cursorY, textSize, XText);
+                    cursorY += lineHeight;
+                }
+            }
+        }
+
+        // Interaktionsleiste (Antworten, Reposts, Likes, Aufrufe, Teilen)
+        cursorY += 10;
+        int iconSize = isMainPost ? 17 : 14;
+        int fontS = isMainPost ? 12 : 11;
+        int iconCy = cursorY + iconSize / 2;
+        int step = postW / 5;
+
+        int replies = post.Id * 7 % 89 + 3;
+        int reposts = post.Id * 13 % 420 + 12;
+        int likes = post.Id * 234 % 8200 + 156;
+        int views = post.Id * 1237 % 240_000 + 5400;
+
+        DrawCommentIcon(postX, iconCy, iconSize, XGray);
+        DrawGameText(FormatXCount(replies), postX + iconSize + 5, cursorY + 2, fontS, XGray);
+
+        DrawRetweetIcon(postX + step, iconCy, iconSize, XGray);
+        DrawGameText(FormatXCount(reposts), postX + step + iconSize + 5, cursorY + 2, fontS, XGray);
+
+        DrawHeartIcon(postX + step * 2, iconCy, iconSize, isMainPost ? XLikePink : XGray);
+        DrawGameText(FormatXCount(likes), postX + step * 2 + iconSize + 5, cursorY + 2, fontS,
+            isMainPost ? XLikePink : XGray);
+
+        DrawViewsIcon(postX + step * 3, iconCy, iconSize, XGray);
+        DrawGameText(FormatXCount(views), postX + step * 3 + iconSize + 5, cursorY + 2, fontS, XGray);
+
+        DrawShareIcon(postX + step * 4 + step / 2, iconCy, iconSize, XGray);
+
+        cursorY += iconSize + 12;
+
+        // Hairline-Trenner zwischen Posts
+        Raylib.DrawLine(screenX, cursorY, screenX + screenW, cursorY, XBorder);
+
+        return cursorY;
+    }
+
+    /// <summary>
+    /// Rundes Profilbild: Flagge mit Kreis-Maske oder farbiger Typ-Kreis.
+    /// Die Maske (Ring in Hintergrundfarbe) wird per Scissor auf das Avatar-
+    /// Quadrat begrenzt, damit sie keine Nachbar-Inhalte uebermalt.
+    /// clipBounds: aktiver aeusserer Scissor-Bereich, der danach
+    /// wiederhergestellt wird (Raylib hat keinen Scissor-Stack).
+    /// </summary>
+    static void DrawRoundAvatar(int cx, int cy, int radius, string? countryId, Color fallbackColor,
+        Rectangle? clipBounds = null)
+    {
+        var center = new Vector2(cx, cy);
+
+        if (countryId != null)
+        {
+            var flagTex = GetFlagTexture(countryId);
+            if (flagTex != null)
+            {
+                // Avatar-Quadrat, ggf. mit dem aeusseren Clip-Bereich geschnitten
+                int bx = cx - radius, by = cy - radius, bw = radius * 2, bh = radius * 2;
+                if (clipBounds is Rectangle cb)
+                {
+                    int nx = Math.Max(bx, (int)cb.X);
+                    int ny = Math.Max(by, (int)cb.Y);
+                    int nx2 = Math.Min(bx + bw, (int)(cb.X + cb.Width));
+                    int ny2 = Math.Min(by + bh, (int)(cb.Y + cb.Height));
+                    if (nx2 <= nx || ny2 <= ny) return; // komplett ausserhalb
+                    bx = nx; by = ny; bw = nx2 - nx; bh = ny2 - ny;
+                }
+
+                Raylib.BeginScissorMode(bx, by, bw, bh);
+
+                var tex = flagTex.Value;
+                float scale = (radius * 2f) / Math.Min(tex.Width, tex.Height);
+                int drawW = (int)(tex.Width * scale);
+                int drawH = (int)(tex.Height * scale);
+                Raylib.DrawTexturePro(tex, new Rectangle(0, 0, tex.Width, tex.Height),
+                    new Rectangle(cx - drawW / 2, cy - drawH / 2, drawW, drawH), Vector2.Zero, 0, Color.White);
+
+                // Kreis-Maske: Ring kaschiert die Ecken (1.6r deckt die
+                // Quadrat-Diagonale ab, Scissor begrenzt den Ueberstand)
+                Raylib.DrawRing(center, radius, radius * 1.6f, 0, 360, 32, XBg);
+                Raylib.DrawCircleLines(cx, cy, radius, XBorder);
+
+                Raylib.EndScissorMode();
+
+                // Aeusseren Scissor wiederherstellen
+                if (clipBounds is Rectangle restore)
+                    Raylib.BeginScissorMode((int)restore.X, (int)restore.Y, (int)restore.Width, (int)restore.Height);
+                return;
+            }
+        }
+
+        Raylib.DrawCircleV(center, radius, fallbackColor);
+        string sym = "!";
+        int symW = MeasureTextCached(sym, radius);
+        DrawGameText(sym, cx - symW / 2, cy - radius / 2, radius, Color.White);
+    }
+
+    /// <summary>
+    /// Blauer Verifiziert-Haken im X-Stil
+    /// </summary>
+    static void DrawVerifiedBadge(int cx, int cy, int radius)
+    {
+        Raylib.DrawCircle(cx, cy, radius, XBlue);
+        float s = radius * 0.55f;
+        Raylib.DrawLineEx(new Vector2(cx - s, cy), new Vector2(cx - s * 0.2f, cy + s * 0.8f), 2f, Color.White);
+        Raylib.DrawLineEx(new Vector2(cx - s * 0.2f, cy + s * 0.8f), new Vector2(cx + s, cy - s * 0.6f), 2f, Color.White);
+    }
+
+    /// <summary>
+    /// X-Logo: zwei kraeftige gekreuzte Diagonalstriche
+    /// </summary>
+    static void DrawXLogo(int cx, int cy, int size, Color color)
+    {
+        float s = size;
+        Raylib.DrawLineEx(new Vector2(cx - s, cy - s), new Vector2(cx + s, cy + s), 3.5f, color);
+        Raylib.DrawLineEx(new Vector2(cx + s, cy - s), new Vector2(cx + s * 0.25f, cy - s * 0.15f), 2.5f, color);
+        Raylib.DrawLineEx(new Vector2(cx - s * 0.25f, cy + s * 0.15f), new Vector2(cx - s, cy + s), 2.5f, color);
+    }
+
+    // === Bottom-Navigation-Icons ===
+
+    static void DrawHouseIcon(int cx, int cy, int size, Color color)
+    {
+        // Dach
+        Raylib.DrawLineEx(new Vector2(cx - size, cy), new Vector2(cx, cy - size), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx, cy - size), new Vector2(cx + size, cy), 2f, color);
+        // Korpus
+        Raylib.DrawLineEx(new Vector2(cx - size + 2, cy - 1), new Vector2(cx - size + 2, cy + size - 1), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx + size - 2, cy - 1), new Vector2(cx + size - 2, cy + size - 1), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx - size + 2, cy + size - 1), new Vector2(cx + size - 2, cy + size - 1), 2f, color);
+        // Tuer
+        Raylib.DrawRectangle(cx - 2, cy + size - 6, 4, 5, color);
+    }
+
+    static void DrawSearchIcon(int cx, int cy, int size, Color color)
+    {
+        Raylib.DrawRing(new Vector2(cx - 2, cy - 2), size - 3, size - 1, 0, 360, 24, color);
+        Raylib.DrawLineEx(new Vector2(cx + size / 2 - 1, cy + size / 2 - 1), new Vector2(cx + size, cy + size), 2.5f, color);
+    }
+
+    static void DrawBellIcon(int cx, int cy, int size, Color color)
+    {
+        // Glockenkoerper (Bogen oben + Seiten)
+        Raylib.DrawRing(new Vector2(cx, cy - 1), size - 3, size - 1, 180, 360, 24, color);
+        Raylib.DrawLineEx(new Vector2(cx - size + 2, cy - 1), new Vector2(cx - size + 1, cy + size - 4), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx + size - 2, cy - 1), new Vector2(cx + size - 1, cy + size - 4), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx - size + 1, cy + size - 4), new Vector2(cx + size - 1, cy + size - 4), 2f, color);
+        // Kloeppel
+        Raylib.DrawCircle(cx, cy + size - 1, 2, color);
+    }
+
+    static void DrawMailIcon(int cx, int cy, int size, Color color)
+    {
+        int w = size + 3;
+        int h = size - 1;
+        Raylib.DrawRectangleRoundedLinesEx(new Rectangle(cx - w, cy - h, w * 2, h * 2), 0.2f, 4, 2, color);
+        // Umschlag-Klappe
+        Raylib.DrawLineEx(new Vector2(cx - w + 2, cy - h + 2), new Vector2(cx, cy + 1), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx, cy + 1), new Vector2(cx + w - 2, cy - h + 2), 2f, color);
+    }
+
+    /// <summary>
+    /// Teilen-Icon: Pfeil nach oben aus einer Ablage
+    /// </summary>
+    static void DrawShareIcon(int cx, int centerY, int size, Color color)
+    {
+        int half = size / 2;
+        // Pfeil
+        Raylib.DrawLineEx(new Vector2(cx, centerY - half), new Vector2(cx, centerY + 2), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx - 4, centerY - half + 4), new Vector2(cx, centerY - half), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx + 4, centerY - half + 4), new Vector2(cx, centerY - half), 2f, color);
+        // Ablage
+        Raylib.DrawLineEx(new Vector2(cx - half, centerY), new Vector2(cx - half, centerY + half), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx - half, centerY + half), new Vector2(cx + half, centerY + half), 2f, color);
+        Raylib.DrawLineEx(new Vector2(cx + half, centerY + half), new Vector2(cx + half, centerY), 2f, color);
+    }
+
+    /// <summary>
+    /// Zeichnet ein Kommentar-Icon (Sprechblase) im X-Stil
     /// </summary>
     static void DrawCommentIcon(int x, int centerY, int size, Color color)
     {
@@ -409,16 +568,13 @@ partial class Program
         int cx = x + size / 2;
         int cy = centerY;
 
-        // Sprechblase als Ellipse
         Raylib.DrawEllipseLines(cx, cy - 1, r, r - 2, color);
-
-        // Kleiner Pfeil unten links
         Raylib.DrawLine(cx - r / 2, cy + r - 3, cx - r / 2 - 3, cy + r + 2, color);
         Raylib.DrawLine(cx - r / 2 - 3, cy + r + 2, cx - r / 2 + 2, cy + r - 1, color);
     }
 
     /// <summary>
-    /// Zeichnet ein Retweet-Icon (zwei Pfeile) im X/Twitter-Stil
+    /// Zeichnet ein Repost-Icon (zwei Pfeile) im X-Stil
     /// </summary>
     static void DrawRetweetIcon(int x, int centerY, int size, Color color)
     {
@@ -427,25 +583,19 @@ partial class Program
         int cx = x + size / 2;
         int cy = centerY;
 
-        // Oberer Pfeil (nach rechts)
         Raylib.DrawLine(cx - w / 2, cy - h / 2, cx + w / 2 - 3, cy - h / 2, color);
         Raylib.DrawLine(cx + w / 2 - 3, cy - h / 2, cx + w / 2 - 6, cy - h / 2 - 3, color);
         Raylib.DrawLine(cx + w / 2 - 3, cy - h / 2, cx + w / 2 - 6, cy - h / 2 + 3, color);
-
-        // Verbindung rechts
         Raylib.DrawLine(cx + w / 2 - 3, cy - h / 2, cx + w / 2 - 3, cy, color);
 
-        // Unterer Pfeil (nach links)
         Raylib.DrawLine(cx + w / 2, cy + h / 2, cx - w / 2 + 3, cy + h / 2, color);
         Raylib.DrawLine(cx - w / 2 + 3, cy + h / 2, cx - w / 2 + 6, cy + h / 2 - 3, color);
         Raylib.DrawLine(cx - w / 2 + 3, cy + h / 2, cx - w / 2 + 6, cy + h / 2 + 3, color);
-
-        // Verbindung links
         Raylib.DrawLine(cx - w / 2 + 3, cy + h / 2, cx - w / 2 + 3, cy, color);
     }
 
     /// <summary>
-    /// Zeichnet ein Herz-Icon im X/Twitter-Stil
+    /// Zeichnet ein Herz-Icon im X-Stil
     /// </summary>
     static void DrawHeartIcon(int x, int centerY, int size, Color color)
     {
@@ -453,17 +603,14 @@ partial class Program
         int cy = centerY;
         int r = size / 4;
 
-        // Zwei Kreise oben
         Raylib.DrawCircleLines(cx - r + 1, cy - r / 2, r, color);
         Raylib.DrawCircleLines(cx + r - 1, cy - r / 2, r, color);
-
-        // Spitze unten (Dreieck)
         Raylib.DrawLine(cx - size / 2 + 2, cy, cx, cy + size / 2 - 2, color);
         Raylib.DrawLine(cx + size / 2 - 2, cy, cx, cy + size / 2 - 2, color);
     }
 
     /// <summary>
-    /// Zeichnet ein Views-Icon (Balkendiagramm) im X/Twitter-Stil
+    /// Zeichnet ein Views-Icon (Balkendiagramm) im X-Stil
     /// </summary>
     static void DrawViewsIcon(int x, int centerY, int size, Color color)
     {
@@ -471,7 +618,6 @@ partial class Program
         int spacing = 2;
         int baseY = centerY + size / 2 - 3;
 
-        // Drei Balken unterschiedlicher Hoehe
         int bar1H = size / 3;
         int bar2H = size / 2;
         int bar3H = size - 6;
