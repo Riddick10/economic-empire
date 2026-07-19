@@ -58,7 +58,7 @@ internal class TradeTopMenuPanel : ITopMenuPanel
             Rectangle btnRect = new Rectangle(contentX, y, btnW, btnH);
             bool btnHovered = Raylib.CheckCollisionPointRec(mousePos, btnRect);
 
-            Color btnBg = btnHovered ? ColorPalette.Accent : ColorPalette.PanelLight;
+            Color btnBg = btnHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal;
             Raylib.DrawRectangleRec(btnRect, btnBg);
             Raylib.DrawRectangleLinesEx(btnRect, 1, ColorPalette.Accent);
 

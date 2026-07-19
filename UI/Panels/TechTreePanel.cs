@@ -89,15 +89,17 @@ internal class TechTreePanel
 
         Vector2 mousePos = Program._cachedMousePos;
 
-        // Vollbild-Hintergrund
-        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight, new Color((byte)15, (byte)15, (byte)20, (byte)250));
+        // Vollbild-Hintergrund (dunkles Glas)
+        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, Program.ScreenHeight, new Color((byte)8, (byte)10, (byte)16, (byte)250));
 
-        // Header
+        // Header mit Goldkante (Living-World-Stil)
         int headerH = 60;
-        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, headerH, ColorPalette.Panel);
+        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, headerH, new Color((byte)12, (byte)16, (byte)27, (byte)255));
+        Raylib.DrawRectangle(0, 0, Program.ScreenWidth, 3, MenuStyle.Gold(210));
         Raylib.DrawLine(0, headerH, Program.ScreenWidth, headerH, ColorPalette.PanelLight);
 
-        Program.DrawGameText("FORSCHUNGSBAUM", 30, 18, 22, ColorPalette.Accent);
+        Raylib.DrawRectangle(30, 22, 5, 20, MenuStyle.Gold());
+        Program.DrawGameText("FORSCHUNGSBAUM", 43, 18, 22, new Color((byte)245, (byte)240, (byte)228, (byte)255));
 
         // Forschungs-Uebersicht im Header
         DrawHeaderStats(techManager, headerH);
@@ -325,7 +327,7 @@ internal class TechTreePanel
             int barX = x + 10;
             int barY = y + TECH_NODE_HEIGHT - 12;
 
-            Raylib.DrawRectangle(barX, barY, barW, barH, new Color((byte)20, (byte)20, (byte)30, (byte)200));
+            Raylib.DrawRectangle(barX, barY, barW, barH, new Color((byte)10, (byte)13, (byte)22, (byte)200));
             int fillW = (int)(barW * percent);
             if (fillW > 0)
             {
@@ -474,10 +476,7 @@ internal class TechTreePanel
         if (tooltipY + tooltipH > Program.ScreenHeight - 10)
             tooltipY = Program.ScreenHeight - tooltipH - 10;
 
-        Raylib.DrawRectangleRounded(new Rectangle(tooltipX - 2, tooltipY - 2, tooltipW + 4, tooltipH + 4),
-            0.05f, 8, ColorPalette.PanelLight);
-        Raylib.DrawRectangleRounded(new Rectangle(tooltipX, tooltipY, tooltipW, tooltipH),
-            0.05f, 8, ColorPalette.Panel);
+        MenuStyle.DrawTooltip(new Rectangle(tooltipX, tooltipY, tooltipW, tooltipH));
 
         int y = tooltipY + 10;
 
@@ -531,10 +530,9 @@ internal class TechTreePanel
         int panelX = Program.ScreenWidth - panelW - 20;
         int panelY = 80;
 
-        Raylib.DrawRectangleRounded(new Rectangle(panelX - 2, panelY - 2, panelW + 4, panelH + 4),
-            0.03f, 8, GetCategoryColor(tech.Category));
-        Raylib.DrawRectangleRounded(new Rectangle(panelX, panelY, panelW, panelH),
-            0.03f, 8, ColorPalette.Panel);
+        // Glas-Panel mit Kategorie-farbenem Rahmen
+        MenuStyle.DrawGlassPanel(new Rectangle(panelX, panelY, panelW, panelH));
+        Raylib.DrawRectangleLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 1, GetCategoryColor(tech.Category));
 
         int y = panelY + 15;
         int contentX = panelX + 15;

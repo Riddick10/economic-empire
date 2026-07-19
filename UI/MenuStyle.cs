@@ -97,6 +97,44 @@ internal static class MenuStyle
         new(r.X - dx, r.Y - dy, r.Width + dx * 2, r.Height + dy * 2);
 
     /// <summary>
+    /// Dunkler Glas-Panel-Rahmen: Schatten, Glas, Lichtkante, Rand, Goldkante oben.
+    /// Der gemeinsame Fenster-Look aller Menues und In-Game-Panels.
+    /// </summary>
+    public static void DrawGlassPanel(Rectangle panel, float a = 1f)
+    {
+        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
+        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
+
+        Raylib.DrawRectangle(px + 4, py + 6, pw, ph, new Color((byte)0, (byte)0, (byte)0, A(90)));
+        Raylib.DrawRectangleRec(panel, new Color((byte)12, (byte)16, (byte)27, A(244)));
+        Raylib.DrawRectangle(px, py + 3, pw, 1, new Color((byte)255, (byte)255, (byte)255, A(22)));
+        Raylib.DrawRectangleLinesEx(panel, 1, new Color((byte)80, (byte)88, (byte)110, A(170)));
+        Raylib.DrawRectangle(px, py, pw, 3, Gold(A(210)));
+    }
+
+    /// <summary>
+    /// Panel-Titel: Goldmarke + Titel in warmem Weiss. Gibt Y unter dem Titel zurueck.
+    /// </summary>
+    public static int DrawPanelTitle(string title, int x, int y, int fontSize = 26)
+    {
+        Raylib.DrawRectangle(x, y + 4, 5, fontSize - 6, Gold(210));
+        Program.DrawGameText(title, x + 13, y, fontSize, new Color((byte)245, (byte)240, (byte)228, (byte)255));
+        return y + fontSize + 10;
+    }
+
+    /// <summary>
+    /// Kleiner Glas-Tooltip mit Goldmarke links (fuer Karten-Hover u.ae.)
+    /// </summary>
+    public static void DrawTooltip(Rectangle r)
+    {
+        Raylib.DrawRectangleRounded(new Rectangle(r.X + 3, r.Y + 4, r.Width, r.Height), 0.12f, 6,
+            new Color((byte)0, (byte)0, (byte)0, (byte)90));
+        Raylib.DrawRectangleRounded(r, 0.12f, 6, new Color((byte)12, (byte)16, (byte)27, (byte)242));
+        Raylib.DrawRectangleRoundedLinesEx(r, 0.12f, 6, 1, new Color((byte)80, (byte)88, (byte)110, (byte)180));
+        Raylib.DrawRectangleRounded(new Rectangle(r.X, r.Y + 4, 4, r.Height - 8), 0.5f, 4, Gold(220));
+    }
+
+    /// <summary>
     /// Abschnitts-Ueberschrift: goldene Marke + Titel + feine Linie
     /// </summary>
     public static void DrawOptionsSection(string title, int x, int y, int width, float a)

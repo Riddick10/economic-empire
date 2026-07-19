@@ -26,19 +26,17 @@ internal class ProvinceInfoPanel
         int panelY = 135;
         int panelH = 650;
 
-        Rectangle panelRect = new(panelX, panelY, panelW, panelH);
-        Rectangle panelShadow = new(panelX + 2, panelY + 2, panelW, panelH);
-        Raylib.DrawRectangleRounded(panelShadow, 0.02f, 6, new Color((byte)0, (byte)0, (byte)0, (byte)40));
-        Raylib.DrawRectangleRounded(panelRect, 0.02f, 6, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(panelRect, 0.02f, 6, 2, ColorPalette.Accent);
+        // Glas-Huelle im Living-World-Stil
+        MenuStyle.DrawGlassPanel(new Rectangle(panelX, panelY, panelW, panelH));
 
         int y = panelY + 15;
         int contentX = panelX + 15;
 
-        Program.DrawGameText("PROVINZ", contentX, y, 14, ColorPalette.Accent);
+        Raylib.DrawRectangle(contentX, y + 2, 4, 13, MenuStyle.Gold());
+        Program.DrawGameText("PROVINZ", contentX + 12, y, 14, ColorPalette.Accent);
         y += 32;
 
-        Raylib.DrawLine(contentX, y, panelX + panelW - 15, y, ColorPalette.Accent);
+        Raylib.DrawLine(contentX, y, panelX + panelW - 15, y, new Color((byte)255, (byte)255, (byte)255, (byte)30));
         y += 15;
 
         Program.DrawGameText(province.Name, contentX, y, 20, ColorPalette.TextWhite);

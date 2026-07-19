@@ -267,19 +267,10 @@ partial class Program
     }
 
     /// <summary>
-    /// Glas-Panel-Rahmen: Schatten, dunkles Glas, Lichtkante, Rand, Goldkante
+    /// Glas-Panel-Rahmen (zentral in MenuStyle, hier nur Kurzform)
     /// </summary>
-    static void DrawGlassPanelFrame(Rectangle panel, float ease)
-    {
-        byte A(float v) => (byte)Math.Clamp(v * ease, 0, 255);
-        int px = (int)panel.X, py = (int)panel.Y, pw = (int)panel.Width, ph = (int)panel.Height;
-
-        Raylib.DrawRectangle(px + 4, py + 6, pw, ph, new Color((byte)0, (byte)0, (byte)0, A(90)));
-        Raylib.DrawRectangleRec(panel, new Color((byte)12, (byte)16, (byte)27, A(238)));
-        Raylib.DrawRectangle(px, py + 3, pw, 1, new Color((byte)255, (byte)255, (byte)255, A(22)));
-        Raylib.DrawRectangleLinesEx(panel, 1, new Color((byte)80, (byte)88, (byte)110, A(170)));
-        Raylib.DrawRectangle(px, py, pw, 3, MenuStyle.Gold(A(210)));
-    }
+    static void DrawGlassPanelFrame(Rectangle panel, float ease) =>
+        MenuStyle.DrawGlassPanel(panel, ease);
 
     /// <summary>
     /// Zeichnet das Pause-Menü als Overlay (mit Ein-/Ausblend-Animation)

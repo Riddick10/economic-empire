@@ -228,7 +228,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         // +100M
         Rectangle btn100 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
         bool hover100 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn100);
-        Raylib.DrawRectangleRec(btn100, hover100 ? ColorPalette.Accent : ColorPalette.PanelLight);
+        Raylib.DrawRectangleRec(btn100, hover100 ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
         Raylib.DrawRectangleLinesEx(btn100, 1, ColorPalette.Accent);
         Program.DrawGameText("+100M", loanBtnX + 8, y + 4, 14, ColorPalette.TextWhite);
         if (hover100 && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -242,7 +242,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         // +500M
         Rectangle btn500 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
         bool hover500 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn500);
-        Raylib.DrawRectangleRec(btn500, hover500 ? ColorPalette.Accent : ColorPalette.PanelLight);
+        Raylib.DrawRectangleRec(btn500, hover500 ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
         Raylib.DrawRectangleLinesEx(btn500, 1, ColorPalette.Accent);
         Program.DrawGameText("+500M", loanBtnX + 8, y + 4, 14, ColorPalette.TextWhite);
         if (hover500 && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -257,7 +257,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         loanBtnW = 58;
         Rectangle btn1000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
         bool hover1000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn1000);
-        Raylib.DrawRectangleRec(btn1000, hover1000 ? ColorPalette.Accent : ColorPalette.PanelLight);
+        Raylib.DrawRectangleRec(btn1000, hover1000 ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
         Raylib.DrawRectangleLinesEx(btn1000, 1, ColorPalette.Accent);
         Program.DrawGameText("+1Mrd", loanBtnX + 6, y + 4, 14, ColorPalette.TextWhite);
         if (hover1000 && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -272,7 +272,7 @@ internal class BudgetTopMenuPanel : ITopMenuPanel
         loanBtnW = 68;
         Rectangle btn10000 = new Rectangle(loanBtnX, y, loanBtnW, loanBtnH);
         bool hover10000 = mouseInArea && Raylib.CheckCollisionPointRec(mousePos, btn10000);
-        Raylib.DrawRectangleRec(btn10000, hover10000 ? ColorPalette.Accent : ColorPalette.PanelLight);
+        Raylib.DrawRectangleRec(btn10000, hover10000 ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
         Raylib.DrawRectangleLinesEx(btn10000, 1, ColorPalette.Accent);
         Program.DrawGameText("+10Mrd", loanBtnX + 4, y + 4, 14, ColorPalette.TextWhite);
         if (hover10000 && Raylib.IsMouseButtonPressed(MouseButton.Left))

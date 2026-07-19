@@ -127,7 +127,7 @@ partial class Program
 
                     // Hintergrund fuer Icons
                     Raylib.DrawRectangle(iconStartX - 3, iconY - 2, totalIconsW + 6, iconSize + 4,
-                        new Color((byte)20, (byte)20, (byte)30, (byte)210));
+                        new Color((byte)10, (byte)13, (byte)22, (byte)215));
                     Raylib.DrawRectangleLinesEx(
                         new Rectangle(iconStartX - 3, iconY - 2, totalIconsW + 6, iconSize + 4),
                         1, new Color(arrowColor.R, arrowColor.G, arrowColor.B, (byte)120));
@@ -149,7 +149,7 @@ partial class Program
                         int textW = MeasureTextCached(routeLabel, 10);
 
                         Raylib.DrawRectangle((int)midPoint.X - textW / 2 - 2, (int)midPoint.Y - 1, textW + 4, 13,
-                            new Color((byte)20, (byte)20, (byte)30, (byte)200));
+                            new Color((byte)10, (byte)13, (byte)22, (byte)205));
                         DrawGameText(routeLabel, (int)midPoint.X - textW / 2, (int)midPoint.Y, 11, arrowColor);
                     }
                 }
@@ -274,7 +274,7 @@ partial class Program
         int legendH = 85;
 
         // Hintergrund
-        Raylib.DrawRectangle(legendX, legendY, legendW, legendH, new Color((byte)30, (byte)30, (byte)40, (byte)220));
+        Raylib.DrawRectangle(legendX, legendY, legendW, legendH, new Color((byte)12, (byte)16, (byte)27, (byte)235));
         Raylib.DrawRectangleLinesEx(new Rectangle(legendX, legendY, legendW, legendH), 1, ColorPalette.PanelLight);
 
         int y = legendY + 8;
@@ -349,7 +349,7 @@ partial class Program
         int panelY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT - 100 - panelH - 8;
 
         // Hintergrund
-        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, new Color((byte)30, (byte)30, (byte)40, (byte)220));
+        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, new Color((byte)12, (byte)16, (byte)27, (byte)235));
         Raylib.DrawRectangleLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 1, ColorPalette.PanelLight);
 
         int y = panelY + 4;
@@ -392,7 +392,10 @@ partial class Program
             Raylib.DrawRectangleLinesEx(new Rectangle(panelX + 10, y + 4, 12, 14), 1, ColorPalette.PanelLight);
 
             // Name
-            Color textColor = isActive ? Color.White : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
+            // Dunkler Text auf goldener Auswahl-Fuellung (Kontrast)
+            Color textColor = isActive
+                ? new Color((byte)10, (byte)13, (byte)22, (byte)255)
+                : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
             DrawGameText(name, panelX + 28, y + 4, 11, textColor);
 
             if (isHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
@@ -441,7 +444,7 @@ partial class Program
         int legendY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT - legendH - 8;
 
         // Hintergrund
-        Raylib.DrawRectangle(legendX, legendY, legendW, legendH, new Color((byte)30, (byte)30, (byte)40, (byte)220));
+        Raylib.DrawRectangle(legendX, legendY, legendW, legendH, new Color((byte)12, (byte)16, (byte)27, (byte)235));
         Raylib.DrawRectangleLinesEx(new Rectangle(legendX, legendY, legendW, legendH), 1, ColorPalette.PanelLight);
 
         int y = legendY + 6;
@@ -533,7 +536,7 @@ partial class Program
         int panelY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT - panelH - 66;
 
         // Hintergrund
-        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, new Color((byte)30, (byte)30, (byte)40, (byte)220));
+        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, new Color((byte)12, (byte)16, (byte)27, (byte)235));
         Raylib.DrawRectangleLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 1, ColorPalette.PanelLight);
 
         int y = panelY + 6;
@@ -573,7 +576,10 @@ partial class Program
             Raylib.DrawRectangleLinesEx(new Rectangle(panelX + 10, y + 5, 12, 14), 1, ColorPalette.PanelLight);
 
             // Name
-            Color textColor = isActive ? Color.White : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
+            // Dunkler Text auf goldener Auswahl-Fuellung (Kontrast)
+            Color textColor = isActive
+                ? new Color((byte)10, (byte)13, (byte)22, (byte)255)
+                : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
             DrawGameText(name, panelX + 28, y + 5, 11, textColor);
 
             // Klick
@@ -594,7 +600,7 @@ partial class Program
         int scaleY = panelY + panelH + 4;
 
         // Farbverlauf zeichnen
-        Raylib.DrawRectangle(scaleX, scaleY - 2, scaleW, scaleH + 18, new Color((byte)30, (byte)30, (byte)40, (byte)220));
+        Raylib.DrawRectangle(scaleX, scaleY - 2, scaleW, scaleH + 18, new Color((byte)12, (byte)16, (byte)27, (byte)235));
         for (int px = 0; px < scaleW; px++)
         {
             float val = (float)px / scaleW;

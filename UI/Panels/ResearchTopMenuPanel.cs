@@ -29,12 +29,15 @@ internal class ResearchTopMenuPanel : ITopMenuPanel
         Rectangle openTreeBtn = new Rectangle(contentX, y, btnW, btnH);
         bool btnHover = Raylib.CheckCollisionPointRec(mousePos, openTreeBtn);
 
-        Raylib.DrawRectangleRounded(openTreeBtn, 0.15f, 8,
+        // Glas-Button im Living-World-Stil (Hover: heller + Goldrand)
+        Raylib.DrawRectangleRounded(openTreeBtn,
+            0.15f, 8, btnHover ? ColorPalette.ButtonHover : ColorPalette.ButtonNormal);
+        Raylib.DrawRectangleRoundedLinesEx(openTreeBtn, 0.15f, 8, 1,
             btnHover ? ColorPalette.Accent : ColorPalette.PanelLight);
         string btnText = "FORSCHUNGSBAUM OEFFNEN";
         int btnTextW = Program.MeasureTextCached(btnText, 16);
         Program.DrawGameText(btnText, contentX + (btnW - btnTextW) / 2, y + 12, 14,
-            btnHover ? Color.White : ColorPalette.TextWhite);
+            btnHover ? ColorPalette.AccentLight : ColorPalette.TextWhite);
 
         if (btnHover && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {

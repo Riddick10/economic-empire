@@ -29,13 +29,12 @@ internal class PoliticsInfoPanel
         int panelW = 440;
         int panelH = Program.ScreenHeight - panelY - GameConfig.BOTTOM_BAR_HEIGHT - 10;
 
-        // Panel-Hintergrund - andere Farbe fuer fremde Laender
+        // Glas-Huelle; fremde Laender bekommen einen gelben Zusatzrahmen
         Color borderColor = isOwnCountry ? ColorPalette.Accent : ColorPalette.Yellow;
         Rectangle panelRect = new(panelX, panelY, panelW, panelH);
-        Rectangle panelShadow = new(panelX + 2, panelY + 2, panelW, panelH);
-        Raylib.DrawRectangleRounded(panelShadow, 0.02f, 6, new Color((byte)0, (byte)0, (byte)0, (byte)40));
-        Raylib.DrawRectangleRounded(panelRect, 0.02f, 6, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(panelRect, 0.02f, 6, 2, borderColor);
+        MenuStyle.DrawGlassPanel(panelRect);
+        if (!isOwnCountry)
+            Raylib.DrawRectangleLinesEx(panelRect, 1, ColorPalette.Yellow);
 
         int y = panelY + 15;
         int contentX = panelX + 15;
@@ -299,7 +298,7 @@ internal class PoliticsInfoPanel
                 Rectangle decisionBtnRect = new Rectangle(contentX, y, panelW - 30, 34);
                 bool decisionHovered = Raylib.CheckCollisionPointRec(Raylib.GetMousePosition(), decisionBtnRect);
 
-                Color decBtnBg = decisionHovered ? ColorPalette.Accent : ColorPalette.PanelLight;
+                Color decBtnBg = decisionHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal;
                 Raylib.DrawRectangleRounded(decisionBtnRect, GameConfig.BUTTON_ROUNDNESS, 6, decBtnBg);
                 Raylib.DrawRectangleRoundedLinesEx(decisionBtnRect, GameConfig.BUTTON_ROUNDNESS, 6, 1, ColorPalette.Accent);
 

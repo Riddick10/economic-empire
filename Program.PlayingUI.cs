@@ -170,7 +170,10 @@ partial class Program
                     name = name.Substring(0, name.Length - 4) + "...";
                 }
 
-                Color textColor = isCurrentTrack ? ColorPalette.TextWhite : (hoverTrack ? ColorPalette.TextWhite : ColorPalette.TextGray);
+                // Dunkler Text auf goldener Auswahl-Fuellung (Kontrast)
+                Color textColor = isCurrentTrack
+                    ? new Color((byte)10, (byte)13, (byte)22, (byte)255)
+                    : (hoverTrack ? ColorPalette.TextWhite : ColorPalette.TextGray);
                 DrawGameText($"{i + 1}.", listX + 5, trackY + 5, 11, textColor);
                 DrawGameText(name, listX + 25, trackY + 5, 11, textColor);
 
@@ -275,16 +278,17 @@ partial class Program
         int panelY = (ScreenHeight - panelH) / 2;
 
         // Hintergrund abdunkeln
-        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)2, (byte)3, (byte)7, (byte)165));
 
-        // Panel-Hintergrund
-        Raylib.DrawRectangleRounded(new Rectangle(panelX, panelY, panelW, panelH), 0.02f, 8, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 0.02f, 8, 2, ColorPalette.Accent);
+        // Glas-Huelle im Living-World-Stil
+        MenuStyle.DrawGlassPanel(new Rectangle(panelX, panelY, panelW, panelH));
 
         // Header
         int headerH = 50;
-        Raylib.DrawRectangle(panelX, panelY, panelW, headerH, ColorPalette.PanelLight);
-        DrawGameText("Spielanleitung", panelX + 20, panelY + 14, 11, ColorPalette.Accent);
+        Raylib.DrawLine(panelX, panelY + headerH, panelX + panelW, panelY + headerH,
+            new Color((byte)255, (byte)255, (byte)255, (byte)30));
+        Raylib.DrawRectangle(panelX + 20, panelY + 16, 5, 20, MenuStyle.Gold());
+        DrawGameText("Spielanleitung", panelX + 33, panelY + 14, 11, new Color((byte)245, (byte)240, (byte)228, (byte)255));
 
         // Schliessen-Button (X)
         int closeBtnSize = 30;
@@ -576,15 +580,15 @@ partial class Program
         int panelY = (ScreenHeight - panelH) / 2;
 
         // Hintergrund abdunkeln
-        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)0, (byte)0, (byte)0, (byte)150));
+        Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, new Color((byte)2, (byte)3, (byte)7, (byte)165));
 
-        // Panel-Hintergrund
-        Raylib.DrawRectangleRounded(new Rectangle(panelX, panelY, panelW, panelH), 0.02f, 8, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 0.02f, 8, 2, ColorPalette.Accent);
+        // Glas-Huelle im Living-World-Stil
+        MenuStyle.DrawGlassPanel(new Rectangle(panelX, panelY, panelW, panelH));
 
         // Header
         int headerH = 50;
-        Raylib.DrawRectangle(panelX, panelY, panelW, headerH, ColorPalette.PanelLight);
+        Raylib.DrawLine(panelX, panelY + headerH, panelX + panelW, panelY + headerH,
+            new Color((byte)255, (byte)255, (byte)255, (byte)30));
 
         // Tab-Buttons im Header
         int tabW = 200;
@@ -723,9 +727,9 @@ partial class Program
             if (isPlayer)
                 rowColor = new Color((byte)40, (byte)50, (byte)80, (byte)200);
             else if (i % 2 == 0)
-                rowColor = new Color((byte)40, (byte)40, (byte)55, (byte)150);
+                rowColor = new Color((byte)30, (byte)38, (byte)58, (byte)150);
             else
-                rowColor = new Color((byte)35, (byte)35, (byte)48, (byte)150);
+                rowColor = new Color((byte)16, (byte)20, (byte)32, (byte)150);
 
             Raylib.DrawRectangle(panelX + 5, rowY, panelW - 10, rowH, rowColor);
 
@@ -998,7 +1002,7 @@ partial class Program
             int lineY = y + chartH - (int)(ratio * chartH);
             double val = ratio * displayMax;
 
-            Raylib.DrawLine(chartX, lineY, chartX + chartW, lineY, new Color((byte)60, (byte)60, (byte)80, (byte)100));
+            Raylib.DrawLine(chartX, lineY, chartX + chartW, lineY, new Color((byte)70, (byte)78, (byte)100, (byte)100));
             DrawGameText(Formatting.Resource(val), x, lineY - 5, 9, ColorPalette.TextGray);
         }
 
@@ -1082,7 +1086,7 @@ partial class Program
 
             // Hover-Hintergrund
             if (hovered)
-                Raylib.DrawRectangleRounded(legendRect, 0.3f, 4, new Color((byte)60, (byte)60, (byte)80, (byte)120));
+                Raylib.DrawRectangleRounded(legendRect, 0.3f, 4, new Color((byte)70, (byte)78, (byte)100, (byte)120));
 
             // Checkbox
             Color boxColor = active ? color : new Color((byte)60, (byte)60, (byte)70, (byte)255);

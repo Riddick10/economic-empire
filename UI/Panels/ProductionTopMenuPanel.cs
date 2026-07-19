@@ -13,19 +13,9 @@ internal class ProductionTopMenuPanel : ITopMenuPanel
 
     public void Draw(TopMenuContext ctx)
     {
+        int headerY = Program.DrawTopMenuPanelHeader("PRODUKTION");
         var (panelX, panelY, panelW, panelH) = Program.GetTopMenuPanelRect();
-
-        // Panel-Hintergrund
-        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, ColorPalette.Panel);
-        Raylib.DrawRectangleLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 2, ColorPalette.Accent);
-
-        // Header (fest, nicht scrollend)
-        int headerY = panelY + 15;
         int contentX = panelX + 15;
-        Program.DrawGameText("PRODUKTION", contentX, headerY, 30, ColorPalette.Accent);
-        headerY += 38;
-        Raylib.DrawLine(contentX, headerY, panelX + panelW - 15, headerY, ColorPalette.Accent);
-        headerY += 10;
 
         // Scrollbarer Bereich
         int scrollAreaY = headerY;
@@ -168,12 +158,15 @@ internal class ProductionTopMenuPanel : ITopMenuPanel
             Rectangle toggleRect = new Rectangle(contentX, y, toggleW, toggleH);
             bool toggleHovered = Raylib.CheckCollisionPointRec(mousePos, toggleRect);
 
-            Color toggleBg = toggleHovered ? ColorPalette.Accent : (Program.ui.ShowBuildPanel ? ColorPalette.PanelLight : ColorPalette.Panel);
+            // Glas-Button: Hover hellt auf, Goldrand + goldener Text
+            Color toggleBg = toggleHovered ? ColorPalette.ButtonHover :
+                             (Program.ui.ShowBuildPanel ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
             Raylib.DrawRectangleRec(toggleRect, toggleBg);
             Raylib.DrawRectangleLinesEx(toggleRect, 1, ColorPalette.Accent);
 
             int toggleTextW = Program.MeasureTextCached(toggleLabel, 14);
-            Program.DrawGameText(toggleLabel, contentX + (toggleW - toggleTextW) / 2, y + 8, 14, ColorPalette.TextWhite);
+            Program.DrawGameText(toggleLabel, contentX + (toggleW - toggleTextW) / 2, y + 8, 14,
+                toggleHovered ? ColorPalette.AccentLight : ColorPalette.TextWhite);
 
             if (toggleHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
             {

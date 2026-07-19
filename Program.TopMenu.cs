@@ -170,7 +170,9 @@ partial class Program
             int iconSize = TOP_MENU_BTN_SIZE - (iconPadding * 2);
             int iconX = x + iconPadding;
             int iconY = y + iconPadding;
-            Color iconTint = isActive ? ColorPalette.TextWhite : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
+            // Dunkles Icon auf goldenem Aktiv-Button (Kontrast)
+            Color iconTint = isActive ? new Color((byte)10, (byte)13, (byte)22, (byte)255)
+                                      : (isHovered ? ColorPalette.TextWhite : ColorPalette.TextGray);
             DrawTopMenuIcon(panel, iconX, iconY, iconSize, iconTint);
 
             // Shortcut-Zahl unten rechts im Button (1-8 fuer alle Buttons)
@@ -181,7 +183,8 @@ partial class Program
                 int numW = MeasureTextCached(shortcutNum, numFontSize);
                 int numX = x + TOP_MENU_BTN_SIZE - numW - 4;
                 int numY = y + TOP_MENU_BTN_SIZE - numFontSize - 3;
-                DrawGameText(shortcutNum, numX, numY, numFontSize, isActive ? ColorPalette.TextWhite : ColorPalette.TextGray);
+                DrawGameText(shortcutNum, numX, numY, numFontSize,
+                    isActive ? new Color((byte)10, (byte)13, (byte)22, (byte)255) : ColorPalette.TextGray);
             }
 
             // Klick-Handler
@@ -264,31 +267,18 @@ partial class Program
     {
         var (panelX, panelY, panelW, panelH) = GetTopMenuPanelRect();
 
-        float roundness = 0.02f;
-        int segments = 6;
-        Rectangle panelRect = new(panelX, panelY, panelW, panelH);
+        // Glas-Huelle im Living-World-Stil (Schatten, Glas, Lichtkante, Goldkante)
+        MenuStyle.DrawGlassPanel(new Rectangle(panelX, panelY, panelW, panelH));
 
-        // Schatten
-        Rectangle shadowRect = new(panelX + 2, panelY + 2, panelW, panelH);
-        Raylib.DrawRectangleRounded(shadowRect, roundness, segments, new Color((byte)0, (byte)0, (byte)0, (byte)40));
-
-        // Panel-Hintergrund
-        Raylib.DrawRectangleRounded(panelRect, roundness, segments, ColorPalette.Panel);
-
-        // Oberer Glanz
-        Rectangle glossRect = new(panelX + 1, panelY + 1, panelW - 2, 25);
-        Raylib.DrawRectangleRounded(glossRect, roundness, segments, new Color((byte)255, (byte)255, (byte)255, (byte)8));
-
-        Raylib.DrawRectangleRoundedLinesEx(panelRect, roundness, segments, 2, ColorPalette.Accent);
-
-        // Titel
+        // Titel mit Goldmarke in warmem Weiss
         int y = panelY + 15;
         int contentX = panelX + 15;
-        DrawGameText(title, contentX, y, 30, ColorPalette.Accent);
+        Raylib.DrawRectangle(contentX, y + 5, 5, 22, MenuStyle.Gold());
+        DrawGameText(title, contentX + 13, y, 26, new Color((byte)245, (byte)240, (byte)228, (byte)255));
         y += 38;
 
-        // Trennlinie (Gradient-artig mit Alpha)
-        Raylib.DrawLine(contentX, y, panelX + panelW - 15, y, ColorPalette.Accent);
+        // Feine Trennlinie
+        Raylib.DrawLine(contentX, y, panelX + panelW - 15, y, new Color((byte)255, (byte)255, (byte)255, (byte)30));
         y += 15;
 
         return y;
@@ -429,11 +419,14 @@ partial class Program
                 : player.DailyProduction.GetValueOrDefault(resType, 0);
             bool canTrade = ui.TradeIsExport ? available > 0 : true;
 
-            Color resBg = !canTrade ? new Color((byte)40, (byte)40, (byte)50, (byte)255) :
+            Color resBg = !canTrade ? new Color((byte)16, (byte)20, (byte)32, (byte)255) :
                           resSelected ? ColorPalette.Accent :
                           resHovered ? ColorPalette.PanelLight : ColorPalette.Panel;
             Color resBorder = resSelected ? ColorPalette.Accent : ColorPalette.PanelLight;
-            Color resText = !canTrade ? ColorPalette.TextGray : ColorPalette.TextWhite;
+            // Dunkler Text auf goldener Auswahl-Fuellung (Kontrast)
+            Color resText = !canTrade ? ColorPalette.TextGray :
+                            resSelected ? new Color((byte)10, (byte)13, (byte)22, (byte)255) :
+                            ColorPalette.TextWhite;
 
             Raylib.DrawRectangleRec(resBtn, resBg);
             Raylib.DrawRectangleLinesEx(resBtn, 1, resBorder);
@@ -489,7 +482,7 @@ partial class Program
             // Minus Button
             Rectangle minusBtn = new Rectangle(contentX, y, 14, 22);
             bool minusHovered = Raylib.CheckCollisionPointRec(mousePos, minusBtn);
-            Raylib.DrawRectangleRec(minusBtn, minusHovered ? ColorPalette.Accent : ColorPalette.PanelLight);
+            Raylib.DrawRectangleRec(minusBtn, minusHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
             DrawGameText("-", contentX + 8, y + 3, 14, ColorPalette.TextWhite);
             if (minusHovered && Raylib.IsMouseButtonPressed(MouseButton.Left) && ui.TradeAmount > 1)
             {
@@ -503,7 +496,7 @@ partial class Program
             // Plus Button
             Rectangle plusBtn = new Rectangle(contentX + 70, y, 14, 22);
             bool plusHovered = Raylib.CheckCollisionPointRec(mousePos, plusBtn);
-            Raylib.DrawRectangleRec(plusBtn, plusHovered ? ColorPalette.Accent : ColorPalette.PanelLight);
+            Raylib.DrawRectangleRec(plusBtn, plusHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
             DrawGameText("+", contentX + 78, y + 3, 14, ColorPalette.TextWhite);
 
             int maxAmount = ui.TradeIsExport ? (int)exportCapacity : 1000;
@@ -521,7 +514,7 @@ partial class Program
                 if (ui.TradeIsExport && qa > exportCapacity) continue;
                 Rectangle qaBtn = new Rectangle(qx, y, 36, 22);
                 bool qaHovered = Raylib.CheckCollisionPointRec(mousePos, qaBtn);
-                Raylib.DrawRectangleRec(qaBtn, qaHovered ? ColorPalette.Accent : ColorPalette.Panel);
+                Raylib.DrawRectangleRec(qaBtn, qaHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal);
                 DrawGameText($"{qa}", qx + 4, y + 4, 14, ColorPalette.TextWhite);
                 if (qaHovered && Raylib.IsMouseButtonPressed(MouseButton.Left))
                 {
@@ -835,12 +828,8 @@ partial class Program
         int buildPanelW = 280;
         int buildPanelH = panelH;
 
-        // Panel-Hintergrund (abgerundet)
-        Rectangle buildSideRect = new(buildPanelX, panelY, buildPanelW, buildPanelH);
-        Rectangle buildSideShadow = new(buildPanelX + 2, panelY + 2, buildPanelW, buildPanelH);
-        Raylib.DrawRectangleRounded(buildSideShadow, 0.02f, 6, new Color((byte)0, (byte)0, (byte)0, (byte)40));
-        Raylib.DrawRectangleRounded(buildSideRect, 0.02f, 6, ColorPalette.Panel);
-        Raylib.DrawRectangleRoundedLinesEx(buildSideRect, 0.02f, 6, 2, ColorPalette.Accent);
+        // Glas-Huelle im Living-World-Stil
+        MenuStyle.DrawGlassPanel(new Rectangle(buildPanelX, panelY, buildPanelW, buildPanelH));
 
         int contentX = buildPanelX + 15;
         int y = panelY + 15;
@@ -869,8 +858,8 @@ partial class Program
             Rectangle btnRect = new Rectangle(bx, by, bw, bh);
             bool isHovered = Raylib.CheckCollisionPointRec(mousePos, btnRect);
 
-            Color bgColor = !canAfford ? ColorPalette.PanelLight :
-                            isHovered ? ColorPalette.Accent : ColorPalette.Panel;
+            Color bgColor = !canAfford ? ColorPalette.PanelDark :
+                            isHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal;
             Color borderColor = !canAfford ? ColorPalette.TextGray : ColorPalette.Accent;
             Color textColor = !canAfford ? ColorPalette.TextGray : ColorPalette.TextWhite;
 
@@ -931,8 +920,8 @@ partial class Program
             Rectangle btnRectMine = new Rectangle(bx, by, bw, bh);
             bool isMineHovered = Raylib.CheckCollisionPointRec(mousePos, btnRectMine);
 
-            Color bgColorMine = !canAfford ? ColorPalette.PanelLight :
-                            isMineHovered ? ColorPalette.Accent : ColorPalette.Panel;
+            Color bgColorMine = !canAfford ? ColorPalette.PanelDark :
+                            isMineHovered ? ColorPalette.PanelLight : ColorPalette.ButtonNormal;
             Color borderColorMine = !canAfford ? ColorPalette.TextGray : Mine.GetMapColor(mineType);
             Color textColorMine = !canAfford ? ColorPalette.TextGray : ColorPalette.TextWhite;
 

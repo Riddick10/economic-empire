@@ -12,17 +12,9 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
 
     public void Draw(TopMenuContext ctx)
     {
+        int headerY = Program.DrawTopMenuPanelHeader("LOGISTIK");
         var (panelX, panelY, panelW, panelH) = Program.GetTopMenuPanelRect();
-
-        Raylib.DrawRectangle(panelX, panelY, panelW, panelH, ColorPalette.Panel);
-        Raylib.DrawRectangleLinesEx(new Rectangle(panelX, panelY, panelW, panelH), 2, ColorPalette.Accent);
-
-        int headerY = panelY + 15;
         int contentX = panelX + 15;
-        Program.DrawGameText("LOGISTIK", contentX, headerY, 30, ColorPalette.Accent);
-        headerY += 38;
-        Raylib.DrawLine(contentX, headerY, panelX + panelW - 15, headerY, ColorPalette.Accent);
-        headerY += 10;
 
         int scrollAreaY = headerY;
         int scrollAreaH = panelH - (scrollAreaY - panelY) - 10;

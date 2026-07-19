@@ -22,8 +22,11 @@ partial class Program
         if (game.PlayerCountry == null) return;
         var player = game.PlayerCountry;
 
-        // Weltkarte als Hintergrund
-        worldMap.Draw(ui.HoveredCountryId, ui.SelectedCountryId, player.Id, ui.SelectedProvinceId, ui.HoveredProvinceId, ui.CurrentMapView, ui.HeatmapResource);
+        // Weltkarte als Hintergrund.
+        // hoveredCountry bewusst null: Im laufenden Spiel soll das Land unter der
+        // Maus KEINE weisse Hover-Umrandung bekommen (nur bei der Laenderauswahl).
+        // Tooltip und Klick-Logik nutzen ui.HoveredCountryId weiterhin direkt.
+        worldMap.Draw(null, ui.SelectedCountryId, player.Id, ui.SelectedProvinceId, ui.HoveredProvinceId, ui.CurrentMapView, ui.HeatmapResource);
 
         // Handelsrouten zeichnen (nur in Trade-Ansicht)
         if (ui.CurrentMapView == MapViewMode.Trade)
@@ -74,7 +77,7 @@ partial class Program
         // Top Bar (Hauptleiste) - breiter fuer alle Infos
         int topBarHeight = 70;
         Raylib.DrawRectangleGradientV(0, 0, ScreenWidth, topBarHeight,
-            new Color((byte)50, (byte)50, (byte)65, (byte)255), ColorPalette.Panel);
+            new Color((byte)36, (byte)46, (byte)72, (byte)255), ColorPalette.Panel);
         Raylib.DrawLine(0, topBarHeight - 1, ScreenWidth, topBarHeight - 1, new Color((byte)70, (byte)70, (byte)90, (byte)255));
 
         // Flagge links (nur Anzeige, nicht klickbar)
@@ -234,12 +237,8 @@ partial class Program
             if (hx > ScreenWidth - tooltipW - 10) hx = (int)mp.X - tooltipW - 10;
             if (hy > ScreenHeight - tooltipH - 10) hy = (int)mp.Y - tooltipH - 10;
 
-            Rectangle provTooltipRect = new(hx, hy, tooltipW, tooltipH);
-            Rectangle provShadowRect = new(hx + 2, hy + 2, tooltipW, tooltipH);
-            Raylib.DrawRectangleRounded(provShadowRect, 0.12f, 6, new Color((byte)0, (byte)0, (byte)0, (byte)80));
-            Raylib.DrawRectangleRounded(provTooltipRect, 0.12f, 6, ColorPalette.Panel);
-            Raylib.DrawRectangleRoundedLinesEx(provTooltipRect, 0.12f, 6, 1, ColorPalette.Accent);
-            DrawGameText(hoveredProv.Name, hx + 10, hy + 6, 18, ColorPalette.TextWhite);
+            MenuStyle.DrawTooltip(new Rectangle(hx, hy, tooltipW, tooltipH));
+            DrawGameText(hoveredProv.Name, hx + 14, hy + 6, 18, ColorPalette.TextWhite);
 
             // Land anzeigen
             string countryName = hoveredProv.CountryId;
@@ -247,7 +246,7 @@ partial class Program
             {
                 countryName = provCountry.Name;
             }
-            DrawGameText(countryName, hx + 10, hy + 28, 11, ColorPalette.TextGray);
+            DrawGameText(countryName, hx + 14, hy + 28, 11, ColorPalette.TextGray);
         }
         else if (ui.HoveredCountryId != null && game.Countries.TryGetValue(ui.HoveredCountryId, out var hovered))
         {
@@ -259,12 +258,8 @@ partial class Program
             if (hx > ScreenWidth - 150) hx = (int)mp.X - 150;
             if (hy > ScreenHeight - 40) hy = (int)mp.Y - 40;
 
-            Rectangle countryTooltipRect = new(hx, hy, 140, 30);
-            Rectangle countryShadowRect = new(hx + 2, hy + 2, 140, 30);
-            Raylib.DrawRectangleRounded(countryShadowRect, 0.15f, 6, new Color((byte)0, (byte)0, (byte)0, (byte)80));
-            Raylib.DrawRectangleRounded(countryTooltipRect, 0.15f, 6, ColorPalette.Panel);
-            Raylib.DrawRectangleRoundedLinesEx(countryTooltipRect, 0.15f, 6, 1, ColorPalette.PanelLight);
-            DrawGameText(hovered.Name, hx + 10, hy + 6, 18, ColorPalette.TextWhite);
+            MenuStyle.DrawTooltip(new Rectangle(hx, hy, 140, 30));
+            DrawGameText(hovered.Name, hx + 14, hy + 6, 18, ColorPalette.TextWhite);
         }
 
         // === TOP-MENU BUTTON-LEISTE (HOI4-Stil) ===
@@ -448,7 +443,7 @@ partial class Program
         // Bottom Bar (Berater-Leiste + Steuerung)
         int bbY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT;
         Raylib.DrawRectangleGradientV(0, bbY, ScreenWidth, GameConfig.BOTTOM_BAR_HEIGHT,
-            ColorPalette.Panel, new Color((byte)35, (byte)35, (byte)48, (byte)255));
+            ColorPalette.Panel, new Color((byte)10, (byte)13, (byte)22, (byte)255));
         Raylib.DrawLine(0, bbY, ScreenWidth, bbY, new Color((byte)70, (byte)70, (byte)90, (byte)255));
 
         // Zoom-Anzeige (rechts unten, in der grauen Leiste)

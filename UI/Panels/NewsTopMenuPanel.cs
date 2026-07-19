@@ -113,7 +113,7 @@ internal class NewsTopMenuPanel : ITopMenuPanel
 
             Raylib.DrawLine(contentX + 12, drawY + itemHeight - 4,
                 contentX + contentW, drawY + itemHeight - 4,
-                new Color((byte)60, (byte)60, (byte)80, (byte)100));
+                new Color((byte)70, (byte)78, (byte)100, (byte)100));
 
             drawY += itemHeight;
         }
