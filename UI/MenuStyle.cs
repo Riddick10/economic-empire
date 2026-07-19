@@ -77,7 +77,7 @@ internal static class MenuStyle
         byte A(float v) => (byte)Math.Clamp(v * alpha, 0, 255);
         DrawGlassCard(r, hover, alpha);
 
-        const string label = "ZURUECK";
+        const string label = "ZURÜCK";
         int textW = Program.MeasureTextCached(label, GameConfig.FONT_SIZE_LARGE);
         int textX = (int)(r.X + (r.Width - textW) / 2f + 8);
         int textY = (int)(r.Y + (r.Height - GameConfig.FONT_SIZE_LARGE) / 2f);

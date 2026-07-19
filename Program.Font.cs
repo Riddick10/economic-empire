@@ -98,7 +98,19 @@ partial class Program
         Raylib.SetTextureFilter(_gameFont.Texture, TextureFilter.Bilinear);
 
         _fontLoaded = true;
-        Console.WriteLine($"[Font] Geladen: {foundPath} ({codepointArray.Length} Zeichen)");
+
+        // Diagnose: pruefen ob die Umlaut-Glyphen wirklich geladen wurden
+        // (GetGlyphIndex liefert den Index des Fallback-Zeichens, wenn ein Codepoint fehlt)
+        int fallbackIndex = Raylib.GetGlyphIndex(_gameFont, '?');
+        string missing = "";
+        foreach (char c in "ÄÖÜäöüß")
+        {
+            if (Raylib.GetGlyphIndex(_gameFont, c) == fallbackIndex)
+                missing += c;
+        }
+        Console.WriteLine(missing.Length == 0
+            ? $"[Font] Geladen: {foundPath} ({codepointArray.Length} Zeichen, Umlaute OK)"
+            : $"[Font] Geladen: {foundPath} - WARNUNG: fehlende Glyphen: {missing}");
     }
 
     /// <summary>

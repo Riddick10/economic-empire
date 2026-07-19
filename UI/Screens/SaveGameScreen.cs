@@ -112,7 +112,7 @@ internal class SaveGameScreen : IGameScreen
 
         Program.ui.BackButtonRect.X = panelX + 20;
         Program.ui.BackButtonRect.Y = panelY + 20;
-        Program.DrawMenuButton(Program.ui.BackButtonRect, "Zurueck", Program.ui.BackButtonHovered);
+        Program.DrawMenuButton(Program.ui.BackButtonRect, "Zurück", Program.ui.BackButtonHovered);
 
         for (int i = 0; i < 3; i++)
         {

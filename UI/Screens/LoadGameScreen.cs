@@ -157,7 +157,7 @@ internal class LoadGameScreen : IGameScreen
 
         if (!hasAnySave)
         {
-            string noSaves = "Noch keine Spielstaende - starte ein neues Spiel!";
+            string noSaves = "Noch keine Spielstände - starte ein neues Spiel!";
             int noSavesW = Program.MeasureTextCached(noSaves, 17);
             int msgY = SlotStartY() + 4 * (SlotHeight + SlotSpacing) + 12;
             Program.DrawGameText(noSaves, (w - noSavesW) / 2, msgY, 17,
@@ -165,7 +165,7 @@ internal class LoadGameScreen : IGameScreen
         }
 
         // Tastatur-Hinweis unten
-        string hint = "ESC = Zurueck";
+        string hint = "ESC = Zurück";
         int hintW = Program.MeasureTextCached(hint, 14);
         Program.DrawGameText(hint, (w - hintW) / 2, h - 36, 14,
             new Color((byte)140, (byte)145, (byte)160, (byte)170));

@@ -39,19 +39,19 @@ internal class MainMenuScreen : IGameScreen
     {
         ("Der Preis ist, was du zahlst. Der Wert ist, was du bekommst.", "Warren Buffett"),
         ("Eine Investition in Wissen bringt noch immer die besten Zinsen.", "Benjamin Franklin"),
-        ("Geld schlaeft nie.", "Gordon Gekko"),
+        ("Geld schläft nie.", "Gordon Gekko"),
         ("Jedes Imperium beginnt mit einer einzigen Fabrik.", "Economic Empire"),
         ("Wer den Handel kontrolliert, kontrolliert die Welt.", "Economic Empire"),
-        ("Nicht Gold, sondern Vertrauen ist die Waehrung der Maechte.", "Economic Empire"),
-        ("Das Risiko entsteht, wenn man nicht weiss, was man tut.", "Warren Buffett"),
+        ("Nicht Gold, sondern Vertrauen ist die Währung der Mächte.", "Economic Empire"),
+        ("Das Risiko entsteht, wenn man nicht weiß, was man tut.", "Warren Buffett"),
         ("Handel hat noch keine Nation ruiniert.", "Benjamin Franklin"),
     };
 
     private static readonly (string Name, float Base)[] TickerItems =
     {
-        ("OEL", 82.4f), ("ERDGAS", 34.1f), ("KOHLE", 51.8f), ("EISEN", 104.6f),
+        ("ÖL", 82.4f), ("ERDGAS", 34.1f), ("KOHLE", 51.8f), ("EISEN", 104.6f),
         ("KUPFER", 812.0f), ("URAN", 148.2f), ("STAHL", 216.5f),
-        ("ELEKTRONIK", 458.0f), ("MASCHINEN", 690.3f), ("KONSUMGUETER", 129.7f),
+        ("ELEKTRONIK", 458.0f), ("MASCHINEN", 690.3f), ("KONSUMGÜTER", 129.7f),
         ("WAFFEN", 970.0f), ("MUNITION", 63.5f),
     };
 
@@ -643,9 +643,9 @@ internal class MainMenuScreen : IGameScreen
 
         // === Sound ===
         MenuStyle.DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
-        MenuStyle.DrawOptionSlider("Musik-Lautstaerke", musicTrack, Program.ui.OptionsMusicVolume,
+        MenuStyle.DrawOptionSlider("Musik-Lautstärke", musicTrack, Program.ui.OptionsMusicVolume,
             Program.ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(musicTrack, 10, 14)), ease);
-        MenuStyle.DrawOptionSlider("Sound-Lautstaerke", soundTrack, Program.ui.OptionsSoundVolume,
+        MenuStyle.DrawOptionSlider("Sound-Lautstärke", soundTrack, Program.ui.OptionsSoundVolume,
             Program.ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(soundTrack, 10, 14)), ease);
 
         // === Grafik ===
@@ -676,7 +676,7 @@ internal class MainMenuScreen : IGameScreen
         MenuStyle.DrawCloseButton(close, _optHover[1], ease);
 
         // ESC-Hinweis unter dem Panel
-        string hint = "ESC zum Schliessen";
+        string hint = "ESC zum Schließen";
         int hintW = Program.MeasureTextCached(hint, 13);
         Program.DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
             new Color((byte)150, (byte)155, (byte)170, A(150)));

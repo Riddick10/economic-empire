@@ -115,7 +115,7 @@ partial class Program
         {
             bool hoverConfirm = open && ui.ConfirmSaveButtonHovered;
             _saveConfirmHover += ((hoverConfirm ? 1f : 0f) - _saveConfirmHover) * Math.Min(1f, dt * 12f);
-            string saveText = ui.SaveSlots[ui.SelectedSaveSlot] != null ? "UEBERSCHREIBEN" : "SPEICHERN";
+            string saveText = ui.SaveSlots[ui.SelectedSaveSlot] != null ? "ÜBERSCHREIBEN" : "SPEICHERN";
             DrawPauseButton(confirm, saveText, null, _saveConfirmHover, ease);
         }
 
@@ -125,7 +125,7 @@ partial class Program
         MenuStyle.DrawCloseButton(close, _saveCloseHover, ease);
 
         // Hinweis unter dem Panel
-        string hint = "F9 = Schnellspeichern (Slot 1)   |   ESC = Zurueck";
+        string hint = "F9 = Schnellspeichern (Slot 1)   |   ESC = Zurück";
         int hintW = MeasureTextCached(hint, 13);
         DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
             new Color((byte)150, (byte)155, (byte)170, A(150)));
@@ -149,7 +149,7 @@ partial class Program
         // Auswahl-Markierung oben rechts (links neben dem Loeschen-Kreuz)
         if (isSelected)
         {
-            const string sel = "AUSGEWAEHLT";
+            const string sel = "AUSGEWÄHLT";
             int selW = MeasureTextCached(sel, 12);
             DrawGameText(sel, (int)(r.X + r.Width - selW - 58), (int)r.Y + 14, 12, MenuStyle.Gold(A(220)));
         }
@@ -342,7 +342,7 @@ partial class Program
         {
             ("SPIEL SPEICHERN", "F5"),
             ("OPTIONEN", null),
-            ("ZURUECK ZUM HAUPTMENUE", null),
+            ("ZURÜCK ZUM HAUPTMENÜ", null),
         };
         for (int i = 0; i < buttons.Length; i++)
         {
@@ -434,9 +434,9 @@ partial class Program
 
         // === Sound ===
         MenuStyle.DrawOptionsSection("SOUND", cx, (int)musicTrack.Y - 64, cw, ease);
-        MenuStyle.DrawOptionSlider("Musik-Lautstaerke", musicTrack, ui.OptionsMusicVolume,
+        MenuStyle.DrawOptionSlider("Musik-Lautstärke", musicTrack, ui.OptionsMusicVolume,
             ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(musicTrack, 10, 14)), ease);
-        MenuStyle.DrawOptionSlider("Sound-Lautstaerke", soundTrack, ui.OptionsSoundVolume,
+        MenuStyle.DrawOptionSlider("Sound-Lautstärke", soundTrack, ui.OptionsSoundVolume,
             ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, MenuStyle.Inflate(soundTrack, 10, 14)), ease);
 
         // Aktueller Musik-Track
@@ -475,7 +475,7 @@ partial class Program
         MenuStyle.DrawCloseButton(close, _pauseCloseHover, ease);
 
         // ESC-Hinweis unter dem Panel
-        string hint = "ESC = Zurueck";
+        string hint = "ESC = Zurück";
         int hintW = MeasureTextCached(hint, 13);
         DrawGameText(hint, px + (pw - hintW) / 2, py + ph + 10, 13,
             new Color((byte)150, (byte)155, (byte)170, A(150)));
