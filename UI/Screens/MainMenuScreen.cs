@@ -676,7 +676,7 @@ internal class MainMenuScreen : IGameScreen
         // === Zurueck-Button + Schliessen-Kreuz ===
         bool hoverBack = open && Raylib.CheckCollisionPointRec(mousePos, back);
         _optHover[0] += ((hoverBack ? 1f : 0f) - _optHover[0]) * Math.Min(1f, dt * 12f);
-        DrawBackButton(back, _optHover[0], ease);
+        MenuStyle.DrawBackButton(back, _optHover[0], ease);
 
         bool hoverClose = open && Raylib.CheckCollisionPointRec(mousePos, close);
         _optHover[1] += ((hoverClose ? 1f : 0f) - _optHover[1]) * Math.Min(1f, dt * 12f);
@@ -734,47 +734,6 @@ internal class MainMenuScreen : IGameScreen
             Raylib.DrawCircleV(new Vector2(kx, ky), 14, new Color((byte)230, (byte)185, (byte)80, A(55)));
         Raylib.DrawCircleV(new Vector2(kx, ky), 8, new Color((byte)244, (byte)246, (byte)252, A(255)));
         Raylib.DrawCircleLines((int)kx, (int)ky, 8, gold);
-    }
-
-    /// <summary>
-    /// Zurueck-Button im Stil der Hauptmenue-Buttons (Glas, Goldbalken, Chevron links)
-    /// </summary>
-    private static void DrawBackButton(Rectangle r, float hover, float a)
-    {
-        byte A(float v) => (byte)Math.Clamp(v * a, 0, 255);
-
-        Raylib.DrawRectangle((int)r.X + 3, (int)r.Y + 4, (int)r.Width, (int)r.Height,
-            new Color((byte)0, (byte)0, (byte)0, A(70)));
-
-        Color bg = LerpColor(new Color((byte)14, (byte)18, (byte)30, A(210)),
-                             new Color((byte)36, (byte)46, (byte)72, A(245)), hover);
-        Raylib.DrawRectangleRec(r, bg);
-        Raylib.DrawRectangle((int)r.X, (int)r.Y, (int)r.Width, 1,
-            new Color((byte)255, (byte)255, (byte)255, A(18 + hover * 25)));
-
-        Color border = LerpColor(new Color((byte)80, (byte)88, (byte)110, A(150)), ColorPalette.Accent, hover);
-        border.A = A(150 + hover * 105);
-        Raylib.DrawRectangleLinesEx(r, 1, border);
-
-        int barW = (int)(4 + hover * 5);
-        Raylib.DrawRectangle((int)r.X, (int)r.Y, barW, (int)r.Height,
-            new Color((byte)230, (byte)185, (byte)80, A(190 + hover * 65)));
-
-        const string label = "ZURUECK";
-        int textW = Program.MeasureTextCached(label, GameConfig.FONT_SIZE_LARGE);
-        int textX = (int)(r.X + (r.Width - textW) / 2f + 8);
-        int textY = (int)(r.Y + (r.Height - GameConfig.FONT_SIZE_LARGE) / 2f);
-
-        // Chevron zeigt nach links (zurueck), rueckt beim Hover weiter raus
-        float chx = textX - 20 - hover * 4;
-        float chy = r.Y + r.Height / 2f;
-        Color chev = new Color((byte)255, (byte)215, (byte)130, A(160 + hover * 95));
-        Raylib.DrawLineEx(new Vector2(chx + 5, chy - 7), new Vector2(chx - 2, chy), 2.5f, chev);
-        Raylib.DrawLineEx(new Vector2(chx - 2, chy), new Vector2(chx + 5, chy + 7), 2.5f, chev);
-
-        Color textColor = LerpColor(new Color((byte)205, (byte)210, (byte)222, A(235)),
-                                    new Color((byte)255, (byte)255, (byte)255, A(255)), hover);
-        Program.DrawGameText(label, textX, textY, GameConfig.FONT_SIZE_LARGE, textColor);
     }
 
     /// <summary>

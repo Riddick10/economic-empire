@@ -18,8 +18,8 @@ internal class SaveGameScreen : IGameScreen
     {
         Vector2 mousePos = Program._cachedMousePos;
 
-        Program.ui.BackButtonRect.X = 30;
-        Program.ui.BackButtonRect.Y = 30;
+        // Groesse explizit setzen (der Lade-Screen nutzt dasselbe Rect mit anderen Massen)
+        Program.ui.BackButtonRect = new Rectangle(30, 30, 150, 40);
         Program.ui.BackButtonHovered = Raylib.CheckCollisionPointRec(mousePos, Program.ui.BackButtonRect);
 
         int slotWidth = 580;
