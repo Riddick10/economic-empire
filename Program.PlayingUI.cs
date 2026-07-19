@@ -341,7 +341,6 @@ partial class Program
             "  - Eisenerz: Grundlage fuer Stahlproduktion",
             "  - Kupfer: Wird fuer Elektronik benoetigt",
             "  - Uran: Kernenergie und strategische Bedeutung",
-            "  - Nahrung: Grundversorgung der Bevoelkerung",
             "",
             "VERARBEITETE GUETER (in Fabriken produziert):",
             "  - Stahl: Aus Eisen + Kohle (fuer Maschinen/Militaer)",
@@ -377,7 +376,7 @@ partial class Program
             "  - Stahl = 0.75 Eisen + 0.4 Kohle",
             "  - Elektronik = 0.4 Kupfer + 0.15 Kohle",
             "  - Maschinen = 0.5 Stahl + 0.25 Elektronik",
-            "  - Konsumgueter = 0.15 Nahrung + 0.1 Stahl + 0.1 Elektronik",
+            "  - Konsumgueter = 0.1 Stahl + 0.1 Elektronik",
             "  - Waffen = 1.0 Stahl + 0.5 Elektronik",
             "  - Munition = 0.5 Stahl + 0.3 Kupfer"
         }, iconSize, lineSpacing);
@@ -406,24 +405,25 @@ partial class Program
         yOffset += sectionSpacing;
 
         // === BEVOELKERUNG ===
-        yOffset = DrawTutorialSection(contentX, yOffset, contentW, "Bevoelkerung & Nahrung",
+        yOffset = DrawTutorialSection(contentX, yOffset, contentW, "Bevoelkerung & Versorgung",
             "tutorial_population.png", new string[]
         {
             "Deine Bevoelkerung hat taegliche Beduerfnisse:",
             "",
             "VERBRAUCH PRO MILLION EINWOHNER/TAG:",
-            "  - Nahrung: 1.0 Einheiten",
             "  - Konsumgueter: 0.3 Einheiten",
+            "  - Elektronik: 0.1 Einheiten",
             "  - Oel: 0.1 Einheiten (Transport/Heizung)",
             "  - Gas: 0.08 Einheiten (Heizung/Strom)",
+            "  - Maschinen: 0.05 Einheiten (Haushaltsgeraete)",
             "  - Kohle: 0.05 Einheiten (Strom)",
             "",
-            "HUNGERSNOETE:",
-            "  - Ohne Nahrung beginnt nach 7 Tagen das Sterben",
-            "  - Die Sterberate steigt mit der Dauer",
-            "  - Jedes Land startet mit 1 Jahr Nahrungsvorrat",
+            "VERSORGUNG (Fluss-System):",
+            "  - Ressourcen koennen nicht gehortet werden",
+            "  - Es zaehlt nur was du taeglich produzierst/importierst",
+            "  - Engpaesse senken Zufriedenheit und Stabilitaet",
             "",
-            "Warnung: Achte auf deine Nahrungsreserven!"
+            "Warnung: Achte auf deinen Versorgungsgrad im Logistik-Panel!"
         }, iconSize, lineSpacing);
         yOffset += sectionSpacing;
 
@@ -875,12 +875,13 @@ partial class Program
         DrawGameText("Guetermengen (Verlauf)", leftCol + 15, resChartY + 12, 13, ColorPalette.Accent);
         DrawResourceChart(leftCol + 15, resChartY + 35, chartFullW - 30, resourceChartH - 50, mousePos);
 
-        // === UNTERE SEITE: Ressourcen im Umlauf ===
+        // === UNTERE SEITE: Globale Tagesproduktion ===
+        // Fluss-System: statt Lagersummen die weltweite Produktion pro Tag zeigen
         int resY = resChartY + resourceChartH + 15;
         Raylib.DrawRectangleRounded(new Rectangle(leftCol, resY, chartFullW, resSectionH), 0.03f, 8, ColorPalette.PanelDark);
-        DrawGameText("Ressourcen im Umlauf (alle Laender summiert)", leftCol + 15, resY + 12, 13, ColorPalette.Accent);
+        DrawGameText("Weltproduktion pro Tag (alle Laender summiert)", leftCol + 15, resY + 12, 13, ColorPalette.Accent);
 
-        // Ressourcen summieren
+        // Tagesproduktion summieren
         var resourceTypes = Enum.GetValues<ResourceType>();
         var totalResources = new Dictionary<ResourceType, double>();
         foreach (var rt in resourceTypes)
@@ -889,7 +890,7 @@ partial class Program
         foreach (var country in countries)
         {
             foreach (var rt in resourceTypes)
-                totalResources[rt] += country.GetResource(rt);
+                totalResources[rt] += country.DailyProduction.GetValueOrDefault(rt, 0);
         }
 
         // Ressourcen in 2 Spalten zeichnen
@@ -945,7 +946,6 @@ partial class Program
         { ResourceType.Iron,         new Color((byte)180, (byte)180, (byte)190, (byte)255) },  // Silber
         { ResourceType.Copper,       new Color((byte)200, (byte)130, (byte)50,  (byte)255) },  // Kupferfarbe
         { ResourceType.Uranium,      new Color((byte)80,  (byte)220, (byte)80,  (byte)255) },  // Giftgruen
-        { ResourceType.Food,         new Color((byte)200, (byte)180, (byte)50,  (byte)255) },  // Gelb/Weizen
         { ResourceType.Steel,        new Color((byte)160, (byte)170, (byte)200, (byte)255) },  // Stahlblau
         { ResourceType.Electronics,  new Color((byte)50,  (byte)200, (byte)200, (byte)255) },  // Cyan
         { ResourceType.Machinery,    new Color((byte)200, (byte)100, (byte)200, (byte)255) },  // Magenta

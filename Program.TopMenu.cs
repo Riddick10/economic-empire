@@ -402,7 +402,6 @@ partial class Program
             (ResourceType.Iron, "Eisen"),
             (ResourceType.Copper, "Kupfer"),
             (ResourceType.Uranium, "Uran"),
-            (ResourceType.Food, "Nahrung"),
             (ResourceType.Steel, "Stahl"),
             (ResourceType.Electronics, "Elektr."),
             (ResourceType.Machinery, "Masch."),
@@ -423,9 +422,11 @@ partial class Program
             bool resHovered = Raylib.CheckCollisionPointRec(mousePos, resBtn);
             bool resSelected = ui.TradeSelectedResource == resType;
 
-            // Bei Export: Nur Ressourcen anzeigen die wir haben
-            // Bei Import: Alle Ressourcen anzeigen
-            double available = player.GetResource(resType);
+            // Bei Export: Nur Ressourcen anzeigen die wir produzieren (Fluss-System)
+            // bzw. auf Lager haben (Waffen/Munition). Bei Import: alle.
+            double available = ResourceConfig.IsStockpiled(resType)
+                ? player.GetResource(resType)
+                : player.DailyProduction.GetValueOrDefault(resType, 0);
             bool canTrade = ui.TradeIsExport ? available > 0 : true;
 
             Color resBg = !canTrade ? new Color((byte)40, (byte)40, (byte)50, (byte)255) :
@@ -459,10 +460,26 @@ partial class Program
         if (ui.TradeSelectedResource != null)
         {
             var selectedRes = ui.TradeSelectedResource.Value;
-            double stock = player.GetResource(selectedRes);
             double price = game.Resources.TryGetValue(selectedRes, out var res) ? res.CurrentPrice : 0;
 
-            DrawGameText($"Lager: {FormatGermanNumber(stock)}  |  Preis: ${price:F0}M", contentX, y, 14, ColorPalette.TextGray);
+            // Fluss-System: Tagesueberschuss statt Lagerbestand anzeigen.
+            // Exportlimit = Tagesproduktion (bzw. Lager bei Waffen/Munition/Maschinen)
+            string availStr;
+            double exportCapacity;
+            if (ResourceConfig.IsStockpiled(selectedRes))
+            {
+                exportCapacity = player.GetResource(selectedRes);
+                availStr = $"Lager: {FormatGermanNumber(exportCapacity)}";
+            }
+            else
+            {
+                exportCapacity = player.DailyProduction.GetValueOrDefault(selectedRes, 0);
+                double surplus = exportCapacity
+                               - player.DailyConsumption.GetValueOrDefault(selectedRes, 0);
+                availStr = $"Ueberschuss: {(surplus >= 0 ? "+" : "")}{FormatGermanNumber(surplus)}/Tag";
+            }
+
+            DrawGameText($"{availStr}  |  Preis: ${price:F0}M", contentX, y, 14, ColorPalette.TextGray);
             y += 18;
 
             // Mengen-Slider
@@ -489,7 +506,7 @@ partial class Program
             Raylib.DrawRectangleRec(plusBtn, plusHovered ? ColorPalette.Accent : ColorPalette.PanelLight);
             DrawGameText("+", contentX + 78, y + 3, 14, ColorPalette.TextWhite);
 
-            int maxAmount = ui.TradeIsExport ? (int)stock : 1000;
+            int maxAmount = ui.TradeIsExport ? (int)exportCapacity : 1000;
             if (plusHovered && Raylib.IsMouseButtonPressed(MouseButton.Left) && ui.TradeAmount < maxAmount)
             {
                 ui.TradeAmount = Math.Min(maxAmount, ui.TradeAmount + (ui.TradeAmount >= 100 ? 10 : (ui.TradeAmount >= 10 ? 5 : 1)));
@@ -501,7 +518,7 @@ partial class Program
             int qx = contentX + 110;
             foreach (int qa in quickAmounts)
             {
-                if (ui.TradeIsExport && qa > stock) continue;
+                if (ui.TradeIsExport && qa > exportCapacity) continue;
                 Rectangle qaBtn = new Rectangle(qx, y, 36, 22);
                 bool qaHovered = Raylib.CheckCollisionPointRec(mousePos, qaBtn);
                 Raylib.DrawRectangleRec(qaBtn, qaHovered ? ColorPalette.Accent : ColorPalette.Panel);

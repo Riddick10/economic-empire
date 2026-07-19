@@ -76,7 +76,6 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
             ResourceType.Iron => "Eisen",
             ResourceType.Copper => "Kupfer",
             ResourceType.Uranium => "Uran",
-            ResourceType.Food => "Nahrung",
             ResourceType.Steel => "Stahl",
             ResourceType.Electronics => "Elektr.",
             ResourceType.Machinery => "Maschin.",
@@ -94,7 +93,7 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
         int colNet = contentX + 348;
 
         Program.DrawGameText("Ressource", contentX, y, 11, ColorPalette.TextGray);
-        Program.DrawGameText("Lager", colStock, y, 11, ColorPalette.TextGray);
+        Program.DrawGameText("Versorg.", colStock, y, 11, ColorPalette.TextGray);
         Program.DrawGameText("Prod.", colProd, y, 11, ColorPalette.TextGray);
         Program.DrawGameText("Verbr.", colCons, y, 11, ColorPalette.TextGray);
         Program.DrawGameText("Handel", colTrade, y, 11, ColorPalette.TextGray);
@@ -106,7 +105,6 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
 
         void DrawLogisticsRow(ResourceType resType, ref int rowY)
         {
-            double stock = player.GetResource(resType);
             double prod = player.DailyProduction.GetValueOrDefault(resType, 0);
             double cons = player.DailyConsumption.GetValueOrDefault(resType, 0);
             double trade = tradeNet.GetValueOrDefault(resType, 0);
@@ -114,7 +112,27 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
 
             Program.DrawResourceIcon(resType, contentX, rowY, 16);
             Program.DrawGameText(GetResName(resType), colName, rowY, 13, ColorPalette.TextWhite);
-            Program.DrawGameText(Program.FormatGermanNumber(stock), colStock, rowY, 13, ColorPalette.TextWhite);
+
+            // Fluss-System: Versorgungsgrad statt Lagerbestand.
+            // Lagerbare Gueter (Waffen/Munition) zeigen weiter den Bestand.
+            if (ResourceConfig.IsStockpiled(resType))
+            {
+                Program.DrawGameText(Program.FormatGermanNumber(player.GetResource(resType)),
+                    colStock, rowY, 13, ColorPalette.TextWhite);
+            }
+            else if (cons > 0.01)
+            {
+                double coverage = (prod + Math.Max(trade, 0)) / cons;
+                string covStr = $"{(int)(Math.Clamp(coverage, 0, 1) * 100)}%";
+                Color covColor = coverage >= 1.0 ? ColorPalette.Green
+                    : coverage >= 0.8 ? ColorPalette.Yellow : ColorPalette.Red;
+                Program.DrawGameText(covStr, colStock, rowY, 13, covColor);
+            }
+            else
+            {
+                Program.DrawGameText(prod > 0.01 ? "100%" : "-", colStock, rowY, 13,
+                    prod > 0.01 ? ColorPalette.Green : ColorPalette.TextGray);
+            }
 
             string prodStr = prod > 0 ? $"+{Program.FormatGermanNumber(prod)}" : "0";
             Program.DrawGameText(prodStr, colProd, rowY, 13, prod > 0 ? ColorPalette.Green : ColorPalette.TextGray);
@@ -145,13 +163,6 @@ internal class LogisticsTopMenuPanel : ITopMenuPanel
 
         foreach (var res in ResourceConfig.LogisticsRaw)
             DrawLogisticsRow(res, ref y);
-
-        y += 8;
-
-        Program.DrawGameText("AGRAR", contentX, y, 14, ColorPalette.Accent);
-        y += 20;
-
-        DrawLogisticsRow(ResourceType.Food, ref y);
 
         y += 8;
 

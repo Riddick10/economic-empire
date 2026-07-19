@@ -51,9 +51,6 @@ public static class GameConfig
     public const int LOADING_BAR_WIDTH = 400;
     public const int LOADING_BAR_HEIGHT = 20;
 
-    // === SPIELMECHANIK ===
-    public const double FOOD_PER_PERSON_PER_DAY = 0.000001;  // 1 Nahrung pro 1 Mio Einwohner
-    public const double INITIAL_FOOD_DAYS = 365;  // Startvorrat: 1 Jahr Nahrung
 }
 
 /// <summary>

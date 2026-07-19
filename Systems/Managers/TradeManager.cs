@@ -524,7 +524,6 @@ public class TradeManager : GameSystemBase
             // Pruefe auf Embargo
             if (HasEmbargo(excludeCountryId, id)) continue;
 
-            double stock = country.GetResource(resource);
             double production = country.DailyProduction.GetValueOrDefault(resource, 0);
             double consumption = country.DailyConsumption.GetValueOrDefault(resource, 0);
             double surplus = production - consumption;
@@ -532,11 +531,11 @@ public class TradeManager : GameSystemBase
             // EU-Binnenmarkt: EU-Mitglieder sind immer füreinander verfügbar
             bool isEUPartner = playerIsEU && (_diplomacyManager?.GetCountryAlliances(id).Contains("EU") ?? false);
 
-            // Land muss Ressource haben (mindestens 1) oder Ueberschuss produzieren
-            // ODER ist EU-Partner (immer verfügbar im Binnenmarkt)
-            if (stock > 1 || surplus > 0 || isEUPartner)
+            // Fluss-System: Exportkapazitaet = taeglicher Produktionsueberschuss
+            // (Lager gibt es fuer Fluss-Ressourcen nicht mehr)
+            if (surplus > 0 || isEUPartner)
             {
-                double available = Math.Max(stock * 0.5, surplus * 30); // Max 50% Lager oder 30-Tage-Ueberschuss
+                double available = Math.Max(surplus, 0);
                 if (available <= 0 && isEUPartner)
                 {
                     available = 1; // EU-Partner haben immer mind. minimale Verfügbarkeit
@@ -569,7 +568,6 @@ public class TradeManager : GameSystemBase
             ResourceType.Iron => 0.00025,
             ResourceType.Copper => 0.0001,
             ResourceType.Uranium => 0.00002,
-            ResourceType.Food => 0.0004,
             ResourceType.Steel => 0.0002,
             ResourceType.Electronics => 0.00015,
             ResourceType.Machinery => 0.0001,
@@ -584,7 +582,6 @@ public class TradeManager : GameSystemBase
 
             double consumption = country.DailyConsumption.GetValueOrDefault(resource, 0);
             double production = country.DailyProduction.GetValueOrDefault(resource, 0);
-            double stock = country.GetResource(resource);
             double deficit = consumption - production;
 
             bool isEUPartner = playerIsEU && (_diplomacyManager?.GetCountryAlliances(id).Contains("EU") ?? false);
@@ -593,16 +590,12 @@ public class TradeManager : GameSystemBase
             double gdpDemand = country.GDP * gdpDemandFactor;
 
             // Bedarf berechnen: Produktionsdefizit + BIP-Grundbedarf
+            // Fluss-System: Bedarf haengt nur noch am taeglichen Defizit + BIP-Basis
             double demand = 0;
             if (deficit > 0)
             {
                 // Akutes Defizit: tatsaechlicher Fehlbedarf + BIP-Basis
                 demand = deficit + gdpDemand;
-            }
-            else if (consumption > 0 && stock < consumption * 30)
-            {
-                // Niedriger Lagerbestand: BIP-Basis + halber Verbrauch
-                demand = gdpDemand + consumption * 0.5;
             }
             else if (consumption > 0 || isEUPartner)
             {
@@ -610,13 +603,9 @@ public class TradeManager : GameSystemBase
                 demand = gdpDemand;
             }
 
-            // Lager-Abzug: Laender mit grossen Lagern haben weniger dringenden Bedarf
-            if (stock > 0 && demand > 0)
-            {
-                double stockCover = stock / Math.Max(demand, 1);
-                if (stockCover > 60) demand *= 0.3;       // 60+ Tage Lager: wenig Bedarf
-                else if (stockCover > 30) demand *= 0.6;   // 30-60 Tage: moderater Bedarf
-            }
+            // Selbstversorger mit deutlichem Ueberschuss brauchen kaum Importe
+            if (production > consumption * 1.5 && demand > 0)
+                demand *= 0.3;
 
             if (demand > 0)
             {

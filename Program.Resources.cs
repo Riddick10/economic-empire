@@ -235,7 +235,6 @@ partial class Program
             ResourceType.Iron => "iron",
             ResourceType.Copper => "copper",
             ResourceType.Uranium => "uran",
-            ResourceType.Food => "food",
             ResourceType.Steel => "steel",
             ResourceType.Electronics => "electronics",
             ResourceType.Machinery => "machinery",

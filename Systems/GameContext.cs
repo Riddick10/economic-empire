@@ -110,4 +110,3 @@ public interface IGameEvent { }
 public record WarDeclaredEvent(string AggressorId, string DefenderId) : IGameEvent;
 public record PopulationMigratedEvent(string FromCountryId, string ToCountryId, long Amount) : IGameEvent;
 public record UnitRecruitedEvent(MilitaryUnit Unit) : IGameEvent;
-public record StarvationEvent(string CountryId, long Deaths) : IGameEvent;

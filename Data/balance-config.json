@@ -104,11 +104,10 @@
   },
   "production": {
     "civilianRecipes": {
-      "Food": { "inputs": [], "output": 15.0 },
       "Steel": { "inputs": [{"resource": "Iron", "amount": 0.75}, {"resource": "Coal", "amount": 0.4}], "output": 1.0 },
       "Electronics": { "inputs": [{"resource": "Copper", "amount": 0.4}, {"resource": "Coal", "amount": 0.15}], "output": 0.75 },
       "Machinery": { "inputs": [{"resource": "Steel", "amount": 0.5}, {"resource": "Electronics", "amount": 0.25}], "output": 0.6 },
-      "ConsumerGoods": { "inputs": [{"resource": "Food", "amount": 0.15}, {"resource": "Steel", "amount": 0.1}, {"resource": "Electronics", "amount": 0.1}], "output": 1.25 }
+      "ConsumerGoods": { "inputs": [{"resource": "Steel", "amount": 0.1}, {"resource": "Electronics", "amount": 0.1}], "output": 1.25 }
     },
     "militaryRecipes": {
       "Weapons": { "inputs": [{"resource": "Steel", "amount": 1.0}, {"resource": "Electronics", "amount": 0.5}], "output": 0.5 },
@@ -140,7 +139,6 @@
     "Iron": { "name": "Eisenerz", "basePrice": 40 },
     "Copper": { "name": "Kupfer", "basePrice": 75 },
     "Uranium": { "name": "Uran", "basePrice": 1000 },
-    "Food": { "name": "Nahrung", "basePrice": 8 },
     "Steel": { "name": "Stahl", "basePrice": 200 },
     "Electronics": { "name": "Elektronik", "basePrice": 350 },
     "Machinery": { "name": "Maschinen", "basePrice": 500 },

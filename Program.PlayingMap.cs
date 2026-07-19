@@ -327,7 +327,6 @@ partial class Program
         (ResourceType.Iron, "Eisen"),
         (ResourceType.Copper, "Kupfer"),
         (ResourceType.Uranium, "Uran"),
-        (ResourceType.Food, "Nahrung"),
         (ResourceType.Steel, "Stahl"),
         (ResourceType.Electronics, "Elektronik"),
         (ResourceType.Machinery, "Maschinen"),
@@ -383,7 +382,6 @@ partial class Program
                 ResourceType.Iron => new Color((byte)180, (byte)120, (byte)80, (byte)255),
                 ResourceType.Copper => new Color((byte)200, (byte)130, (byte)50, (byte)255),
                 ResourceType.Uranium => new Color((byte)80, (byte)220, (byte)80, (byte)255),
-                ResourceType.Food => new Color((byte)180, (byte)200, (byte)60, (byte)255),
                 ResourceType.Steel => new Color((byte)160, (byte)160, (byte)180, (byte)255),
                 ResourceType.Electronics => new Color((byte)60, (byte)140, (byte)220, (byte)255),
                 ResourceType.Machinery => new Color((byte)180, (byte)160, (byte)100, (byte)255),
@@ -996,13 +994,18 @@ partial class Program
         const int boxHeight = 20;
         const int boxSpacing = 4;
 
-        double amount = player.GetResource(resType);
         double prod = player.DailyProduction.GetValueOrDefault(resType, 0);
         double cons = player.DailyConsumption.GetValueOrDefault(resType, 0);
         double net = prod - cons;
 
+        // Fluss-System: Fluss-Ressourcen zeigen die Tagesproduktion,
+        // lagerbare Gueter (Waffen/Munition) weiterhin den Bestand
+        double amount = ResourceConfig.IsStockpiled(resType)
+            ? player.GetResource(resType)
+            : prod;
+
         string amountStr = Formatting.Resource(amount);
-        int boxW = resType == ResourceType.Food ? RES_BOX_WIDTH + 10 : RES_BOX_WIDTH;
+        int boxW = RES_BOX_WIDTH;
 
         Raylib.DrawRectangle(x, rowY - 2, boxW, boxHeight, ColorPalette.Background);
         Raylib.DrawRectangleLinesEx(new Rectangle(x, rowY - 2, boxW, boxHeight), 1, ColorPalette.PanelLight);

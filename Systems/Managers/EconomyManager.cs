@@ -163,14 +163,15 @@ public class EconomyManager : GameSystemBase
 
         _lastSnapshotDay = totalDays;
 
-        // Globale Ressourcenmengen erfassen
+        // Globale Tagesproduktion erfassen (Fluss-System: Lagersummen gibt es
+        // fuer die meisten Ressourcen nicht mehr, der Verlauf zeigt Produktion/Tag)
         var resourceTotals = new Dictionary<ResourceType, double>();
         foreach (var rt in Enum.GetValues<ResourceType>())
             resourceTotals[rt] = 0;
         foreach (var country in context.Countries.Values)
         {
             foreach (var rt in Enum.GetValues<ResourceType>())
-                resourceTotals[rt] += country.GetResource(rt);
+                resourceTotals[rt] += country.DailyProduction.GetValueOrDefault(rt, 0);
         }
 
         _moneyHistory.Add(new MoneySnapshot

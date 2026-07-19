@@ -50,7 +50,7 @@ internal class MainMenuScreen : IGameScreen
     private static readonly (string Name, float Base)[] TickerItems =
     {
         ("OEL", 82.4f), ("ERDGAS", 34.1f), ("KOHLE", 51.8f), ("EISEN", 104.6f),
-        ("KUPFER", 812.0f), ("URAN", 148.2f), ("NAHRUNG", 24.9f), ("STAHL", 216.5f),
+        ("KUPFER", 812.0f), ("URAN", 148.2f), ("STAHL", 216.5f),
         ("ELEKTRONIK", 458.0f), ("MASCHINEN", 690.3f), ("KONSUMGUETER", 129.7f),
         ("WAFFEN", 970.0f), ("MUNITION", 63.5f),
     };

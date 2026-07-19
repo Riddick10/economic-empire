@@ -103,76 +103,15 @@ public static class CountryDataLoader
     }
 
     /// <summary>
-    /// Initialisiert Lagerbestände basierend auf BIP
+    /// Initialisiert Startbestaende. Im Fluss-System (HOI4-Stil) sind nur noch
+    /// Militaergueter (Waffen, Munition) lagerbar - alles andere kommt taeglich
+    /// aus Produktion und Handel; Startlager wuerden am ersten Tag verfallen.
     /// </summary>
     public static void InitializeStockpiles(Dictionary<string, Country> countries)
     {
         foreach (var country in countries.Values)
         {
             double factor = Math.Max(country.GDP / 5_000_000, 0.01);
-
-            // Nahrung: 1 Jahr Vorrat basierend auf Bevoelkerung
-            double dailyFood = country.Population * GameConfig.FOOD_PER_PERSON_PER_DAY;
-            country.AddResource(ResourceType.Food, dailyFood * GameConfig.INITIAL_FOOD_DAYS);
-
-            // Basis-Vorraete nach BIP
-            double oil = 100 * factor;
-            double gas = 60 * factor;
-            double coal = 30 * factor;
-            double iron = 20 * factor;
-            double copper = 10 * factor;
-            double uranium = 2 * factor;
-            double steel = 50 * factor;
-            double electronics = 40 * factor;
-            double machinery = 35 * factor;
-            double consumerGoods = 75 * factor;
-
-            // Laenderspezifische Multiplikatoren (reale Ressourcen-Staerken)
-            switch (country.Id)
-            {
-                // Oel-Produzenten
-                case "SAU": oil *= 12; gas *= 4; break;              // Saudi-Arabien: groesster Exporteur
-                case "RUS": oil *= 8; gas *= 10; coal *= 3; iron *= 2; uranium *= 3; break;
-                case "USA": oil *= 4; gas *= 5; coal *= 3; break;
-                case "CAN": oil *= 5; gas *= 3; uranium *= 8; break; // Oelsand + Uran
-                case "IRQ": oil *= 8; gas *= 2; break;
-                case "IRN": oil *= 6; gas *= 6; break;
-                case "ARE": oil *= 8; gas *= 3; break;               // VAE
-                case "KWT": oil *= 10; gas *= 2; break;              // Kuwait
-                case "VEN": oil *= 6; break;
-                case "NOR": oil *= 5; gas *= 4; break;
-                case "NGA": oil *= 4; gas *= 2; break;               // Nigeria
-                case "LBY": oil *= 5; break;
-
-                // Gas-Produzenten
-                case "QAT": gas *= 12; oil *= 4; break;
-                case "TKM": gas *= 8; break;                          // Turkmenistan
-
-                // Kohle/Eisen/Kupfer
-                case "AUS": coal *= 6; iron *= 8; copper *= 3; uranium *= 6; break;
-                case "BRA": iron *= 8; copper *= 2; break;
-                case "IND": coal *= 5; iron *= 3; break;
-                case "IDN": coal *= 6; copper *= 2; break;            // Indonesien
-                case "ZAF": coal *= 4; iron *= 2; copper *= 2; break; // Suedafrika
-                case "CHL": copper *= 12; break;                      // Chile: groesster Kupferproduzent
-                case "PER": copper *= 8; break;                       // Peru
-                case "COD": copper *= 6; uranium *= 3; break;         // Kongo
-
-                // Uran-Produzenten
-                case "KAZ": uranium *= 15; coal *= 2; break;          // Kasachstan: Nr.1 Uran
-                case "NER": uranium *= 5; break;                       // Niger
-                case "UZB": uranium *= 4; gas *= 3; break;
-
-                // Industrie-Nationen (Elektronik, Maschinen, Stahl)
-                case "CHN": steel *= 5; electronics *= 4; machinery *= 4; coal *= 4; iron *= 3; break;
-                case "DEU": machinery *= 5; steel *= 2; electronics *= 2; break;
-                case "JPN": electronics *= 4; machinery *= 3; steel *= 3; break;
-                case "KOR": electronics *= 5; steel *= 3; machinery *= 2; break;
-                case "TWN": electronics *= 8; break;                   // Taiwan: Halbleiter
-                case "GBR": machinery *= 2; electronics *= 2; break;
-                case "FRA": machinery *= 2; electronics *= 2; uranium *= 3; break;
-                case "ITA": machinery *= 2; steel *= 2; break;
-            }
 
             // Militaergueter: Waffen und Munition basierend auf BIP + Militaerausgaben
             double militaryFactor = factor * (country.MilitarySpendingPercent / 0.15); // 15% ist Durchschnitt
@@ -198,16 +137,6 @@ public static class CountryDataLoader
                 case "BRA": weapons *= 2; ammunition *= 2; break;
             }
 
-            country.AddResource(ResourceType.Oil, oil);
-            country.AddResource(ResourceType.NaturalGas, gas);
-            country.AddResource(ResourceType.Coal, coal);
-            country.AddResource(ResourceType.Iron, iron);
-            country.AddResource(ResourceType.Copper, copper);
-            country.AddResource(ResourceType.Uranium, uranium);
-            country.AddResource(ResourceType.Steel, steel);
-            country.AddResource(ResourceType.Electronics, electronics);
-            country.AddResource(ResourceType.Machinery, machinery);
-            country.AddResource(ResourceType.ConsumerGoods, consumerGoods);
             country.AddResource(ResourceType.Weapons, weapons);
             country.AddResource(ResourceType.Ammunition, ammunition);
         }

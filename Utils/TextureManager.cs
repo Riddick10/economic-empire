@@ -102,7 +102,6 @@ public static class TextureManager
             ResourceType.Uranium => "uran.png",
             ResourceType.Copper => "copper.png",
             ResourceType.NaturalGas => "natural_gas.png",
-            ResourceType.Food => "food.png",
             ResourceType.ConsumerGoods => "consumer_goods.png",
             ResourceType.Electronics => "electronics.png",
             ResourceType.Machinery => "machinery.png",

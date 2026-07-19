@@ -195,7 +195,6 @@ internal class ProductionTopMenuPanel : ITopMenuPanel
             ResourceType.Iron => "Eisen",
             ResourceType.Copper => "Kupfer",
             ResourceType.Uranium => "Uran",
-            ResourceType.Food => "Nahrung",
             ResourceType.Steel => "Stahl",
             ResourceType.Electronics => "Elektronik",
             ResourceType.Machinery => "Maschinen",
@@ -238,8 +237,10 @@ internal class ProductionTopMenuPanel : ITopMenuPanel
                         var (inputType, inputAmount) = recipe.Inputs[i];
                         double totalInput = inputAmount * productionBlocks;
                         int iy = inputStartY + i * 24;
-                        double stock = player.GetResource(inputType);
-                        bool hasEnough = assigned == 0 || stock >= inputAmount;
+                        // Fluss-System: Tagesproduktion + Restpuffer muss den Bedarf decken
+                        double inputFlow = player.DailyProduction.GetValueOrDefault(inputType, 0)
+                            + player.GetResource(inputType);
+                        bool hasEnough = assigned == 0 || inputFlow >= totalInput;
 
                         Color inputBg = hasEnough ? new Color((byte)30, (byte)50, (byte)30, (byte)255) : new Color((byte)50, (byte)30, (byte)30, (byte)255);
                         Color inputBorder = hasEnough ? ColorPalette.Green : ColorPalette.Red;

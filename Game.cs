@@ -195,9 +195,25 @@ _systemManager.RegisterSystem(new MilitaryManager());
 
         // Tägliche Produktions-/Verbrauchswerte zuruecksetzen BEVOR Systeme laufen,
         // damit alle Manager (PopulationManager, ProductionManager, TradeManager etc.)
-        // sauber in leere Dicts schreiben koennen
+        // sauber in leere Dicts schreiben koennen.
+        // Fluss-System (HOI4-Stil): Nicht-lagerbare Ressourcen verfallen dabei bis
+        // auf einen Betriebspuffer von 2x Tagesdurchsatz - Verfuegbarkeit entspricht
+        // damit immer dem aktuellen Fluss, Horten ist nur bei Waffen und Munition
+        // moeglich.
         foreach (var country in Countries.Values)
         {
+            foreach (var (type, amount) in country.Stockpile)
+            {
+                if (ResourceConfig.IsStockpiled(type)) continue;
+
+                double throughput = Math.Max(
+                    country.DailyProduction.GetValueOrDefault(type, 0),
+                    country.DailyConsumption.GetValueOrDefault(type, 0));
+                double cap = throughput * 2.0;
+                if (amount > cap)
+                    country.Stockpile[type] = cap;
+            }
+
             country.DailyProduction.Clear();
             country.DailyConsumption.Clear();
         }

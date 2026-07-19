@@ -13,7 +13,7 @@ public class PopulationManager : GameSystemBase
 {
     public override string Name => "Population";
     public override int Priority => 5; // VOR EconomyManager (10), da PopGrowthRate dort gelesen wird
-    public override TickType[] SubscribedTicks => new[] { TickType.Daily, TickType.Monthly, TickType.Yearly };
+    public override TickType[] SubscribedTicks => new[] { TickType.Monthly, TickType.Yearly };
 
     // Demografische Daten pro Land
     private readonly Dictionary<string, Demographics> _demographics = new();
@@ -21,20 +21,13 @@ public class PopulationManager : GameSystemBase
     // Migrationsdruck zwischen Ländern
     private readonly Dictionary<(string From, string To), double> _migrationPressure = new();
 
-    // Nahrungsbedarf pro Person pro Tag - nutze GameConfig Konstante
-
-    // Hungersnot-Tracking pro Land
-    private readonly Dictionary<string, int> _starvationDays = new();
-
     // Referenzen fuer andere Manager
-    private NotificationManager? _notificationManager;
     private PoliticsManager? _politicsManager;
     private ConflictManager? _conflictManager;
     private MilitaryManager? _militaryManager;
 
     public override void Initialize(GameContext context)
     {
-        _notificationManager = context.Game.GetSystem<NotificationManager>();
         _politicsManager = context.Game.GetSystem<PoliticsManager>();
         _conflictManager = context.Game.GetSystem<ConflictManager>();
         _militaryManager = context.Game.GetSystem<MilitaryManager>();
@@ -57,10 +50,6 @@ public class PopulationManager : GameSystemBase
     {
         switch (tickType)
         {
-            case TickType.Daily:
-                ProcessFoodConsumption(context);
-                break;
-
             case TickType.Monthly:
                 ProcessMigration(context);
                 break;
@@ -69,92 +58,6 @@ public class PopulationManager : GameSystemBase
                 UpdatePopulationGrowth(context);
                 UpdateDemographics(context);
                 break;
-        }
-    }
-
-    /// <summary>
-    /// Verarbeitet taeglichen Nahrungsverbrauch und Verhungern
-    /// </summary>
-    private void ProcessFoodConsumption(GameContext context)
-    {
-        foreach (var (countryId, country) in context.Countries)
-        {
-            if (!_demographics.TryGetValue(countryId, out var demo))
-                continue;
-
-            // Berechne Nahrungsbedarf
-            double foodNeeded = demo.TotalPopulation * GameConfig.FOOD_PER_PERSON_PER_DAY;
-            double foodAvailable = country.GetResource(ResourceType.Food);
-
-            if (foodAvailable >= foodNeeded)
-            {
-                // Genug Nahrung - verbrauchen und Hungertage zuruecksetzen
-                country.UseResource(ResourceType.Food, foodNeeded);
-                _starvationDays[countryId] = 0;
-
-                // Verbrauch fuer Logistik-Panel tracken
-                if (!country.DailyConsumption.ContainsKey(ResourceType.Food))
-                    country.DailyConsumption[ResourceType.Food] = 0;
-                country.DailyConsumption[ResourceType.Food] += foodNeeded;
-            }
-            else
-            {
-                // Nicht genug Nahrung!
-                // Verbrauche was da ist
-                if (foodAvailable > 0)
-                    country.UseResource(ResourceType.Food, foodAvailable);
-
-                // Bedarf tracken (vollen Bedarf, nicht nur Teilverzehr)
-                if (!country.DailyConsumption.ContainsKey(ResourceType.Food))
-                    country.DailyConsumption[ResourceType.Food] = 0;
-                country.DailyConsumption[ResourceType.Food] += foodNeeded;
-
-                // Erhoehe Hungertage
-                if (!_starvationDays.ContainsKey(countryId))
-                    _starvationDays[countryId] = 0;
-                _starvationDays[countryId]++;
-
-                // Nach 30 Tagen ohne genug Nahrung beginnt das Sterben
-                int starveDays = _starvationDays[countryId];
-                if (starveDays >= 30)
-                {
-                    // Berechne wie viel Prozent der Bevoelkerung verhungert
-                    // Langsame Eskalation ueber 90 Tage bis Maximum
-                    double starvationSeverity = Math.Min(1.0, (starveDays - 30) / 90.0); // Max nach 120 Tagen
-                    double foodDeficit = 1.0 - (foodAvailable / Math.Max(foodNeeded, 0.001));
-
-                    // Todesfaktor: 0.01% bis 0.2% pro Tag bei voller Hungersnot
-                    double deathRate = 0.0001 + (starvationSeverity * foodDeficit * 0.0019);
-                    long deaths = (long)(demo.TotalPopulation * deathRate);
-
-                    if (deaths > 0)
-                    {
-                        // Bevoelkerung darf nie unter 0 fallen
-                        deaths = Math.Min(deaths, demo.TotalPopulation - 1);
-                        deaths = Math.Min(deaths, country.Population - 1);
-                        if (deaths <= 0) continue;
-
-                        demo.TotalPopulation -= deaths;
-                        country.Population -= deaths;
-
-                        // Benachrichtigung fuer Spieler
-                        if (country.Id == context.PlayerCountry?.Id)
-                        {
-                            context.Events.Publish(new StarvationEvent(countryId, deaths));
-
-                            // Warnung nur alle 7 Tage senden um Spam zu vermeiden
-                            if (starveDays % 7 == 0)
-                            {
-                                _notificationManager?.AddNotification(
-                                    "Hungersnot!",
-                                    $"{deaths:N0} Menschen sind heute verhungert. Importiere Nahrung!",
-                                    NotificationType.Danger,
-                                    countryId);
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 

@@ -352,7 +352,7 @@ public class AIManager : GameSystemBase
         // Max Export-Deals begrenzen
         if (exportCount >= MaxTradeAgreements) return;
 
-        // Finde beste Export-Ressource: hoher Ueberschuss + grosses Lager
+        // Finde beste Export-Ressource: hoechster taeglicher Ueberschuss
         ResourceType? bestResource = null;
         double bestSurplus = 0;
 
@@ -362,22 +362,14 @@ public class AIManager : GameSystemBase
 
             double production = country.DailyProduction.GetValueOrDefault(resource, 0);
             double consumption = country.DailyConsumption.GetValueOrDefault(resource, 0);
-            double stock = country.GetResource(resource);
             double surplus = production - consumption;
 
-            // Nur exportieren wenn: Ueberschuss UND mehr als 30 Tage Vorrat
+            // Nur bei echtem Ueberschuss exportieren (Fluss-System: kein Lager)
             if (surplus <= 0.1) continue;
-            double daysOfStock = consumption > 0 ? stock / consumption : stock / Math.Max(surplus, 0.1);
-            if (daysOfStock < 30) continue;
 
-            // Nahrung nur exportieren wenn sehr viel Vorrat (60+ Tage)
-            if (resource == ResourceType.Food && daysOfStock < 60) continue;
-
-            // Score: Ueberschuss * Lagerbestand (groesserer Ueberschuss = besser)
-            double score = surplus * Math.Min(daysOfStock, 120);
-            if (score > bestSurplus)
+            if (surplus > bestSurplus)
             {
-                bestSurplus = score;
+                bestSurplus = surplus;
                 bestResource = resource;
             }
         }
@@ -416,20 +408,18 @@ public class AIManager : GameSystemBase
 
             double production = country.DailyProduction.GetValueOrDefault(agr.ResourceType, 0);
             double consumption = country.DailyConsumption.GetValueOrDefault(agr.ResourceType, 0);
-            double stock = country.GetResource(agr.ResourceType);
-            double daysOfStock = consumption > 0 ? stock / consumption : stock / Math.Max(production, 1);
+            double surplus = production - consumption;
 
-            // Notfall-Kuendigung: Vorrat unter 7 Tage (egal ob Vertrag laeuft)
-            if (daysOfStock < 7)
+            // Notfall-Kuendigung: eigenes Tagesdefizit (egal ob Vertrag laeuft)
+            if (surplus < 0)
             {
                 _trade?.CancelTradeAgreement(agr.Id);
                 continue;
             }
 
-            // Normale Kuendigung: nur wenn Vertragslaufzeit abgelaufen
+            // Normale Kuendigung: Ueberschuss deckt die Exportmenge nicht mehr
             if (!canCancel) continue;
-            double surplus = production - consumption;
-            if (surplus < 0 || daysOfStock < 15)
+            if (surplus < agr.Amount * 0.5)
             {
                 _trade?.CancelTradeAgreement(agr.Id);
             }
@@ -479,15 +469,14 @@ public class AIManager : GameSystemBase
 
             double production = country.DailyProduction.GetValueOrDefault(agr.ResourceType, 0);
             double consumption = country.DailyConsumption.GetValueOrDefault(agr.ResourceType, 0);
-            double stock = country.GetResource(agr.ResourceType);
 
             // Nur kuendigen wenn Vertragslaufzeit abgelaufen
             bool canCancel = _trade != null && _lastTradeContext != null &&
                              _trade.CanCancelAgreement(agr, _lastTradeContext);
             if (!canCancel) continue;
 
-            // Kuendigen wenn: kein Defizit mehr UND grosser Vorrat (200+ statt 100)
-            if (production >= consumption * 1.2 && stock > 200)
+            // Kuendigen wenn die Eigenproduktion den Bedarf deutlich uebersteigt
+            if (production >= consumption * 1.2)
             {
                 _trade?.CancelTradeAgreement(agr.Id);
             }
@@ -810,7 +799,7 @@ public class AIManager : GameSystemBase
     {
         ResourceType.Oil, ResourceType.NaturalGas, ResourceType.Coal,
         ResourceType.Iron, ResourceType.Copper,
-        ResourceType.Food, ResourceType.Steel, ResourceType.Electronics,
+        ResourceType.Steel, ResourceType.Electronics,
         ResourceType.Machinery, ResourceType.ConsumerGoods
     };
 
@@ -827,13 +816,9 @@ public class AIManager : GameSystemBase
 
             double production = country.DailyProduction.GetValueOrDefault(resource, 0);
             double consumption = country.DailyConsumption.GetValueOrDefault(resource, 0);
-            double stock = country.GetResource(resource);
 
-            // Score: Verbrauchsdefizit + niedriger Vorrat
-            double deficit = consumption - production;  // positiv = Defizit
-            double stockScore = stock < 50 ? (50 - stock) * 0.1 : 0; // Bonus bei niedrigem Vorrat
-
-            double score = deficit + stockScore;
+            // Score: reines Tagesdefizit (Fluss-System, kein Lager mehr)
+            double score = consumption - production;  // positiv = Defizit
 
             if (score > worstScore)
             {
@@ -892,17 +877,11 @@ public class AIManager : GameSystemBase
             if (!context.Countries.TryGetValue(exporterId, out var exporter))
                 continue;
 
-            // Pruefen ob Exporteur langfristig liefern kann
+            // Pruefen ob Exporteur langfristig liefern kann:
+            // sein Tagesueberschuss muss die Exportmenge abdecken
             double prod = exporter.DailyProduction.GetValueOrDefault(resource, 0);
             double cons = exporter.DailyConsumption.GetValueOrDefault(resource, 0);
             double surplus = prod - cons;
-            double stock = exporter.GetResource(resource);
-
-            // Mindestens 60 Tage Vorrat NACH dem Export noetig
-            double daysOfStockAfterExport = (cons + tradeAmount) > 0 ? stock / (cons + tradeAmount) : 999;
-            if (daysOfStockAfterExport < 60) continue;
-
-            // Ueberschuss muss Exportmenge abdecken
             if (surplus < tradeAmount * 0.8) continue;
 
             // Score: Beziehung + Verfuegbarkeit

@@ -189,10 +189,6 @@ public class ProductionManager : GameSystemBase
             if (!context.Countries.TryGetValue(countryId, out var country))
                 continue;
 
-            // Nahrungsverbrauch der Bevoelkerung (macht im Tages-Tick der PopulationManager)
-            country.DailyConsumption[ResourceType.Food] =
-                country.Population * GameConfig.FOOD_PER_PERSON_PER_DAY;
-
             ProcessResourceConversion(country, industry, context, applyEffects: false);
             ProcessPopulationConsumption(country, applyEffects: false);
         }
@@ -214,7 +210,7 @@ public class ProductionManager : GameSystemBase
             // Verarbeite Rohstoffe zu verarbeiteten Gütern
             ProcessResourceConversion(country, industry, context);
 
-            // Bevoelkerungsverbrauch (Nahrung, Konsumgueter, Energie)
+            // Bevoelkerungsverbrauch (Konsumgueter, Energie, Elektronik)
             ProcessPopulationConsumption(country);
 
             // Verarbeite Produktionsaufträge
@@ -239,15 +235,17 @@ public class ProductionManager : GameSystemBase
             double available = country.GetResource(resourceType);
             double actualConsumption = Math.Min(consumption, available);
 
-            if (actualConsumption > 0)
-            {
-                if (applyEffects)
-                    country.UseResource(resourceType, actualConsumption);
+            if (applyEffects && actualConsumption > 0)
+                country.UseResource(resourceType, actualConsumption);
 
-                // Tracke Verbrauch
+            // Vollen BEDARF tracken (nicht nur Ist-Verbrauch): Im Fluss-System
+            // haengen Defizit-Erkennung (KI, Handel), Versorgungsanzeige und
+            // der Tages-Cap an diesem Wert - ungedeckter Bedarf muss sichtbar sein
+            if (consumption > 0)
+            {
                 if (!country.DailyConsumption.ContainsKey(resourceType))
                     country.DailyConsumption[resourceType] = 0;
-                country.DailyConsumption[resourceType] += actualConsumption;
+                country.DailyConsumption[resourceType] += consumption;
             }
 
             // Satisfaction-System: Wenn weniger als 80% des Bedarfs gedeckt
@@ -255,10 +253,9 @@ public class ProductionManager : GameSystemBase
             {
                 double deficitRatio = 1.0 - (actualConsumption / consumption);
 
-                // Gewichtung nach Ressourcentyp (Nahrung kritischer als Konsumgueter)
+                // Gewichtung nach Ressourcentyp (Konsumgueter am kritischsten)
                 double weight = resourceType switch
                 {
-                    ResourceType.Food => 3.0,           // Nahrungsmangel sehr kritisch
                     ResourceType.ConsumerGoods => 1.5,   // Konsumguetermangel spuerbar
                     ResourceType.Electronics => 0.7,     // Elektronikmangel aergerlich
                     ResourceType.Oil => 0.8,             // Energiemangel moderat
@@ -402,14 +399,13 @@ public class ProductionManager : GameSystemBase
         {
             double oilAvailable = country.GetResource(ResourceType.Oil);
             double oilConsumed = Math.Min(oilNeeded, oilAvailable);
-            if (oilConsumed > 0)
-            {
-                if (applyEffects)
-                    country.UseResource(ResourceType.Oil, oilConsumed);
-                if (!country.DailyConsumption.ContainsKey(ResourceType.Oil))
-                    country.DailyConsumption[ResourceType.Oil] = 0;
-                country.DailyConsumption[ResourceType.Oil] += oilConsumed;
-            }
+            if (applyEffects && oilConsumed > 0)
+                country.UseResource(ResourceType.Oil, oilConsumed);
+
+            // Vollen Bedarf tracken (siehe ProcessPopulationConsumption)
+            if (!country.DailyConsumption.ContainsKey(ResourceType.Oil))
+                country.DailyConsumption[ResourceType.Oil] = 0;
+            country.DailyConsumption[ResourceType.Oil] += oilNeeded;
 
             // Effizienz sinkt wenn nicht genug Oel vorhanden
             if (oilAvailable < oilNeeded)
@@ -482,55 +478,62 @@ public class ProductionManager : GameSystemBase
             int assignedFactories = assignments.TryGetValue(outputType, out var count) ? count : 0;
             if (assignedFactories < 10) continue;
 
-            // Pro 10 Fabriken wird ein Produktionszyklus ausgefuehrt
+            // Pro 10 Fabriken laeuft ein Produktionszyklus
             int productionBlocks = assignedFactories / 10;
-            for (int i = 0; i < productionBlocks; i++)
+
+            // Anteilige Produktion (HOI4-Stil): Fehlen Inputs teilweise, laeuft
+            // die Produktion gedrosselt weiter statt komplett zu stoppen.
+            // Das verhindert Kaskaden-Ausfaelle entlang der Produktionskette.
+            double ratio = 1.0;
+            foreach (var (inputType, amount) in recipe.Inputs)
             {
-                bool canProduce = true;
-                foreach (var (inputType, amount) in recipe.Inputs)
-                {
-                    double available = country.GetResource(inputType)
-                        + (virtualDelta?.GetValueOrDefault(inputType) ?? 0);
-                    if (available < amount)
-                    {
-                        canProduce = false;
-                        break;
-                    }
-                }
-
-                if (canProduce)
-                {
-                    foreach (var (inputType, amount) in recipe.Inputs)
-                    {
-                        if (virtualDelta == null)
-                            country.UseResource(inputType, amount);
-                        else
-                            virtualDelta[inputType] = virtualDelta.GetValueOrDefault(inputType) - amount;
-
-                        if (!country.DailyConsumption.ContainsKey(inputType))
-                            country.DailyConsumption[inputType] = 0;
-                        country.DailyConsumption[inputType] += amount;
-                    }
-
-                    // Basis-Produktion mit Effizienz
-                    double outputAmount = recipe.OutputAmount * efficiency;
-
-                    // Tech-Bonus: factory_output gilt fuer alle, electronics_output nur fuer Elektronik
-                    double techBonus = techFactoryBonus;
-                    if (outputType == ResourceType.Electronics)
-                        techBonus += techElectronicsBonus;
-                    outputAmount *= (1.0 + techBonus);
-
-                    if (virtualDelta == null)
-                        country.AddResource(outputType, outputAmount);
-                    else
-                        virtualDelta[outputType] = virtualDelta.GetValueOrDefault(outputType) + outputAmount;
-
-                    if (!country.DailyProduction.ContainsKey(outputType))
-                        country.DailyProduction[outputType] = 0;
-                    country.DailyProduction[outputType] += outputAmount;
-                }
+                double needed = amount * productionBlocks;
+                if (needed <= 0) continue;
+                double available = country.GetResource(inputType)
+                    + (virtualDelta?.GetValueOrDefault(inputType) ?? 0);
+                ratio = Math.Min(ratio, Math.Clamp(available / needed, 0, 1));
             }
+            if (recipe.Inputs.Length > 0 && ratio <= 0.001) continue;
+
+            foreach (var (inputType, amount) in recipe.Inputs)
+            {
+                double needed = amount * productionBlocks;
+                double used = needed * ratio;
+
+                if (used > 0)
+                {
+                    if (virtualDelta == null)
+                        country.UseResource(inputType, Math.Min(used, country.GetResource(inputType)));
+                    else
+                        virtualDelta[inputType] = virtualDelta.GetValueOrDefault(inputType) - used;
+                }
+
+                // Vollen Bedarf tracken (nicht nur ratio-gedrosselten Ist-Verbrauch):
+                // so bleibt ein Input-Defizit fuer KI/Handel/Anzeige sichtbar
+                if (!country.DailyConsumption.ContainsKey(inputType))
+                    country.DailyConsumption[inputType] = 0;
+                country.DailyConsumption[inputType] += needed;
+            }
+
+            // Basis-Produktion mit Effizienz und Drosselung
+            double outputAmount = recipe.OutputAmount * productionBlocks * ratio * efficiency;
+
+            // Tech-Bonus: factory_output gilt fuer alle, electronics_output nur fuer Elektronik
+            double techBonus = techFactoryBonus;
+            if (outputType == ResourceType.Electronics)
+                techBonus += techElectronicsBonus;
+            outputAmount *= (1.0 + techBonus);
+
+            if (outputAmount <= 0) continue;
+
+            if (virtualDelta == null)
+                country.AddResource(outputType, outputAmount);
+            else
+                virtualDelta[outputType] = virtualDelta.GetValueOrDefault(outputType) + outputAmount;
+
+            if (!country.DailyProduction.ContainsKey(outputType))
+                country.DailyProduction[outputType] = 0;
+            country.DailyProduction[outputType] += outputAmount;
         }
     }
 
@@ -605,35 +608,26 @@ public class ProductionManager : GameSystemBase
         {
             double score = 1.0; // Basis-Score
 
-            // Bedarf: Wie viel wird verbraucht vs. produziert?
+            // Fluss-System: Bedarf = taegliches Defizit (Verbrauch vs. Produktion)
             double consumption = country.DailyConsumption.GetValueOrDefault(outputType, 0);
             double production = country.DailyProduction.GetValueOrDefault(outputType, 0);
-            double stock = country.GetResource(outputType);
 
-            // Hoher Verbrauch + niedriger Vorrat = hoher Score
-            if (consumption > 0 && stock < consumption * 30)
-                score += 3.0; // Weniger als 30 Tage Vorrat: dringend
-            else if (consumption > 0 && stock < consumption * 60)
-                score += 1.5; // Weniger als 60 Tage: erhoehter Bedarf
-
-            // Nahrung immer priorisieren (Hungersnot vermeiden)
-            if (outputType == ResourceType.Food)
-            {
-                double foodConsumption = country.Population / 1_000_000.0 *
-                    BalanceConfig.Production.PopulationConsumption.GetValueOrDefault(ResourceType.Food, 0);
-                if (stock < foodConsumption * 14)
-                    score += 5.0; // Hungersnot droht!
-            }
+            if (consumption > 0 && production < consumption)
+                score += 3.0; // Tagesdefizit: dringend
+            else if (consumption > 0 && production < consumption * 1.2)
+                score += 1.5; // Knapp gedeckt: erhoehter Bedarf
 
             // Konsumgueter wichtig fuer Zufriedenheit
-            if (outputType == ResourceType.ConsumerGoods && stock < consumption * 20)
+            if (outputType == ResourceType.ConsumerGoods && production < consumption)
                 score += 2.0;
 
-            // Rohstoff-Verfuegbarkeit pruefen: Kann das Rezept ueberhaupt produzieren?
+            // Rohstoff-Verfuegbarkeit pruefen: Fließt genug Input fuer das Rezept?
             bool hasInputs = true;
             foreach (var (inputType, inputAmount) in recipe.Inputs)
             {
-                if (country.GetResource(inputType) < inputAmount * 5) // Weniger als 5 Zyklen
+                double inputFlow = country.DailyProduction.GetValueOrDefault(inputType, 0)
+                    + country.GetResource(inputType);
+                if (inputFlow < inputAmount)
                 {
                     hasInputs = false;
                     break;
@@ -642,8 +636,8 @@ public class ProductionManager : GameSystemBase
             if (!hasInputs)
                 score *= 0.1; // Stark reduzieren wenn Rohstoffe fehlen
 
-            // Ueberproduktion reduzieren (mehr als 90 Tage Vorrat und kein Verbrauch)
-            if (consumption > 0 && stock > consumption * 90)
+            // Deutliche Ueberproduktion reduzieren (Ueberschuss verfaellt ohnehin)
+            if (consumption > 0 && production > consumption * 2)
                 score *= 0.3;
 
             scores[outputType] = Math.Max(0.1, score);

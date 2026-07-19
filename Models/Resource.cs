@@ -14,7 +14,6 @@ public enum ResourceType
     Uranium,        // Uran
 
     // Agrar
-    Food,           // Nahrungsmittel
 
     // Verarbeitete Güter
     Steel,          // Stahl
@@ -64,7 +63,6 @@ public class Resource
             ResourceType.Copper => 0.08,     // Kupfer moderat
             ResourceType.Iron => 0.06,       // Eisen stabiler
             ResourceType.Coal => 0.05,       // Kohle stabil
-            ResourceType.Food => 0.04,       // Nahrung relativ stabil
             ResourceType.Steel => 0.03,      // Verarbeitete Gueter
             ResourceType.Electronics => 0.04,
             ResourceType.Machinery => 0.03,
@@ -121,7 +119,6 @@ public class Resource
             ResourceType.Iron => "Eisenerz",
             ResourceType.Copper => "Kupfer",
             ResourceType.Uranium => "Uran",
-            ResourceType.Food => "Nahrung",
             ResourceType.Steel => "Stahl",
             ResourceType.Electronics => "Elektronik",
             ResourceType.Machinery => "Maschinen",
