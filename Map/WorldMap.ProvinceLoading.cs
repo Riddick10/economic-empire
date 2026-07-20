@@ -687,6 +687,15 @@ public partial class WorldMap
             ? GeoJsonLoader.LoadGermanStates(geoJsonPath)
             : GeoJsonLoader.LoadProvinces(geoJsonPath, prefix);
 
+        // Topologisch konsistente Vereinfachung: gemeinsame Grenzen zwischen
+        // Nachbarprovinzen werden als Ketten nur EINMAL vereinfacht, damit beide
+        // Seiten exakt dieselbe Punktfolge nutzen. Unabhaengige Vereinfachung pro
+        // Provinz wuerde die geteilte Grenze auf jeder Seite anders vereinfachen -
+        // beim starken Zoom entstehen dann versetzte Doppellinien
+        // (z.B. Saarland vs. Rheinland-Pfalz).
+        var rawPolygons = regions.ToDictionary(kv => kv.Key, kv => kv.Value.Polygons);
+        var simplifiedGeo = ProvinceChainSimplifier.Simplify(rawPolygons, tolerance);
+
         // Landeskontur fuer das Grenz-Snapping (Regions sind zu diesem
         // Zeitpunkt bereits geladen, siehe Initialize-Reihenfolge).
         // Der Index wird einmal pro Land aufgebaut, nicht pro Provinz.
@@ -696,8 +705,8 @@ public partial class WorldMap
 
         foreach (var (id, data) in regions)
         {
-            var polys = data.Polygons
-                .Select(p => SimplifyAndConvertGeoToScreen(p, tolerance))
+            var polys = simplifiedGeo[id]
+                .Select(ConvertGeoToScreen)
                 .Where(p => p.Length >= 3)
                 .ToList();
 
