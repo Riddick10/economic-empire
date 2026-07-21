@@ -14,3 +14,8 @@ mit den fehlenden Zeichen.
 
 Falls die Schriftart-Datei fehlt, wird automatisch der Raylib-Standard-
 Font verwendet (dieser hat KEINE Umlaute).
+
+---
+DejaVuSans-Bold.ttf  -  fuer die Laendernamen auf der Karte (klare, glatte Schrift).
+DejaVu Fonts sind frei lizenziert (DejaVu-Lizenz, auf Bitstream Vera basierend),
+frei nutzbar und weitergebbar, auch kommerziell.

@@ -478,12 +478,23 @@ public partial class WorldMap
             DrawPlayerBorderOverlay(playerRegion);
         }
 
-        // Laendernamen zeichnen (verschwinden wenn Provinzgrenzen erscheinen)
+        // Laendernamen zeichnen (blenden weich aus, wenn Provinzgrenzen erscheinen)
         if (Zoom >= 0.6f && Zoom < 8.0f)
         {
-            foreach (var (countryId, region) in visibleRegions)
+            EnsureCountryLabelLayouts();
+
+            // Weiches Ein-/Ausblenden statt harter Schnitte:
+            // - beim Reinzoomen ab 6.0 langsam transparent, ab 8.0 ganz weg
+            // - beim ganz Rauszoomen unter 0.9 ebenfalls sanft ausblenden
+            float labelAlpha = 1f - Math.Clamp((Zoom - 6.0f) / (8.0f - 6.0f), 0f, 1f);
+            labelAlpha *= Math.Clamp((Zoom - 0.6f) / (0.9f - 0.6f), 0f, 1f);
+
+            if (labelAlpha > 0.01f)
             {
-                DrawCountryLabel(countryId, region);
+                foreach (var (countryId, region) in visibleRegions)
+                {
+                    DrawCountryLabel(countryId, region, labelAlpha);
+                }
             }
         }
 

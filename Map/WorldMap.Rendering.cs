@@ -814,82 +814,313 @@ public partial class WorldMap
     /// <summary>
     /// Zeichnet das Laenderlabel
     /// </summary>
-    private void DrawCountryLabel(string countryId, MapRegion region)
+    // === HOI4-artige Laendernamen: passen sich an Form und Ausrichtung des ===
+    // === aktuell besessenen Territoriums an (auch nach Eroberungen).       ===
+
+    /// <summary>
+    /// Vorberechnetes Label-Layout eines Landes in Map-Koordinaten (zoom-unabhaengig).
+    /// Der Name folgt einer Parabel-"Mittellinie" durchs Territorium (HOI4-Kurve):
+    /// AngleRad = Basisausrichtung, StdAlong/StdPerp = Ausdehnung entlang/quer,
+    /// CurveA/B/C = Parabel y=A*x^2+B*x+C im gedrehten Bezugssystem (Map-Einheiten).
+    /// </summary>
+    private struct CountryLabelLayout
     {
-        // Nutze gecachte transformierte Punkte
-        if (region.TransformedRings == null || region.TransformedRings.Count == 0) return;
+        public Vector2 Center;
+        public float AngleRad;
+        public float StdAlong;
+        public float StdPerp;
+        public float CurveA;
+        public float CurveB;
+        public float CurveC;
+        public bool Valid;
+    }
 
-        var transformedPoints = region.TransformedRings[0];
-        if (transformedPoints.Length < 3) return;
+    private readonly Dictionary<string, CountryLabelLayout> _labelLayouts = new();
+    private int _labelRecomputeCountdown = 0;
 
-        // Bounding Box des Landes auf dem Bildschirm berechnen
-        float minX = float.MaxValue, maxX = float.MinValue;
-        float minY = float.MaxValue, maxY = float.MinValue;
-        foreach (var p in transformedPoints)
+    /// <summary>
+    /// Berechnet die Label-Layouts bei Bedarf neu (gedrosselt, da sich das
+    /// Territorium nur bei Eroberungen aendert - ein kurzer Verzug ist unkritisch).
+    /// </summary>
+    private void EnsureCountryLabelLayouts()
+    {
+        if (_labelLayouts.Count > 0 && _labelRecomputeCountdown > 0)
         {
-            minX = Math.Min(minX, p.X);
-            maxX = Math.Max(maxX, p.X);
-            minY = Math.Min(minY, p.Y);
-            maxY = Math.Max(maxY, p.Y);
-        }
-        float countryWidth = maxX - minX;
-        float countryHeight = maxY - minY;
-
-        // Laendername holen (falls vorhanden, sonst Code verwenden)
-        string displayName = CountryNames.TryGetValue(countryId, out var fullName) ? fullName : countryId;
-
-        // Intelligente Schriftgroessen-Berechnung
-        float countrySize = Math.Min(countryWidth, countryHeight);
-
-        // Maximale Textbreite: 70% der Landesbreite
-        float maxTextWidth = countryWidth * 0.7f;
-
-        // Schriftgroesse berechnen (iterativ anpassen)
-        int fontSize = (int)(countrySize * 0.25f);  // Startgroesse
-        fontSize = Math.Clamp(fontSize, 8, 48);     // Grenzen
-
-        int textWidth = Program.MeasureGameText(displayName, fontSize);
-
-        // Text zu breit? Verkleinern oder auf Code wechseln
-        if (textWidth > maxTextWidth && fontSize > 10)
-        {
-            fontSize = (int)(fontSize * maxTextWidth / textWidth);
-            fontSize = Math.Max(fontSize, 10);
-            textWidth = Program.MeasureGameText(displayName, fontSize);
-        }
-
-        // Wenn immer noch zu breit, zeige nur den Code
-        if (textWidth > maxTextWidth * 1.2f)
-        {
-            displayName = countryId;
-            textWidth = Program.MeasureGameText(displayName, fontSize);
-        }
-
-        // Wenn das Land zu klein ist (Text passt nicht), Label ueberspringen
-        if (countryWidth < 30 || countryHeight < 20)
-        {
+            _labelRecomputeCountdown--;
             return;
         }
+        _labelRecomputeCountdown = 30; // ~alle 30 Frames neu
+        RecomputeCountryLabelLayouts();
+    }
 
-        // Bei sehr kleinen Laendern nur Code zeigen
-        if (countrySize < 60 && displayName != countryId)
+    // Wiederverwendbare Punktlisten (vermeidet Allokationen pro Recompute)
+    private readonly Dictionary<string, List<(Vector2 P, float W)>> _labelPoints = new();
+
+    private void RecomputeCountryLabelLayouts()
+    {
+        // 1) Gewichtete Punktwolke pro aktuellem Besitzer sammeln.
+        //    Gewicht = Provinzflaeche / Vertexzahl -> grosse Flaechen dominieren,
+        //    winzige ferne Inseln zaehlen kaum (verhindert dass Exklaven wie
+        //    US-Alaska oder franzoesische Ueberseegebiete das Label ins Meer ziehen).
+        foreach (var list in _labelPoints.Values) list.Clear();
+
+        void AddRing(List<(Vector2, float)> list, Vector2[] ring)
         {
-            displayName = countryId;
-            textWidth = Program.MeasureGameText(displayName, fontSize);
+            if (ring.Length < 3) return;
+            float w = Math.Abs(PolygonUtils.CalculateRingArea(ring)) / ring.Length;
+            if (w <= 0) w = 1e-4f;
+            foreach (var p in ring) list.Add((p, w));
         }
 
-        // Nutze gecachte transformierte Label-Position
-        Vector2 screenPos = region.TransformedLabelPos;
+        List<(Vector2, float)> ListFor(string cid)
+        {
+            if (!_labelPoints.TryGetValue(cid, out var list))
+                _labelPoints[cid] = list = new List<(Vector2, float)>();
+            return list;
+        }
 
-        int textX = (int)(screenPos.X - textWidth / 2);
-        int textY = (int)(screenPos.Y - fontSize / 2);
+        foreach (var province in Provinces.Values)
+        {
+            var cid = province.CountryId;
+            if (string.IsNullOrEmpty(cid)) continue;
+            var list = ListFor(cid);
+            foreach (var ring in province.PolygonRings)
+                AddRing(list, ring);
+        }
 
-        // Schatten rechts-unten fuer 3D-Effekt
-        Color shadowColor = new Color(0, 0, 0, 140);
-        Program.DrawGameText(displayName, textX + 1, textY + 1, fontSize, shadowColor);
+        // 2) Pro Land ein robustes Layout (Winkel + Kurve) ableiten
+        _labelLayouts.Clear();
+        foreach (var (cid, region) in Regions)
+        {
+            _labelPoints.TryGetValue(cid, out var pts);
 
-        // Haupttext - leicht cremefarbener Ton wie in HOI4
-        Color textColor = new Color(255, 252, 240, 255);
-        Program.DrawGameText(displayName, textX, textY, fontSize, textColor);
+            // Laender ohne eigene Provinzdaten: Heimatgebiet ueber das Region-Polygon.
+            // Provinz-Laender dagegen ausschliesslich aus ihren Provinzen -> Label
+            // schrumpft/waechst korrekt bei Gebietsverlust/-gewinn (Eroberung).
+            if (!CountriesWithProvinces.Contains(cid))
+            {
+                pts ??= ListFor(cid);
+                foreach (var ring in region.PolygonRings)
+                    AddRing(pts, ring);
+            }
+
+            if (pts == null || pts.Count < 3) continue;
+
+            var layout = ComputeLabelLayout(pts);
+            if (layout.Valid)
+                _labelLayouts[cid] = layout;
+        }
+    }
+
+    /// <summary>
+    /// Berechnet Ausrichtung + Parabel-Kurve fuer ein Land aus seiner gewichteten
+    /// Punktwolke: robuste Ausreisser-Verwerfung, Elongations-dosierte Rotation,
+    /// und eine flaechengewichtete Parabel als gekruemmte Mittellinie.
+    /// </summary>
+    private static CountryLabelLayout ComputeLabelLayout(List<(Vector2 P, float W)> input)
+    {
+        const double maha = 2.0;
+
+        // Robuster Schwerpunkt + Kovarianz (2 Iterationen: fernes Territorium raus)
+        var pts = input;
+        ComputeWeighted(pts, out double mx, out double my, out double cxx, out double cyy, out double cxy);
+        for (int iter = 0; iter < 2; iter++)
+        {
+            double det0 = cxx * cyy - cxy * cxy;
+            if (det0 <= 1e-9) break;
+            double ixx = cyy / det0, iyy = cxx / det0, ixy = -cxy / det0;
+            var kept = new List<(Vector2, float)>(pts.Count);
+            foreach (var (p, w) in pts)
+            {
+                double ddx = p.X - mx, ddy = p.Y - my;
+                double m2 = ddx * ddx * ixx + 2 * ddx * ddy * ixy + ddy * ddy * iyy;
+                if (m2 <= maha * maha) kept.Add((p, w));
+            }
+            if (kept.Count < 3 || kept.Count == pts.Count) break;
+            pts = kept;
+            ComputeWeighted(pts, out mx, out my, out cxx, out cyy, out cxy);
+        }
+
+        // Hauptachse + Elongation -> dosierte, begrenzte Rotation
+        double pcaAngle = 0.5 * Math.Atan2(2 * cxy, cxx - cyy);
+        double trace = (cxx + cyy) / 2;
+        double dev = Math.Sqrt(Math.Max(0, (cxx - cyy) * (cxx - cyy) / 4 + cxy * cxy));
+        double elong = Math.Sqrt((trace + dev) / Math.Max(1e-9, trace - dev));
+        float factor = (float)Math.Clamp((elong - 1.15) / 0.5, 0.0, 1.0);
+        double angle = pcaAngle * factor;
+        double maxAngle = 52.0 * Math.PI / 180.0;
+        angle = Math.Clamp(angle, -maxAngle, maxAngle);
+
+        // Ausdehnung entlang der gewaehlten Achse
+        double c = Math.Cos(angle), s = Math.Sin(angle);
+        double varAlong = cxx * c * c + 2 * cxy * c * s + cyy * s * s;
+        double varPerp = cxx * s * s - 2 * cxy * c * s + cyy * c * c;
+        float stdAlong = (float)Math.Sqrt(Math.Max(0, varAlong));
+        float stdPerp = (float)Math.Sqrt(Math.Max(0, varPerp));
+
+        // Flaechengewichtete Parabel y = A x^2 + B x + C im gedrehten Bezugssystem
+        // (x entlang Achse, y quer). Nur fuer laengliche Laender (per factor gedaempft).
+        double s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, sy0 = 0, sy1 = 0, sy2 = 0;
+        double cA = Math.Cos(-angle), sA = Math.Sin(-angle);
+        foreach (var (p, w) in pts)
+        {
+            double dx = p.X - mx, dy = p.Y - my;
+            double u = dx * cA - dy * sA;   // entlang Achse
+            double v = dx * sA + dy * cA;   // quer
+            double u2 = u * u;
+            s0 += w; s1 += w * u; s2 += w * u2; s3 += w * u2 * u; s4 += w * u2 * u2;
+            sy0 += w * v; sy1 += w * v * u; sy2 += w * v * u2;
+        }
+        double A = 0, B = 0, C = 0;
+        Solve3(s4, s3, s2, s3, s2, s1, s2, s1, s0, sy2, sy1, sy0, ref A, ref B, ref C);
+        A *= factor; B *= factor; C *= factor;
+
+        // Kruemmung begrenzen: Auslenkung an den Enden <= 0.9 * Querausdehnung
+        float halfLen = stdAlong * 1.55f;
+        double endDefl = Math.Abs(A * halfLen * halfLen + B * halfLen + C);
+        double maxDefl = 0.9 * stdPerp;
+        if (endDefl > maxDefl && endDefl > 1e-6)
+        {
+            double sc = maxDefl / endDefl;
+            A *= sc; B *= sc; C *= sc;
+        }
+
+        return new CountryLabelLayout
+        {
+            Center = new Vector2((float)mx, (float)my),
+            AngleRad = (float)angle,
+            StdAlong = stdAlong,
+            StdPerp = stdPerp,
+            CurveA = (float)A,
+            CurveB = (float)B,
+            CurveC = (float)C,
+            Valid = true,
+        };
+    }
+
+    /// <summary>Loest ein 3x3-Gleichungssystem (Cramersche Regel) fuer die Parabel.</summary>
+    private static void Solve3(double a11, double a12, double a13,
+        double a21, double a22, double a23, double a31, double a32, double a33,
+        double b1, double b2, double b3, ref double x1, ref double x2, ref double x3)
+    {
+        double det = a11 * (a22 * a33 - a23 * a32)
+                   - a12 * (a21 * a33 - a23 * a31)
+                   + a13 * (a21 * a32 - a22 * a31);
+        if (Math.Abs(det) < 1e-12) { x1 = x2 = x3 = 0; return; }
+        double dx = b1 * (a22 * a33 - a23 * a32) - a12 * (b2 * a33 - a23 * b3) + a13 * (b2 * a32 - a22 * b3);
+        double dy = a11 * (b2 * a33 - a23 * b3) - b1 * (a21 * a33 - a23 * a31) + a13 * (a21 * b3 - b2 * a31);
+        double dz = a11 * (a22 * b3 - b2 * a32) - a12 * (a21 * b3 - b2 * a31) + b1 * (a21 * a32 - a22 * a31);
+        x1 = dx / det; x2 = dy / det; x3 = dz / det;
+    }
+
+    private static void ComputeWeighted(List<(Vector2 P, float W)> pts,
+        out double mx, out double my, out double cxx, out double cyy, out double cxy)
+    {
+        double sw = 0, sx = 0, sy = 0;
+        foreach (var (p, w) in pts) { sw += w; sx += p.X * w; sy += p.Y * w; }
+        if (sw <= 0) sw = 1;
+        mx = sx / sw; my = sy / sw;
+        double axx = 0, ayy = 0, axy = 0;
+        foreach (var (p, w) in pts)
+        {
+            double dx = p.X - mx, dy = p.Y - my;
+            axx += w * dx * dx; ayy += w * dy * dy; axy += w * dx * dy;
+        }
+        cxx = axx / sw; cyy = ayy / sw; cxy = axy / sw;
+    }
+
+    /// <summary>
+    /// Zeichnet den Laendernamen HOI4-artig: entlang einer gekruemmten Mittellinie
+    /// durchs Territorium, buchstabenweise tangential gedreht.
+    /// </summary>
+    private void DrawCountryLabel(string countryId, MapRegion region, float alpha = 1f)
+    {
+        if (!_labelLayouts.TryGetValue(countryId, out var layout) || !layout.Valid) return;
+
+        double angle = layout.AngleRad;
+        float halfMajor = layout.StdAlong * 1.55f * Zoom;   // halbe Ausdehnung in Screen-Pixeln
+        float halfMinor = layout.StdPerp * 1.55f * Zoom;
+
+        // Zu kleines Territorium auf dem Bildschirm -> kein Label
+        if (halfMajor < 14f || halfMinor < 5f) return;
+
+        Vector2 screenCenter = MapToScreen(layout.Center);
+        string displayName = CountryNames.TryGetValue(countryId, out var fullName) ? fullName : countryId;
+
+        // Schriftgroesse PROPORTIONAL zur Querausdehnung des Landes - KEINE feste
+        // Obergrenze, damit der Name beim Reinzoomen mitwaechst und das Land immer
+        // gleich gut fuellt (nur eine Sanity-Grenze). Zu kleines Label wird verworfen.
+        const int fontFloor = 6;
+        int fontSize = Math.Min((int)(halfMinor * 0.9f), 240);
+        if (fontSize < fontFloor) return;
+
+        float targetWidth = halfMajor * 2f * 0.72f;
+
+        // Name zu breit? Erst Schrift verkleinern (statt sofort auf den Code),
+        // damit deutlich mehr Laender mit vollem Namen erscheinen.
+        while (fontSize > fontFloor && Program.MeasureLabelText(displayName, fontSize) > targetWidth)
+            fontSize--;
+
+        float naturalWidth = Program.MeasureLabelText(displayName, fontSize);
+
+        // Immer noch zu breit -> auf Laendercode ausweichen (und ggf. weiter verkleinern)
+        if (naturalWidth > targetWidth * 1.25f && displayName != countryId)
+        {
+            displayName = countryId;
+            while (fontSize > fontFloor && Program.MeasureLabelText(displayName, fontSize) > targetWidth)
+                fontSize--;
+            naturalWidth = Program.MeasureLabelText(displayName, fontSize);
+        }
+
+        if (fontSize < fontFloor) return;
+
+        int charCount = displayName.Length;
+        if (charCount == 0) return;
+
+        // Buchstaben spreizen (gedeckelt, damit keine absurden Luecken)
+        float spacing = 0f;
+        if (charCount > 1 && naturalWidth < targetWidth)
+            spacing = (targetWidth - naturalWidth) / (charCount - 1);
+        spacing = Math.Min(spacing, 0.42f * fontSize);
+
+        // Der Label-Font ist PROPORTIONAL (nicht monospace) -> jede Glyphe hat eine
+        // eigene Breite. Vorab messen, damit Platzierung + Zentrierung stimmen.
+        var charWidths = new float[charCount];
+        float sumW = 0f;
+        for (int i = 0; i < charCount; i++)
+        {
+            charWidths[i] = Program.MeasureLabelText(displayName.Substring(i, 1), fontSize);
+            sumW += charWidths[i];
+        }
+        float total = sumW + spacing * (charCount - 1);
+
+        // Parabel in Screen-lokalen Koordinaten (relativ zu screenCenter, Achse=angle):
+        // aus y_map = A x_map^2 + B x_map + C wird y_s = (A/Zoom) x_s^2 + B x_s + C*Zoom
+        double aS = layout.CurveA / Zoom, bS = layout.CurveB, cS = layout.CurveC * Zoom;
+        double cosA = Math.Cos(angle), sinA = Math.Sin(angle);
+
+        byte A(float baseA) => (byte)Math.Clamp(baseA * alpha, 0, 255);
+        Color shadow = new Color((byte)0, (byte)0, (byte)0, A(150));
+        Color cream = new Color((byte)255, (byte)252, (byte)240, A(255));
+
+        float pen = -total / 2f;
+        for (int i = 0; i < charCount; i++)
+        {
+            string ch = displayName.Substring(i, 1);
+            double xs = pen + charWidths[i] / 2f;
+            double y = aS * xs * xs + bS * xs + cS;
+            double slope = 2 * aS * xs + bS;
+            float glyphAngleDeg = (float)((angle + Math.Atan(slope)) * (180.0 / Math.PI));
+
+            // lokale (xs, y) um angle rotieren + Zentrum
+            double lx = xs * cosA - y * sinA;
+            double ly = xs * sinA + y * cosA;
+            Vector2 gpos = new Vector2(screenCenter.X + (float)lx, screenCenter.Y + (float)ly);
+
+            Program.DrawLabelGlyph(ch, gpos + new Vector2(1.5f, 1.5f), fontSize, glyphAngleDeg, shadow);
+            Program.DrawLabelGlyph(ch, gpos, fontSize, glyphAngleDeg, cream);
+
+            pen += charWidths[i] + spacing;
+        }
     }
 }
