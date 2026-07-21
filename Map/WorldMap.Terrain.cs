@@ -102,7 +102,7 @@ public partial class WorldMap
             {
                 try
                 {
-                    _reliefTexture = Raylib.LoadTexture(reliefPath);
+                    _reliefTexture = LoadReliefWithoutCoastGlow(reliefPath);
                     if (_reliefTexture.Id != 0)
                     {
                         Raylib.SetTextureFilter(_reliefTexture, TextureFilter.Bilinear);
@@ -160,6 +160,50 @@ public partial class WorldMap
             Console.WriteLine($"[Terrain] Kritischer Fehler beim Laden: {ex.Message}");
             _terrainLoaded = false;
         }
+    }
+
+    /// <summary>
+    /// Laedt die Relief-Textur und neutralisiert den weissen Ozean-Bereich.
+    ///
+    /// Hintergrund: Im Relief ist der Ozean reinweiss (255) und Land grau (~177).
+    /// Da das Relief per Multiply-Blend gezeichnet wird, laesst Weiss die Farbe
+    /// unveraendert, Grau dunkelt sie ab. An der Kueste "blutet" das weisse Meer
+    /// (Bilinear-Filter + Raster/Vektor-Versatz) ein paar Pixel ins Land - dieser
+    /// Streifen bleibt un-abgedunkelt und wirkt als heller Kuestensaum ("Glow").
+    ///
+    /// Fix: Alle nahezu weissen Pixel werden auf den Land-Grundton (177) gesetzt.
+    /// Dann gibt es kein Weiss mehr zum Bluten, der Kuestensaum verschwindet und
+    /// die Kueste ist so dunkel wie das Landesinnere. Der (uniforme) Ozean wird
+    /// dadurch nur minimal dunkler.
+    /// </summary>
+    private static unsafe Texture2D LoadReliefWithoutCoastGlow(string reliefPath)
+    {
+        Image img = Raylib.LoadImage(reliefPath);
+        if (img.Data == null)
+            return Raylib.LoadTexture(reliefPath); // Fallback
+
+        Raylib.ImageFormat(ref img, PixelFormat.UncompressedR8G8B8A8);
+
+        const byte neutral = 177;      // Land-Grundton (Median der Relief-Landflaechen)
+        const int oceanThreshold = 190; // Land liegt <=185, Ozean bei 255 -> saubere Trennung
+
+        byte* data = (byte*)img.Data;
+        int pixelCount = img.Width * img.Height;
+        for (int i = 0; i < pixelCount; i++)
+        {
+            int o = i * 4;
+            // Graustufe: R==G==B, daher reicht ein Kanal als Helligkeit
+            if (data[o] >= oceanThreshold)
+            {
+                data[o] = neutral;
+                data[o + 1] = neutral;
+                data[o + 2] = neutral;
+            }
+        }
+
+        Texture2D tex = Raylib.LoadTextureFromImage(img);
+        Raylib.UnloadImage(img);
+        return tex;
     }
 
     /// <summary>
