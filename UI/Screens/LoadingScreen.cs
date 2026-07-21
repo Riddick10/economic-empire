@@ -61,7 +61,7 @@ internal class LoadingScreen : IGameScreen
             {
                 if (Program.game.SelectPlayerCountry(quickstartId))
                 {
-                    Program.worldMap.DayNightCycleEnabled = Program.ui.MainMenuDayNightCycleEnabled;
+                    Program.worldMap.DayNightCycleEnabled = false; // Neues Spiel (Quickstart): standardmaessig aus
                     Program.worldMap.Zoom = 2.0f;
                     Program.worldMap.CenterOnCountry(quickstartId, Program.ScreenWidth, Program.ScreenHeight);
                     Program.currentScreen = GameScreen.Playing;

@@ -30,9 +30,8 @@ internal class MainMenuScreen : IGameScreen
     private struct Dust { public float X, Y, Speed, SwayAmp, SwayFreq, Phase, Size; public byte Alpha; }
     private Dust[] _dust = Array.Empty<Dust>();
 
-    // Options-Overlay: Ein-/Ausblenden und weiche Hover-/Schalter-Zustaende
+    // Options-Overlay: Ein-/Ausblenden und weiche Hover-Zustaende
     private float _optionsAnim;                          // 0..1
-    private float _dayNightToggleAnim;
     private readonly float[] _optHover = new float[2];   // 0 = Zurueck, 1 = Schliessen
 
     private static readonly (string Text, string Author)[] Quotes =
@@ -63,7 +62,6 @@ internal class MainMenuScreen : IGameScreen
         Array.Clear(_hoverAnim, 0, _hoverAnim.Length);
         _optionsAnim = 0f;
         Array.Clear(_optHover, 0, _optHover.Length);
-        _dayNightToggleAnim = Program.ui.MainMenuDayNightCycleEnabled ? 1f : 0f;
         _mapClock = 17.0f + (float)_rng.NextDouble() * 4f; // Abendstimmung ueber Europa
 
         // Partikel initialisieren
@@ -99,7 +97,9 @@ internal class MainMenuScreen : IGameScreen
         // sanfte Sinus-Kamerafahrt (bleibt automatisch in Grenzen) + wandernde Uhrzeit
         Program.worldMap.Move(new Vector2(MathF.Cos(_menuTime * 0.055f) * 9f * dt, 0));
         _mapClock = (_mapClock + dt * 0.10f) % 24f; // voller Tag in 4 Minuten
-        Program.worldMap.DayNightCycleEnabled = Program.ui.MainMenuDayNightCycleEnabled;
+        // Menue-Hintergrund zeigt immer den Tag/Nacht-Zyklus (rein aesthetisch).
+        // Im Spiel ist er standardmaessig aus und ueber die Pause-Optionen schaltbar.
+        Program.worldMap.DayNightCycleEnabled = true;
 
         if (_quoteTimer >= 9f)
         {
@@ -258,7 +258,7 @@ internal class MainMenuScreen : IGameScreen
     {
         Program.worldMap.Draw(null, null, null, null, null);
 
-        if (Program.ui.MainMenuDayNightCycleEnabled)
+        // Menue-Hintergrund immer mit Tag/Nacht-Zyklus (aesthetisch)
         {
             int dayOfYear = DateTime.Now.DayOfYear;
             Program.worldMap.DrawDayNightOverlay(_mapClock, dayOfYear);
@@ -506,10 +506,10 @@ internal class MainMenuScreen : IGameScreen
     /// Gemeinsames Layout fuer Update und Draw (eine Quelle, keine Duplikate)
     /// </summary>
     private static (Rectangle Panel, Rectangle Close, Rectangle Back, Rectangle MusicTrack,
-        Rectangle SoundTrack, Rectangle Toggle) GetOptionsLayout()
+        Rectangle SoundTrack) GetOptionsLayout()
     {
         const int menuW = 520;
-        const int menuH = 500;
+        const int menuH = 380;
         const int pad = 36;
         int x = (Program.ScreenWidth - menuW) / 2;
         int y = (Program.ScreenHeight - menuH) / 2;
@@ -517,16 +517,13 @@ internal class MainMenuScreen : IGameScreen
         int soundHeaderY = y + 96;
         int musicTrackY = soundHeaderY + 64;
         int soundTrackY = musicTrackY + 64;
-        int gfxHeaderY = soundTrackY + 44;
-        int toggleY = gfxHeaderY + 34;
 
         return (
             new Rectangle(x, y, menuW, menuH),
             new Rectangle(x + menuW - 44, y + 12, 32, 32),
             new Rectangle(x + pad, y + menuH - 74, menuW - pad * 2, 50),
             new Rectangle(x + pad, musicTrackY, menuW - pad * 2, 10),
-            new Rectangle(x + pad, soundTrackY, menuW - pad * 2, 10),
-            new Rectangle(x + menuW - pad - 58, toggleY, 58, 28));
+            new Rectangle(x + pad, soundTrackY, menuW - pad * 2, 10));
     }
 
     private static Rectangle Inflate(Rectangle r, float dx, float dy) =>
@@ -579,11 +576,6 @@ internal class MainMenuScreen : IGameScreen
                 // X, Zurueck oder Klick neben das Panel schliessen
                 Close();
             }
-            else if (Raylib.CheckCollisionPointRec(mousePos, l.Toggle))
-            {
-                Program.ui.MainMenuDayNightCycleEnabled = !Program.ui.MainMenuDayNightCycleEnabled;
-                SoundManager.Play(SoundEffect.Click);
-            }
         }
 
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
@@ -611,7 +603,6 @@ internal class MainMenuScreen : IGameScreen
         var panel = Shift(l.Panel);
         var musicTrack = Shift(l.MusicTrack);
         var soundTrack = Shift(l.SoundTrack);
-        var toggle = Shift(l.Toggle);
         var back = Shift(l.Back);
         var close = Shift(l.Close);
 
@@ -647,24 +638,6 @@ internal class MainMenuScreen : IGameScreen
             Program.ui.IsDraggingMusicSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(musicTrack, 10, 14)), ease);
         MenuStyle.DrawOptionSlider("Sound-Lautstärke", soundTrack, Program.ui.OptionsSoundVolume,
             Program.ui.IsDraggingSoundSlider || Raylib.CheckCollisionPointRec(mousePos, Inflate(soundTrack, 10, 14)), ease);
-
-        // === Grafik ===
-        MenuStyle.DrawOptionsSection("GRAFIK", cx, (int)toggle.Y - 34, cw, ease);
-
-        bool dayNightOn = Program.ui.MainMenuDayNightCycleEnabled;
-        _dayNightToggleAnim += ((dayNightOn ? 1f : 0f) - _dayNightToggleAnim) * Math.Min(1f, dt * 14f);
-        float t = _dayNightToggleAnim;
-
-        Program.DrawGameText("Tag/Nacht-Zyklus auf der Karte", cx, (int)toggle.Y + 5, 17,
-            new Color((byte)210, (byte)215, (byte)228, A(235)));
-
-        string status = dayNightOn ? "AN" : "AUS";
-        int statusW = Program.MeasureTextCached(status, 15);
-        Program.DrawGameText(status, (int)toggle.X - statusW - 12, (int)toggle.Y + 6, 15,
-            dayNightOn ? gold : new Color((byte)140, (byte)146, (byte)162, A(200)));
-
-        // Schalter-Pille mit gleitendem Knopf
-        MenuStyle.DrawTogglePill(toggle, t, ease);
 
         // === Zurueck-Button + Schliessen-Kreuz ===
         bool hoverBack = open && Raylib.CheckCollisionPointRec(mousePos, back);

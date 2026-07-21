@@ -26,7 +26,7 @@ internal class CountrySelectScreen : IGameScreen
             if (Raylib.IsMouseButtonPressed(MouseButton.Left) && Program.ui.SelectCountryButtonHovered)
             {
                 Program.game.SelectPlayerCountry(Program.ui.SelectedCountryId);
-                Program.worldMap.DayNightCycleEnabled = Program.ui.MainMenuDayNightCycleEnabled;
+                Program.worldMap.DayNightCycleEnabled = false; // Neues Spiel: standardmaessig aus (in den Pause-Optionen aktivierbar)
                 Program.currentScreen = GameScreen.Playing;
                 return;
             }

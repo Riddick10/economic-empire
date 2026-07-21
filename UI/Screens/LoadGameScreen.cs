@@ -111,7 +111,7 @@ internal class LoadGameScreen : IGameScreen
 
                         Program.game.SelectPlayerCountry(saveData.PlayerCountryId);
 
-                        Program.worldMap.DayNightCycleEnabled = Program.ui.MainMenuDayNightCycleEnabled;
+                        Program.worldMap.DayNightCycleEnabled = false; // Standardmaessig aus (in den Pause-Optionen aktivierbar)
 
                         Program.currentScreen = GameScreen.Playing;
                     }

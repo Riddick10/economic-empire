@@ -326,7 +326,6 @@ class UIState
     public bool IsDraggingMusicSlider;
     public bool IsDraggingSoundSlider;
     public bool IsDraggingDeficitSlider;
-    public bool MainMenuDayNightCycleEnabled = false; // Standard: aus (in den Optionen aktivierbar)
 
     // Sonstiges
     public int LastNotificationId = -1;
