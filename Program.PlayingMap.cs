@@ -793,19 +793,20 @@ partial class Program
             SoundManager.Play(SoundEffect.Click);
         }
 
-        // === NACHRICHTEN-BUTTON (ueber dem Kartenansichten-Rahmen) ===
+        // === NACHRICHTEN-BUTTON (Handy) - oeffnet das Handy mit allen Nachrichten ===
         int newsBtnX = ScreenWidth - btnSize - 15;
         int newsBtnY = frameY - btnSize - btnSpacing;
         Rectangle newsBtn = new Rectangle(newsBtnX, newsBtnY, btnSize, btnSize);
         bool hoverNews = Raylib.CheckCollisionPointRec(mousePos, newsBtn);
-        bool activeNews = ui.ActiveTopMenuPanel == TopMenuPanel.News;
+        bool activeNews = ui.ShowNotificationPhone;
 
         Color newsBtnColor = activeNews ? ColorPalette.Accent : (hoverNews ? ColorPalette.PanelLight : ColorPalette.Panel);
         Raylib.DrawRectangleRec(newsBtn, newsBtnColor);
         Raylib.DrawRectangleLinesEx(newsBtn, 2, activeNews ? ColorPalette.Accent : ColorPalette.PanelLight);
 
-        // News-Icon zeichnen
-        DrawViewIcon(LoadCachedIcon(ref _newsIcon, "news.png"), newsBtnX, newsBtnY, btnSize, activeNews, hoverNews);
+        // Handy-Icon zeichnen (aktiv = dunkel auf Gold, sonst hell)
+        Color phoneIconColor = activeNews ? ColorPalette.Panel : (hoverNews ? ColorPalette.TextWhite : new Color((byte)200, (byte)200, (byte)200, (byte)255));
+        DrawPhoneIcon(newsBtnX + btnSize / 2, newsBtnY + btnSize / 2, btnSize, phoneIconColor);
 
         // Badge (ungelesene Nachrichten)
         int unread = _mgr.Notif?.UnreadCount ?? 0;
@@ -819,16 +820,20 @@ partial class Program
             DrawGameText(badgeText, badgeX + (badgeW - MeasureTextCached(badgeText, 12)) / 2, badgeY2 + 2, 11, ColorPalette.TextWhite);
         }
 
-        // Klick-Handler fuer News-Button
+        // Klick-Handler: Handy oeffnen/schliessen
         if (hoverNews && Raylib.IsMouseButtonPressed(MouseButton.Left))
         {
-            ui.ActiveTopMenuPanel = activeNews ? TopMenuPanel.None : TopMenuPanel.News;
-            ui.ShowBuildPanel = false;
+            ui.ShowNotificationPhone = !activeNews;
             SoundManager.Play(SoundEffect.Click);
-            if (ui.ActiveTopMenuPanel != TopMenuPanel.None)
+            if (ui.ShowNotificationPhone)
             {
+                // Beim Oeffnen: als gelesen markieren + andere Panels schliessen
+                _mgr.Notif?.MarkAllAsRead();
+                ui.NotificationScrollOffset = 0;
+                ui.ShowBuildPanel = false;
                 ui.ShowPoliticsPanel = false;
                 ui.ShowProvincePanel = false;
+                ui.ActiveTopMenuPanel = TopMenuPanel.None;
             }
         }
 

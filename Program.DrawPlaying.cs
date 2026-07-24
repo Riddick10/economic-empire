@@ -438,7 +438,7 @@ partial class Program
         }
 
         // === POPUP-NACHRICHTEN (unten rechts) ===
-        DrawNotificationPopups();
+        DrawNotificationPhone();
 
         // Bottom Bar (Berater-Leiste + Steuerung)
         int bbY = ScreenHeight - GameConfig.BOTTOM_BAR_HEIGHT;

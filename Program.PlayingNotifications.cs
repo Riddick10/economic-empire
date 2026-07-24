@@ -61,22 +61,27 @@ partial class Program
     /// <summary>
     /// Zeichnet aktive Popup-Nachrichten als Smartphone mit X-App (scrollbar)
     /// </summary>
-    static void DrawNotificationPopups()
+    static void DrawNotificationPhone()
     {
         var notifMgr = _mgr.Notif;
         if (notifMgr == null) return;
 
         var popups = notifMgr.ActivePopups;
-        if (popups.Count == 0) return;
+        bool manual = ui.ShowNotificationPhone;   // per Handy-Button geoeffnet (volle Historie)
+        bool showForPopup = popups.Count > 0;      // neue Meldung poppt automatisch auf
+        if (!manual && !showForPopup) return;
 
-        // Nur das neueste Popup anzeigen
-        var popup = popups[0];
+        var all = notifMgr.Notifications;          // alle Nachrichten, neueste zuerst
 
-        // Scroll-Reset wenn neue Nachricht
-        if (popup.Id != ui.LastNotificationId)
+        // Hauptpost: aktives Popup, sonst die neueste Nachricht
+        GameNotification? main = showForPopup ? popups[0] : (all.Count > 0 ? all[0] : null);
+
+        // Scroll-Reset bei Wechsel des Hauptposts / beim Oeffnen
+        int mainId = main?.Id ?? -1;
+        if (mainId != ui.LastNotificationId)
         {
             ui.NotificationScrollOffset = 0;
-            ui.LastNotificationId = popup.Id;
+            ui.LastNotificationId = mainId;
         }
 
         Vector2 mousePos = _cachedMousePos;
@@ -175,18 +180,25 @@ partial class Program
         int scrollY = contentY - ui.NotificationScrollOffset;
         int cursorY = scrollY;
 
-        // Hauptpost (die aktuelle Meldung, gross)
-        cursorY = DrawXPost(popup, screenX, cursorY, screenW, isMainPost: true, contentClip);
-
-        // Aeltere Meldungen als kompakte Feed-Posts darunter
-        var all = notifMgr.Notifications;
-        int shown = 0;
-        for (int i = all.Count - 1; i >= 0 && shown < 6; i--)
+        if (main != null)
         {
-            var n = all[i];
-            if (n.Id == popup.Id) continue;
-            cursorY = DrawXPost(n, screenX, cursorY, screenW, isMainPost: false, contentClip);
-            shown++;
+            // Hauptpost (neueste Meldung, gross)
+            cursorY = DrawXPost(main, screenX, cursorY, screenW, isMainPost: true, contentClip);
+
+            // Alle weiteren (auch historischen) Meldungen als Feed, neueste zuerst
+            for (int i = 0; i < all.Count; i++)
+            {
+                var n = all[i];
+                if (n.Id == main.Id) continue;
+                cursorY = DrawXPost(n, screenX, cursorY, screenW, isMainPost: false, contentClip);
+            }
+        }
+        else
+        {
+            // Leerzustand (Handy manuell geoeffnet, aber keine Nachrichten)
+            string empty = "Keine Nachrichten";
+            int ew = MeasureTextCached(empty, 15);
+            DrawGameText(empty, screenX + (screenW - ew) / 2, contentY + 40, 15, XGray);
         }
 
         int totalContentH = cursorY - scrollY + 10;
@@ -260,16 +272,12 @@ partial class Program
 
         if (Raylib.IsMouseButtonPressed(MouseButton.Left) && closeHover)
         {
-            notifMgr.DismissPopup(popup.Id);
+            if (manual) ui.ShowNotificationPhone = false;
+            if (showForPopup) notifMgr.DismissAllPopups();   // ganze Salve auf einmal schliessen
             ui.NotificationScrollOffset = 0;
             SoundManager.Play(SoundEffect.Click);
         }
-
-        if (Raylib.IsKeyPressed(KeyboardKey.Escape) || Raylib.IsKeyPressed(KeyboardKey.Enter))
-        {
-            notifMgr.DismissPopup(popup.Id);
-            ui.NotificationScrollOffset = 0;
-        }
+        // Escape schliesst das Handy - zentral in Program.Update (vor dem Pause-Menue) behandelt.
     }
 
     /// <summary>
@@ -541,6 +549,28 @@ partial class Program
         // Umschlag-Klappe
         Raylib.DrawLineEx(new Vector2(cx - w + 2, cy - h + 2), new Vector2(cx, cy + 1), 2f, color);
         Raylib.DrawLineEx(new Vector2(cx, cy + 1), new Vector2(cx + w - 2, cy - h + 2), 2f, color);
+    }
+
+    /// <summary>
+    /// Smartphone-Icon (Hochformat) fuer den Nachrichten-Button, zentriert bei (cx,cy).
+    /// <paramref name="btnSize"/> = Groesse des Buttons (Icon skaliert daraus).
+    /// </summary>
+    static void DrawPhoneIcon(int cx, int cy, int btnSize, Color color)
+    {
+        float h = btnSize * 0.58f;
+        float w = h * 0.54f;
+        float x = cx - w / 2f;
+        float y = cy - h / 2f;
+        float thick = Math.Max(1.5f, btnSize * 0.05f);
+
+        // Handy-Umriss
+        Raylib.DrawRectangleRoundedLinesEx(new Rectangle(x, y, w, h), 0.30f, 8, thick, color);
+        // Lautsprecher-Schlitz oben
+        Raylib.DrawLineEx(new Vector2(cx - w * 0.16f, y + h * 0.14f),
+            new Vector2(cx + w * 0.16f, y + h * 0.14f), Math.Max(1.2f, btnSize * 0.035f), color);
+        // Home-Indikator unten
+        Raylib.DrawLineEx(new Vector2(cx - w * 0.18f, y + h * 0.87f),
+            new Vector2(cx + w * 0.18f, y + h * 0.87f), Math.Max(1.2f, btnSize * 0.035f), color);
     }
 
     /// <summary>

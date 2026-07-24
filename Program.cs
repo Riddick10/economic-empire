@@ -259,6 +259,7 @@ class UIState
     public bool ShowProvincePanel;
     public bool ShowBuildPanel;
     public bool ShowTutorialPanel;
+    public bool ShowNotificationPhone;   // Handy mit allen (auch historischen) Nachrichten
     public bool ShowPauseMenu;
     public bool ShowOptionsMenu;
     public bool ShowSavePanel;
@@ -366,6 +367,7 @@ class UIState
         ShowProvincePanel = false;
         ShowBuildPanel = false;
         ShowTutorialPanel = false;
+        ShowNotificationPhone = false;
         ShowPauseMenu = false;
         ShowOptionsMenu = false;
         ShowSavePanel = false;

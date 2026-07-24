@@ -20,6 +20,7 @@ partial class Program
     /// </summary>
     static bool HasActiveNotificationPopup()
     {
+        if (ui.ShowNotificationPhone) return true;   // manuell geoeffnetes Handy blockiert auch
         var notifMgr = _mgr.Notif;
         if (notifMgr == null) return false;
         return notifMgr.ActivePopups.Count > 0;
@@ -357,7 +358,7 @@ partial class Program
         }
 
         // Wenn Nachrichten-Popup aktiv, nur beschraenkte Interaktion erlauben
-        // (Die Popup-Interaktion wird in DrawNotificationPopups behandelt)
+        // (Die Handy-/Popup-Interaktion wird in DrawNotificationPhone behandelt)
         if (HasActiveNotificationPopup())
         {
             // Tick-basierte Simulation laeuft weiter (oder pausiert je nach Einstellung)
@@ -720,6 +721,18 @@ partial class Program
         // ESC-Taste
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))
         {
+            // Handy hat Vorrang: Escape schliesst es bzw. verwirft das aktive Popup
+            // (verhindert, dass gleichzeitig das Pause-Menue aufgeht).
+            var notif = _mgr.Notif;
+            if (ui.ShowNotificationPhone || (notif?.ActivePopups.Count ?? 0) > 0)
+            {
+                ui.ShowNotificationPhone = false;
+                if (notif != null && notif.ActivePopups.Count > 0)
+                    notif.DismissAllPopups();   // ganze Salve auf einmal schliessen
+                ui.NotificationScrollOffset = 0;
+                return;
+            }
+
             // Wenn Bau-Modus aktiv, erst diesen abbrechen
             if (ui.FactoryBuildMode != null)
             {

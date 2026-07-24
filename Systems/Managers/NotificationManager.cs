@@ -1,4 +1,5 @@
 using GrandStrategyGame.Models;
+using Raylib_cs;
 
 namespace GrandStrategyGame.Systems.Managers;
 
@@ -21,6 +22,11 @@ public class NotificationManager : GameSystemBase
     // Gecachte Popup-Liste (wird nur bei Aenderungen aktualisiert)
     private readonly List<GameNotification> _activePopupsCache = new();
     private bool _popupCacheDirty = true;
+
+    // Entprellung des Benachrichtigungstons: bei mehreren Meldungen im selben
+    // Moment (z.B. NATO-Buendnisbeitritt) nur EIN Ton statt einer Salve.
+    private double _lastSoundTime = -1;
+    private const double SoundDebounceSeconds = 0.4;
 
     /// <summary>
     /// Alle Nachrichten (neueste zuerst)
@@ -100,9 +106,27 @@ public class NotificationManager : GameSystemBase
         _notifications.Insert(0, notification); // Neueste zuerst
         _popupCacheDirty = true;
 
-        // Twitter-Sound abspielen (wie X/Twitter Benachrichtigung)
-        // Fallback auf NotificationInfo wenn Twitter-Sound nicht vorhanden
-        SoundManager.PlayWithFallback(SoundEffect.NotificationTwitter, SoundEffect.NotificationInfo);
+        // Twitter-Sound abspielen (wie X/Twitter Benachrichtigung), aber entprellt:
+        // eine Salve gleichzeitiger Meldungen spielt den Ton nur einmal.
+        double now = Raylib.GetTime();
+        if (now - _lastSoundTime > SoundDebounceSeconds)
+        {
+            _lastSoundTime = now;
+            SoundManager.PlayWithFallback(SoundEffect.NotificationTwitter, SoundEffect.NotificationInfo);
+        }
+    }
+
+    /// <summary>
+    /// Schliesst ALLE aktiven Popups auf einmal (setzt PopupRemainingDays auf 0).
+    /// So verwirft ein einziges Schliessen im Handy eine ganze Salve gleichzeitiger
+    /// Meldungen (z.B. alle NATO-Buendnisbeitritte), statt eins nach dem anderen.
+    /// </summary>
+    public void DismissAllPopups()
+    {
+        bool any = false;
+        foreach (var n in _notifications)
+            if (n.PopupRemainingDays > 0) { n.PopupRemainingDays = 0; any = true; }
+        if (any) _popupCacheDirty = true;
     }
 
     /// <summary>
