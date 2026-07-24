@@ -40,6 +40,7 @@ public partial class MilitaryManager : GameSystemBase
     // Referenzen fuer Provinz-Eroberung
     private GameContext? _context;
     private NotificationManager? _notificationManager;
+    private DiplomacyManager? _diplomacyManager;
 
     // Flag: Starteinheiten bereits erstellt (oder aus Spielstand geladen)
     private bool _startingUnitsCreated;
@@ -48,6 +49,7 @@ public partial class MilitaryManager : GameSystemBase
     {
         _context = context;
         _notificationManager = context.Game.GetSystem<NotificationManager>();
+        _diplomacyManager = context.Game.GetSystem<DiplomacyManager>();
 
         // Initialisiere Militärstärke für alle Länder
         foreach (var (countryId, country) in context.Countries)

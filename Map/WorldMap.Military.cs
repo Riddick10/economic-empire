@@ -127,21 +127,19 @@ public partial class WorldMap
     /// </summary>
     private void DrawMovingUnit(MilitaryUnit unit, string? playerCountryId, MilitaryUnit? selectedUnit)
     {
-        // Hole Start- und Zielprovinz
-        string? startId = unit.StartProvinceId ?? unit.ProvinceId;
-        string? targetId = unit.TargetProvinceId;
+        if (unit.TargetProvinceId == null) return;
 
-        if (targetId == null) return;
-        if (!Provinces.TryGetValue(startId, out var startProvince)) return;
-        if (!Provinces.TryGetValue(targetId, out var targetProvince)) return;
+        // Wegpunkte (Screen) entlang der Provinzkette (oder Luftlinie-Fallback)
+        var wpMap = BuildMovementWaypointsMap(unit);
+        if (wpMap.Count < 2) return;
+        var pts = new List<Vector2>(wpMap.Count);
+        foreach (var w in wpMap) pts.Add(MapToScreen(w));
 
         // VisualProgress wird zentral in MilitaryManager.UpdateMovementAnimation
         // fluessig (an die Simulationsuhr gekoppelt) gesetzt - hier nur lesen.
         float t = Math.Clamp(unit.VisualProgress, 0f, 1f);
-
-        Vector2 startScreen = MapToScreen(startProvince.LabelPosition);
-        Vector2 targetScreen = MapToScreen(targetProvince.LabelPosition);
-        Vector2 curScreen = Vector2.Lerp(startScreen, targetScreen, t);
+        Vector2 curScreen = PolylineAt(pts, t, out int segIdx);
+        Vector2 goalScreen = pts[^1];
 
         double time = Raylib.GetTime();
         float th = Math.Max(1.5f, Zoom * 0.32f);
@@ -150,25 +148,89 @@ public partial class WorldMap
         Color routeGlow = new Color((byte)130, (byte)175, (byte)255, (byte)225); // fliessende Marschlinie
         Color destCol = new Color((byte)140, (byte)185, (byte)255, (byte)235);   // Zielmarker
 
-        // 1) Gedimmte Gesamtroute als ruhige Basis
-        Raylib.DrawLineEx(startScreen, targetScreen, th * 0.55f, routeDim);
+        // 1) Gedimmte Gesamtroute (alle Segmente der Provinzkette)
+        for (int i = 0; i < pts.Count - 1; i++)
+            Raylib.DrawLineEx(pts[i], pts[i + 1], th * 0.55f, routeDim);
 
-        // 2) Animierte Marschlinie auf dem verbleibenden Weg, fliesst zum Ziel
+        // 2) Animierte Marschlinie auf dem verbleibenden Weg, fliesst zum Ziel:
+        //    Rest des aktuellen Segments + alle folgenden Segmente.
         float dash = Math.Max(6f, Zoom * 0.9f);
         float gap = Math.Max(5f, Zoom * 0.8f);
         float phase = (float)(time * (Zoom * 3f + 22f));   // px/s -> Marschgeschwindigkeit
-        DrawDashedLine(curScreen, targetScreen, routeGlow, dash, gap, th, phase);
+        DrawDashedLine(curScreen, pts[segIdx + 1], routeGlow, dash, gap, th, phase);
+        for (int i = segIdx + 1; i < pts.Count - 1; i++)
+            DrawDashedLine(pts[i], pts[i + 1], routeGlow, dash, gap, th, phase);
 
         // 3) Zielmarker: pulsierender Doppelring + Kern (Fadenkreuz-Anmutung)
         float pulse = (float)(Math.Sin(time * 3.0) * 0.5 + 0.5);
         float rOuter = (2.6f + pulse * 2.0f) * Zoom * 0.42f;
-        Raylib.DrawCircleLines((int)targetScreen.X, (int)targetScreen.Y, rOuter, destCol);
-        Raylib.DrawCircleLines((int)targetScreen.X, (int)targetScreen.Y, rOuter * 0.55f, destCol);
-        Raylib.DrawCircle((int)targetScreen.X, (int)targetScreen.Y, Math.Max(1.5f, Zoom * 0.24f), destCol);
+        Raylib.DrawCircleLines((int)goalScreen.X, (int)goalScreen.Y, rOuter, destCol);
+        Raylib.DrawCircleLines((int)goalScreen.X, (int)goalScreen.Y, rOuter * 0.55f, destCol);
+        Raylib.DrawCircle((int)goalScreen.X, (int)goalScreen.Y, Math.Max(1.5f, Zoom * 0.24f), destCol);
 
         // 4) Einheit an interpolierter Position (Glas-Chit im Moving-Zustand)
         var unitIcon = TextureManager.GetMilitaryUnit(unit.Type);
         DrawUnitMarkerAtPosition(curScreen, new List<MilitaryUnit> { unit }, unitIcon, playerCountryId, false, true, selectedUnit);
+    }
+
+    /// <summary>
+    /// Map-Wegpunkte einer bewegenden Einheit: entlang der Provinzkette
+    /// (<see cref="MilitaryUnit.MovementPath"/>) oder als direkte Start-&gt;Ziel-Linie
+    /// (Luftlinie-Fallback), falls kein Pfad vorhanden ist.
+    /// </summary>
+    private List<Vector2> BuildMovementWaypointsMap(MilitaryUnit unit)
+    {
+        var result = new List<Vector2>();
+        var path = unit.MovementPath;
+        if (path != null && path.Count >= 2)
+        {
+            foreach (var id in path)
+                if (Provinces.TryGetValue(id, out var pr)) result.Add(pr.LabelPosition);
+            if (result.Count >= 2) return result;
+            result.Clear();
+        }
+
+        string? startId = unit.StartProvinceId ?? unit.ProvinceId;
+        string? targetId = unit.TargetProvinceId;
+        if (startId != null && targetId != null &&
+            Provinces.TryGetValue(startId, out var s) && Provinces.TryGetValue(targetId, out var g))
+        {
+            result.Add(s.LabelPosition);
+            result.Add(g.LabelPosition);
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Position bei Fortschritt <paramref name="t"/> (0..1) entlang eines Polygonzugs,
+    /// gewichtet nach Segmentlaengen. <paramref name="segIdx"/> = Index des Segments,
+    /// in dem sich die Position befindet.
+    /// </summary>
+    private static Vector2 PolylineAt(List<Vector2> pts, float t, out int segIdx)
+    {
+        segIdx = 0;
+        if (pts.Count == 1) return pts[0];
+
+        float total = 0f;
+        for (int i = 0; i < pts.Count - 1; i++)
+            total += Vector2.Distance(pts[i], pts[i + 1]);
+        if (total < 1e-3f) return pts[0];
+
+        float target = Math.Clamp(t, 0f, 1f) * total;
+        float acc = 0f;
+        for (int i = 0; i < pts.Count - 1; i++)
+        {
+            float seg = Vector2.Distance(pts[i], pts[i + 1]);
+            if (acc + seg >= target || i == pts.Count - 2)
+            {
+                segIdx = i;
+                float local = seg > 1e-3f ? Math.Clamp((target - acc) / seg, 0f, 1f) : 0f;
+                return Vector2.Lerp(pts[i], pts[i + 1], local);
+            }
+            acc += seg;
+        }
+        segIdx = pts.Count - 2;
+        return pts[^1];
     }
 
     /// <summary>
@@ -426,20 +488,18 @@ public partial class WorldMap
     /// </summary>
     private Vector2 GetMovingUnitScreenPosition(MilitaryUnit unit)
     {
-        string? startId = unit.StartProvinceId ?? unit.ProvinceId;
-        string? targetId = unit.TargetProvinceId;
-
-        if (targetId == null || !Provinces.TryGetValue(startId, out var startProvince) || !Provinces.TryGetValue(targetId, out var targetProvince))
+        // Position entlang der Provinzkette (oder Luftlinie), konsistent mit dem Rendering
+        var wpMap = BuildMovementWaypointsMap(unit);
+        if (wpMap.Count < 2)
         {
-            // Fallback: aktuelle Provinz-Position
             if (Provinces.TryGetValue(unit.ProvinceId, out var currentProvince))
                 return MapToScreen(currentProvince.LabelPosition);
             return Vector2.Zero;
         }
 
-        // Nutze visuellen Fortschritt fuer konsistente Position
-        Vector2 currentMapPos = Vector2.Lerp(startProvince.LabelPosition, targetProvince.LabelPosition, unit.VisualProgress);
-        return MapToScreen(currentMapPos);
+        var pts = new List<Vector2>(wpMap.Count);
+        foreach (var w in wpMap) pts.Add(MapToScreen(w));
+        return PolylineAt(pts, Math.Clamp(unit.VisualProgress, 0f, 1f), out _);
     }
 
     private void DrawUnitMarker(Vector2 basePos, float offsetX, List<MilitaryUnit> units, Texture2D? icon, string? playerCountryId, bool isRecruiting, bool isMoving, MilitaryUnit? selectedUnit)

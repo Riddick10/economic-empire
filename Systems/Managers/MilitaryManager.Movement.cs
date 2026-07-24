@@ -1,3 +1,4 @@
+using System.Numerics;
 using GrandStrategyGame.Data;
 using GrandStrategyGame.Map;
 using GrandStrategyGame.Models;
@@ -95,6 +96,7 @@ public partial class MilitaryManager
                 unit.ProvinceId = unit.TargetProvinceId;
                 unit.StartProvinceId = null;
                 unit.TargetProvinceId = null;
+                unit.MovementPath = null;
                 unit.VisualProgress = 0f;
                 unit.Status = UnitStatus.Ready;
 
@@ -151,8 +153,73 @@ public partial class MilitaryManager
             return true;
         }
 
-        unit.StartMovement(targetProvinceId, movementHours);
+        // HOI4-artiger Pfad ueber benachbarte Provinzen suchen (neutrales Gebiet
+        // umgehen, eigenes/verbuendetes/feindliches Gebiet ist passierbar).
+        List<string>? path = null;
+        var worldMap = _context?.WorldMap;
+        if (worldMap != null)
+        {
+            path = worldMap.ProvinceGraph.FindPath(
+                unit.ProvinceId, targetProvinceId, worldMap.Provinces,
+                provId => IsProvincePassable(unit.CountryId, provId, worldMap));
+        }
+
+        if (path != null && path.Count >= 2)
+        {
+            // Bewegungszeit anhand der echten Pfadlaenge (Umwege dauern laenger)
+            float pathLen = PathLength(path, worldMap!.Provinces);
+            int hours = Math.Clamp((int)(pathLen / 50f) + 6, 6, 72);
+            unit.StartMovement(targetProvinceId, hours);
+            unit.MovementPath = path;
+        }
+        else
+        {
+            // Kein Landweg gefunden -> Luftlinie-Fallback (z.B. Insel/Uebersee)
+            unit.StartMovement(targetProvinceId, movementHours);
+            unit.MovementPath = null;
+        }
         return true;
+    }
+
+    /// <summary>
+    /// Ob eine Einheit von Land <paramref name="countryId"/> die Provinz betreten darf:
+    /// eigenes Gebiet, verbuendetes Gebiet (Durchmarschrecht) oder feindliches
+    /// Gebiet (Einmarsch) = ja; neutrales Drittland = nein (wird umgangen).
+    /// </summary>
+    private bool IsProvincePassable(string countryId, string provinceId, WorldMap worldMap)
+    {
+        if (!worldMap.Provinces.TryGetValue(provinceId, out var prov)) return false;
+        string owner = prov.CountryId;
+        if (owner == countryId) return true;
+        if (IsAtWarWith(countryId, owner)) return true;
+        if (AreAllied(countryId, owner)) return true;
+        return false;
+    }
+
+    /// <summary>Ob zwei Laender im selben Buendnis sind (Durchmarschrecht).</summary>
+    private bool AreAllied(string countryA, string countryB)
+    {
+        if (countryA == countryB) return true;
+        if (_diplomacyManager == null) return false;
+        var alliancesA = _diplomacyManager.GetCountryAlliances(countryA);
+        if (alliancesA.Count == 0) return false;
+        var alliancesB = _diplomacyManager.GetCountryAlliances(countryB);
+        for (int i = 0; i < alliancesA.Count; i++)
+            if (alliancesB.Contains(alliancesA[i])) return true;
+        return false;
+    }
+
+    /// <summary>Summe der Distanzen zwischen aufeinanderfolgenden Provinz-Zentren.</summary>
+    private static float PathLength(List<string> path, IReadOnlyDictionary<string, Province> provinces)
+    {
+        float sum = 0f;
+        for (int i = 0; i < path.Count - 1; i++)
+        {
+            if (provinces.TryGetValue(path[i], out var a) &&
+                provinces.TryGetValue(path[i + 1], out var b))
+                sum += Vector2.Distance(a.LabelPosition, b.LabelPosition);
+        }
+        return sum;
     }
 
     /// <summary>

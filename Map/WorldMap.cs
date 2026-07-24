@@ -22,6 +22,9 @@ public partial class WorldMap
     public Dictionary<string, MapRegion> Regions { get; private set; }
     public Dictionary<string, Province> Provinces { get; private set; }
 
+    /// <summary>Nachbarschaftsgraph der Provinzen fuer Truppen-Pathfinding (HOI4-artig).</summary>
+    public ProvinceGraph ProvinceGraph { get; private set; } = new();
+
     // Staedte (nach Land gruppiert)
     public Dictionary<string, List<City>> Cities { get; private set; } = new();
 

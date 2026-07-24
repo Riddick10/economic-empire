@@ -70,6 +70,11 @@ public class MilitaryUnit
     // Bewegung (in Stunden)
     public string? StartProvinceId { get; set; }      // Startprovinz fuer Animation
     public string? TargetProvinceId { get; set; }
+
+    // HOI4-artiger Pfad: Provinzkette von Start bis Ziel entlang benachbarter
+    // Provinzen (statt Luftlinie). Null oder < 2 Eintraege -> direkte Linie
+    // (Luftlinie-Fallback, wenn kein Landweg gefunden wurde).
+    public List<string>? MovementPath { get; set; }
     public int MovementHoursLeft { get; set; }
     public int TotalMovementHours { get; set; }
     public float VisualProgress { get; set; }         // Fuer fluessige Animation (0-1)
@@ -162,6 +167,7 @@ public class MilitaryUnit
 
         StartProvinceId = ProvinceId;  // Merke Startposition fuer Animation
         TargetProvinceId = targetProvinceId;
+        MovementPath = null;           // wird von MoveUnit gesetzt (Pathfinding)
         TotalMovementHours = hoursNeeded;
         MovementHoursLeft = hoursNeeded;
         VisualProgress = 0f;           // Starte bei 0 fuer fluessige Animation
@@ -192,6 +198,7 @@ public class MilitaryUnit
                 }
                 StartProvinceId = null;
                 TargetProvinceId = null;
+                MovementPath = null;
                 VisualProgress = 0f;
                 Status = UnitStatus.Ready;
                 return true; // Bewegung abgeschlossen

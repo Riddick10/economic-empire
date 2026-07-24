@@ -607,6 +607,50 @@ public partial class WorldMap
         AssignStartingMinesFromDeposits();
 
         Console.WriteLine($"Gesamt: {Provinces.Count} Provinzen geladen");
+
+        // Nachbarschaftsgraph fuer Truppen-Pathfinding aufbauen
+        BuildProvinceGraph();
+    }
+
+    /// <summary>
+    /// Baut den Provinz-Nachbarschaftsgraphen und gibt eine Statistik aus
+    /// (zur Verifikation: isolierte Provinzen sollten selten sein).
+    /// </summary>
+    private void BuildProvinceGraph()
+    {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        ProvinceGraph.Build(Provinces.Values, delta: 1.0f);
+        sw.Stop();
+
+        int isolated = 0;
+        int totalNeighbors = 0;
+        foreach (var p in Provinces.Keys)
+        {
+            int deg = ProvinceGraph.GetNeighbors(p).Count;
+            if (deg == 0) isolated++;
+            totalNeighbors += deg;
+        }
+        float avg = Provinces.Count > 0 ? (float)totalNeighbors / Provinces.Count : 0f;
+        Console.WriteLine($"[ProvinceGraph] {ProvinceGraph.EdgeCount} Kanten, " +
+            $"Ø {avg:F1} Nachbarn/Provinz, {isolated} isolierte Provinzen (Inseln), " +
+            $"in {sw.ElapsedMilliseconds} ms");
+
+        // Stichproben zur Verifikation (bekannte Nachbarschaften)
+        foreach (var name in new[] { "Bayern", "Baden-Württemberg", "Sachsen" })
+        {
+            string? pid = null;
+            foreach (var pr in Provinces.Values)
+                if (pr.Name == name) { pid = pr.Id; break; }
+            if (pid == null) continue;
+
+            var sb = new System.Text.StringBuilder();
+            foreach (var nid in ProvinceGraph.GetNeighbors(pid))
+            {
+                if (sb.Length > 0) sb.Append(", ");
+                sb.Append(Provinces.TryGetValue(nid, out var q) ? q.Name : nid);
+            }
+            Console.WriteLine($"[ProvinceGraph]   {name} -> {sb}");
+        }
     }
 
     /// <summary>
