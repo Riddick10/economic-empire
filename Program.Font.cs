@@ -17,16 +17,23 @@ partial class Program
     static Font _labelFont;
     static bool _labelFontLoaded = false;
 
-    // Backing-Aufloesung des Font-Atlas (hoch, damit auch grosse Laendernamen
-    // scharf sind). Der Buchstabenabstand skaliert weiter ueber fontSize/96.
+    // Backing-Aufloesung des Laender-Namen-Atlas (hoch, damit auch grosse
+    // Laendernamen bis ~240px scharf sind).
     private const int FontAtlasSize = 200;
+
+    // Backing-Aufloesung des UI-Fonts. Der UI-Text wird nur mit 11-60px gezeichnet
+    // (Titel = 60px ist das Maximum). Ein 64px-Atlas rendert den Titel quasi 1:1
+    // und verkleinert den haeufigen 14px-Text nur ~4.6x statt ~14x -> deutlich
+    // schaerfer. WICHTIG: keine Mipmaps (verursachen Unschaerfe + Glyphen-"Bluten"
+    // als vertikale Linien), stattdessen Bilinear.
+    private const int GameFontAtlasSize = 64;
 
     /// <summary>
     /// Lädt den Custom Font mit allen benötigten Zeichen (inkl. Umlaute)
     /// </summary>
     static void LoadGameFont()
     {
-        string fontPath = Path.Combine("Data", "Fonts", "VCR_OSD_MONO.ttf");
+        string fontPath = Path.Combine("Data", "Fonts", "Inter-SemiBold.ttf");
 
         // Fallback-Pfade versuchen
         string[] searchPaths = {
@@ -47,7 +54,7 @@ partial class Program
 
         if (foundPath == null)
         {
-            Console.WriteLine("[Font] WARNUNG: VCR_OSD_MONO.ttf nicht gefunden!");
+            Console.WriteLine("[Font] WARNUNG: Inter-SemiBold.ttf nicht gefunden!");
             Console.WriteLine("[Font] Verwende Standard-Font (ohne Umlaute)");
             _fontLoaded = false;
             return;
@@ -95,7 +102,7 @@ partial class Program
             {
                 fixed (int* codepointsPtr = codepointArray)
                 {
-                    _gameFont = Raylib.LoadFontEx((sbyte*)fileNamePtr, FontAtlasSize, codepointsPtr, codepointArray.Length);
+                    _gameFont = Raylib.LoadFontEx((sbyte*)fileNamePtr, GameFontAtlasSize, codepointsPtr, codepointArray.Length);
                 }
             }
         }
@@ -104,7 +111,8 @@ partial class Program
             Marshal.FreeHGlobal(fileNamePtr);
         }
 
-        // Point-Filter für scharfe Pixel-Schrift (VCR OSD Mono Retro-Look)
+        // Bilinear ohne Mipmaps: scharfe, glatte Schrift. (Mipmaps verursachten
+        // Unschaerfe und vertikale Linien durch Glyphen-Bluten - daher entfernt.)
         Raylib.SetTextureFilter(_gameFont.Texture, TextureFilter.Bilinear);
 
         _fontLoaded = true;
