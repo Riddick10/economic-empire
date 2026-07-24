@@ -568,12 +568,8 @@ partial class Program
                             int daysLeft = clickedUnit.RecruitmentDaysLeft;
                             _mgr.Notif?.AddNotification("Rekrutierung", $"Einheit wird noch rekrutiert ({daysLeft} Tage)", NotificationType.Warning);
                         }
-                        else if (clickedUnit.Status == UnitStatus.Moving)
-                        {
-                            // Zeige Hinweis dass Einheit in Bewegung ist
-                            int hoursLeft = clickedUnit.MovementHoursLeft;
-                            _mgr.Notif?.AddNotification("Bewegung", $"Einheit in Bewegung ({hoursLeft} Stunden)", NotificationType.Info);
-                        }
+                        // Bewegende Einheiten: Klick wird still verbraucht - bewusst KEINE
+                        // Handy-Nachricht (stoert nur, waehrend die Einheit unterwegs ist).
                         return; // Keine weitere Verarbeitung
                     }
                 }
@@ -718,8 +714,8 @@ partial class Program
             }
         }
 
-        // Pruefe ob bewegende Einheiten visuell angekommen sind
-        _mgr.Military?.CheckVisualMovementCompletion();
+        // Fluessige Truppenbewegung aktualisieren + angekommene Einheiten abschliessen
+        _mgr.Military?.UpdateMovementAnimation(game.FractionalHour);
 
         // ESC-Taste
         if (Raylib.IsKeyPressed(KeyboardKey.Escape))

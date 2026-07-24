@@ -839,6 +839,16 @@ public partial class WorldMap
     private int _labelRecomputeCountdown = 0;
 
     /// <summary>
+    /// Pro-Land-Feinjustierung der Label-Groesse. Standard ist (Spread 0.72,
+    /// Font 0.9). Einzelne Laender, deren Name sonst ueber die Kueste ins Meer
+    /// ragt, bekommen kompaktere Werte (kuerzere Spreizung, kleinere Schrift).
+    /// </summary>
+    private static readonly Dictionary<string, (float SpreadFrac, float FontFrac)> LabelOverrides = new()
+    {
+        { "SWE", (0.50f, 0.75f) },   // Schweden: schmal + gekruemmt -> kompakter halten
+    };
+
+    /// <summary>
     /// Berechnet die Label-Layouts bei Bedarf neu (gedrosselt, da sich das
     /// Territorium nur bei Eroberungen aendert - ein kurzer Verzug ist unkritisch).
     /// </summary>
@@ -1047,14 +1057,23 @@ public partial class WorldMap
         Vector2 screenCenter = MapToScreen(layout.Center);
         string displayName = CountryNames.TryGetValue(countryId, out var fullName) ? fullName : countryId;
 
+        // Pro-Land-Feinjustierung (Standard 0.9 / 0.72); Sonderfaelle wie Schweden
+        // bekommen kompaktere Werte, damit der Name nicht ins Meer ragt.
+        float fontFrac = 0.9f, spreadFrac = 0.72f;
+        if (LabelOverrides.TryGetValue(countryId, out var ov))
+        {
+            fontFrac = ov.FontFrac;
+            spreadFrac = ov.SpreadFrac;
+        }
+
         // Schriftgroesse PROPORTIONAL zur Querausdehnung des Landes - KEINE feste
         // Obergrenze, damit der Name beim Reinzoomen mitwaechst und das Land immer
         // gleich gut fuellt (nur eine Sanity-Grenze). Zu kleines Label wird verworfen.
         const int fontFloor = 6;
-        int fontSize = Math.Min((int)(halfMinor * 0.9f), 240);
+        int fontSize = Math.Min((int)(halfMinor * fontFrac), 240);
         if (fontSize < fontFloor) return;
 
-        float targetWidth = halfMajor * 2f * 0.72f;
+        float targetWidth = halfMajor * 2f * spreadFrac;
 
         // Name zu breit? Erst Schrift verkleinern (statt sofort auf den Code),
         // damit deutlich mehr Laender mit vollem Namen erscheinen.

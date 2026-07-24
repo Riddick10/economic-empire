@@ -15,6 +15,8 @@ public static class TextureManager
     private static readonly Dictionary<string, Texture2D> _leaders = new();
     private static readonly Dictionary<ResourceType, Texture2D> _resources = new();
     private static readonly Dictionary<UnitType, Texture2D> _militaryUnits = new();
+    // Weisse Silhouetten der Militaer-Icons (fuer die Umrandung, die exakt der Icon-Form folgt)
+    private static readonly Dictionary<UnitType, Texture2D> _militaryOutlines = new();
 
     // Einzelne Texturen
     private static Texture2D? _mapViewIcon;
@@ -126,6 +128,37 @@ public static class TextureManager
         return LoadAndCache(_militaryUnits, type, path);
     }
 
+    /// <summary>
+    /// Weisse Silhouette eines Militaer-Icons (RGB auf Weiss, Alpha des Icons bleibt).
+    /// Wird versetzt hinter das Icon gezeichnet -> weisse Umrandung entlang der Icon-Form.
+    /// </summary>
+    public static Texture2D? GetMilitaryUnitOutline(UnitType type)
+    {
+        if (_militaryOutlines.TryGetValue(type, out var cached))
+            return cached;
+
+        string filename = MilitaryUnit.GetIconName(type);
+        string path = Path.Combine(BasePath, "Data", "Icons", "Military", filename);
+        if (!File.Exists(path)) return null;
+
+        try
+        {
+            Image img = Raylib.LoadImage(path);
+            Raylib.ImageFormat(ref img, PixelFormat.UncompressedR8G8B8A8);
+            // +255 Helligkeit -> alle RGB werden zu 255 (Weiss), Alpha bleibt erhalten
+            Raylib.ImageColorBrightness(ref img, 255);
+            Texture2D tex = Raylib.LoadTextureFromImage(img);
+            Raylib.SetTextureFilter(tex, TextureFilter.Bilinear);
+            Raylib.UnloadImage(img);
+            _militaryOutlines[type] = tex;
+            return tex;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     // === VIEW ICONS ===
 
     public static Texture2D? MapViewIcon => _mapViewIcon ??= LoadSingle(
@@ -208,6 +241,7 @@ public static class TextureManager
         UnloadCache(_leaders);
         UnloadCache(_resources);
         UnloadCache(_militaryUnits);
+        UnloadCache(_militaryOutlines);
 
         UnloadSingle(ref _mapViewIcon);
         UnloadSingle(ref _resourceViewIcon);

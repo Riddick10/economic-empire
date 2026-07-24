@@ -60,31 +60,46 @@ public partial class MilitaryManager
     }
 
     /// <summary>
-    /// Prueft ob Einheiten ihre visuelle Bewegung abgeschlossen haben (jeden Frame aufrufen)
+    /// Aktualisiert die fluessige Bewegungs-Animation aller Einheiten (jeden Frame aufrufen)
+    /// und schliesst Bewegungen ab, die visuell angekommen sind.
+    ///
+    /// Der visuelle Fortschritt wird an die Simulationsuhr gekoppelt: die ganzen
+    /// bereits vergangenen Bewegungsstunden plus der Bruchteil der laufenden Stunde
+    /// (<paramref name="fractionalHour"/>) ergeben eine stetige, sprungfreie Position.
+    /// Dadurch gleitet die Einheit bei jeder Spielgeschwindigkeit gleichmaessig statt
+    /// im Stundentakt zu springen. Laeuft unabhaengig vom Rendering (auch heraus-
+    /// gezoomt), damit Bewegungen zuverlaessig abgeschlossen werden.
     /// </summary>
-    public void CheckVisualMovementCompletion()
+    public void UpdateMovementAnimation(double fractionalHour)
     {
+        float frac = (float)Math.Clamp(fractionalHour, 0.0, 1.0);
+
         for (int i = 0; i < _allUnits.Count; i++)
         {
             var unit = _allUnits[i];
-            if (unit.Status != UnitStatus.Moving || unit.MovementHoursLeft > 0) continue;
-            // Nur verarbeiten wenn TargetProvinceId noch gesetzt ist (verhindert Doppel-Verarbeitung)
-            if (unit.TargetProvinceId == null) continue;
-            if (unit.VisualProgress >= BalanceConfig.Military.MovementCompleteThreshold)
+            if (unit.Status != UnitStatus.Moving) continue;
+            if (unit.TotalMovementHours <= 0) continue;
+
+            // Stetiger Fortschritt: abgeschlossene Stunden + Bruchteil der aktuellen Stunde
+            int hoursDone = unit.TotalMovementHours - unit.MovementHoursLeft;
+            float smooth = (hoursDone + frac) / unit.TotalMovementHours;
+            unit.VisualProgress = Math.Clamp(smooth, 0f, 1f);
+
+            // Abschluss, sobald die Simulation die letzte Stunde erreicht hat und die
+            // visuelle Bewegung nahezu vollstaendig ist.
+            if (unit.MovementHoursLeft <= 0 && unit.TargetProvinceId != null &&
+                unit.VisualProgress >= BalanceConfig.Military.MovementCompleteThreshold)
             {
                 string oldProvinceId = unit.ProvinceId;
 
-                // Bewegung visuell abgeschlossen
                 unit.ProvinceId = unit.TargetProvinceId;
                 unit.StartProvinceId = null;
                 unit.TargetProvinceId = null;
                 unit.VisualProgress = 0f;
                 unit.Status = UnitStatus.Ready;
 
-                // Update Provinz-Tracking
                 UpdateUnitProvinceTracking(unit, oldProvinceId, unit.ProvinceId);
 
-                // Provinz erobern falls fremdes Gebiet
                 if (_context != null)
                 {
                     TryClaimProvince(unit, _context);

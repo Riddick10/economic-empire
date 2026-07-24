@@ -119,20 +119,7 @@ public partial class WorldMap
 
         // Zeichne Engaging-Verbindungen und Bullet-Effekte
         DrawEngagingEffects(allUnits);
-
-        // Zeichne Auswahl-Indikator wenn eine Einheit ausgewaehlt ist
-        if (selectedUnit != null && Provinces.TryGetValue(selectedUnit.ProvinceId, out var selProvince))
-        {
-            Vector2 selMapPos = selProvince.LabelPosition;
-            Vector2 selScreenPos = MapToScreen(selMapPos);
-            float selMarkerSize = 2 * Zoom;
-
-            // Pulsierender Auswahlkreis
-            float pulse = (float)(Math.Sin(Raylib.GetTime() * 4) * 0.3 + 0.7);
-            Color selColor = new Color((byte)255, (byte)255, (byte)100, (byte)(200 * pulse));
-            Raylib.DrawCircleLines((int)selScreenPos.X, (int)selScreenPos.Y, selMarkerSize * 1.2f, selColor);
-            Raylib.DrawCircleLines((int)selScreenPos.X, (int)selScreenPos.Y, selMarkerSize * 1.4f, selColor);
-        }
+        // Auswahl-Hervorhebung erfolgt direkt im Glas-Chit (Gold-Ring), nicht mehr separat.
     }
 
     /// <summary>
@@ -148,114 +135,182 @@ public partial class WorldMap
         if (!Provinces.TryGetValue(startId, out var startProvince)) return;
         if (!Provinces.TryGetValue(targetId, out var targetProvince)) return;
 
-        // Synchronisiere visuellen Fortschritt mit Spielfortschritt
-        // Direkte Synchronisation fuer konsistente Geschwindigkeit bei jeder Spielgeschwindigkeit
-        unit.VisualProgress = unit.GetMovementProgress();
+        // VisualProgress wird zentral in MilitaryManager.UpdateMovementAnimation
+        // fluessig (an die Simulationsuhr gekoppelt) gesetzt - hier nur lesen.
+        float t = Math.Clamp(unit.VisualProgress, 0f, 1f);
 
-        // Interpoliere Map-Position mit visuellem Fortschritt
-        Vector2 startMapPos = startProvince.LabelPosition;
-        Vector2 targetMapPos = targetProvince.LabelPosition;
-        Vector2 currentMapPos = Vector2.Lerp(startMapPos, targetMapPos, unit.VisualProgress);
+        Vector2 startScreen = MapToScreen(startProvince.LabelPosition);
+        Vector2 targetScreen = MapToScreen(targetProvince.LabelPosition);
+        Vector2 curScreen = Vector2.Lerp(startScreen, targetScreen, t);
 
-        // Konvertiere zu Screen-Position
-        Vector2 startScreenPos = MapToScreen(startMapPos);
-        Vector2 targetScreenPos = MapToScreen(targetMapPos);
-        Vector2 currentScreenPos = MapToScreen(currentMapPos);
+        double time = Raylib.GetTime();
+        float th = Math.Max(1.5f, Zoom * 0.32f);
 
-        // Zeichne Bewegungslinie (gestrichelt)
-        Color lineColor = new Color((byte)100, (byte)150, (byte)255, (byte)150);
-        DrawDashedLine(startScreenPos, targetScreenPos, lineColor, 8, 4);
+        Color routeDim = new Color((byte)70, (byte)120, (byte)210, (byte)70);   // Gesamtroute, gedimmt
+        Color routeGlow = new Color((byte)130, (byte)175, (byte)255, (byte)225); // fliessende Marschlinie
+        Color destCol = new Color((byte)140, (byte)185, (byte)255, (byte)235);   // Zielmarker
 
-        // Zeichne Zielpunkt
-        Raylib.DrawCircle((int)targetScreenPos.X, (int)targetScreenPos.Y, 4 * Zoom * 0.3f, lineColor);
+        // 1) Gedimmte Gesamtroute als ruhige Basis
+        Raylib.DrawLineEx(startScreen, targetScreen, th * 0.55f, routeDim);
 
-        // Zeichne Einheit an interpolierter Position
+        // 2) Animierte Marschlinie auf dem verbleibenden Weg, fliesst zum Ziel
+        float dash = Math.Max(6f, Zoom * 0.9f);
+        float gap = Math.Max(5f, Zoom * 0.8f);
+        float phase = (float)(time * (Zoom * 3f + 22f));   // px/s -> Marschgeschwindigkeit
+        DrawDashedLine(curScreen, targetScreen, routeGlow, dash, gap, th, phase);
+
+        // 3) Zielmarker: pulsierender Doppelring + Kern (Fadenkreuz-Anmutung)
+        float pulse = (float)(Math.Sin(time * 3.0) * 0.5 + 0.5);
+        float rOuter = (2.6f + pulse * 2.0f) * Zoom * 0.42f;
+        Raylib.DrawCircleLines((int)targetScreen.X, (int)targetScreen.Y, rOuter, destCol);
+        Raylib.DrawCircleLines((int)targetScreen.X, (int)targetScreen.Y, rOuter * 0.55f, destCol);
+        Raylib.DrawCircle((int)targetScreen.X, (int)targetScreen.Y, Math.Max(1.5f, Zoom * 0.24f), destCol);
+
+        // 4) Einheit an interpolierter Position (Glas-Chit im Moving-Zustand)
         var unitIcon = TextureManager.GetMilitaryUnit(unit.Type);
-        DrawUnitMarkerAtPosition(currentScreenPos, new List<MilitaryUnit> { unit }, unitIcon, playerCountryId, false, true, selectedUnit);
+        DrawUnitMarkerAtPosition(curScreen, new List<MilitaryUnit> { unit }, unitIcon, playerCountryId, false, true, selectedUnit);
     }
 
     /// <summary>
-    /// Zeichnet eine gestrichelte Linie
+    /// Zeichnet eine gestrichelte Linie. Mit <paramref name="phase"/> (in Pixeln)
+    /// wandert das Strichmuster Richtung Endpunkt ("marschierende Ameisen").
     /// </summary>
-    private void DrawDashedLine(Vector2 start, Vector2 end, Color color, float dashLength, float gapLength)
+    private void DrawDashedLine(Vector2 start, Vector2 end, Color color, float dashLength, float gapLength, float thickness = 1f, float phase = 0f)
     {
-        Vector2 direction = end - start;
-        float totalLength = direction.Length();
+        Vector2 delta = end - start;
+        float totalLength = delta.Length();
         if (totalLength < 1) return;
 
-        direction = Vector2.Normalize(direction);
-        float currentPos = 0;
-        bool drawing = true;
+        Vector2 direction = delta / totalLength;
+        float pattern = dashLength + gapLength;
+        if (pattern <= 0.01f) return;
 
-        while (currentPos < totalLength)
+        // Muster um phase Richtung Ende verschieben; eine Periode vor 0 starten,
+        // damit der einlaufende Strich sauber sichtbar ist.
+        float offset = phase % pattern;
+        for (float pos = offset - pattern; pos < totalLength; pos += pattern)
         {
-            float segmentLength = drawing ? dashLength : gapLength;
-            float endPos = Math.Min(currentPos + segmentLength, totalLength);
-
-            if (drawing)
-            {
-                Vector2 segmentStart = start + direction * currentPos;
-                Vector2 segmentEnd = start + direction * endPos;
-                Raylib.DrawLineV(segmentStart, segmentEnd, color);
-            }
-
-            currentPos = endPos;
-            drawing = !drawing;
+            float a = Math.Max(0f, pos);
+            float b = Math.Min(totalLength, pos + dashLength);
+            if (b > a)
+                Raylib.DrawLineEx(start + direction * a, start + direction * b, thickness, color);
         }
     }
 
     /// <summary>
     /// Zeichnet einen Einheiten-Marker an einer bestimmten Position (fuer bewegende Einheiten)
     /// </summary>
+    /// <summary>
+    /// Zeichnet einen Einheiten-Marker als "Glas-Chit": dunkles Glas-Token mit
+    /// Team-/Status-farbenem Rand, hellem Icon, goldenem Anzahl-Badge und
+    /// optionalem Auswahl-Ring. Passt zum Living-World-Glas-Stil der UI.
+    /// </summary>
+    private void DrawUnitChit(Vector2 pos, UnitType type, int count, bool isPlayer,
+        bool isRecruiting, bool isMoving, bool isInCombat, bool isSelected, float markerSize,
+        string? countryId = null)
+    {
+        float chit = markerSize * 1.25f;
+        float half = chit / 2f;
+        Rectangle rect = new Rectangle(pos.X - half, pos.Y - half, chit, chit);
+        const float round = 0.30f;
+        const int seg = 6;
+
+        // Status-/Team-Farbe traegt den Rand
+        Color team;
+        if (isInCombat)
+        {
+            float pulse = (float)(Math.Sin(Raylib.GetTime() * 6) * 0.35 + 0.65);
+            team = new Color((byte)255, (byte)Math.Clamp(120 * pulse + 60, 0, 255), (byte)40, (byte)255);
+            float glow = (float)(Math.Sin(Raylib.GetTime() * 8) * 0.4 + 0.6);
+            Raylib.DrawCircle((int)pos.X, (int)pos.Y, chit * 0.85f,
+                new Color((byte)255, (byte)100, (byte)30, (byte)(70 * glow)));
+        }
+        else if (isRecruiting) team = ColorPalette.Yellow;
+        else if (isMoving) team = new Color((byte)90, (byte)150, (byte)255, (byte)255);
+        else if (isPlayer) team = new Color((byte)90, (byte)200, (byte)110, (byte)255);
+        else team = new Color((byte)225, (byte)90, (byte)80, (byte)255);
+
+        // Schlagschatten
+        Raylib.DrawRectangleRounded(new Rectangle(rect.X + chit * 0.06f, rect.Y + chit * 0.12f, chit, chit),
+            round, seg, new Color((byte)0, (byte)0, (byte)0, (byte)110));
+
+        // Dunkles Glas + feine Lichtkante oben
+        Raylib.DrawRectangleRounded(rect, round, seg, new Color((byte)12, (byte)16, (byte)27, (byte)238));
+        Raylib.DrawRectangle((int)(rect.X + chit * 0.18f), (int)(rect.Y + chit * 0.09f),
+            (int)(chit * 0.64f), 1, new Color((byte)255, (byte)255, (byte)255, (byte)32));
+
+        // Team-Rand
+        float lineTh = Math.Max(1.5f, chit * 0.06f);
+        Raylib.DrawRectangleRoundedLinesEx(rect, round, seg, lineTh, team);
+
+        // Helles Icon (weisse Silhouette liest sich sauber auf dem dunklen Glas)
+        var white = TextureManager.GetMilitaryUnitOutline(type);
+        if (white != null)
+        {
+            float iconSize = chit * 0.66f;
+            Rectangle isrc = new Rectangle(0, 0, white.Value.Width, white.Value.Height);
+            Rectangle idst = new Rectangle(pos.X - iconSize / 2, pos.Y - iconSize / 2, iconSize, iconSize);
+            Raylib.DrawTexturePro(white.Value, isrc, idst, Vector2.Zero, 0, Color.White);
+        }
+
+        // Nationalflagge als kleine gerahmte Fahne unten links (haengt leicht ueber die Ecke)
+        var flag = string.IsNullOrEmpty(countryId) ? null : TextureManager.GetFlag(countryId);
+        if (flag != null && flag.Value.Width > 0)
+        {
+            float fw = chit * 0.30f;
+            float fh = fw * flag.Value.Height / flag.Value.Width;   // Original-Seitenverhaeltnis erhalten
+            float fx = rect.X - fw * 0.15f;
+            float fy = rect.Y + rect.Height - fh + fh * 0.15f;
+            Rectangle fdst = new Rectangle(fx, fy, fw, fh);
+
+            float fb = Math.Max(1f, chit * 0.022f);
+            // Schlagschatten
+            Raylib.DrawRectangle((int)(fx + 1), (int)(fy + 2), (int)fw, (int)fh, new Color((byte)0, (byte)0, (byte)0, (byte)120));
+            // Dunkle Fassung als Rahmen
+            Raylib.DrawRectangle((int)(fx - fb), (int)(fy - fb), (int)(fw + fb * 2), (int)(fh + fb * 2),
+                new Color((byte)12, (byte)16, (byte)27, (byte)255));
+            // Flagge
+            Rectangle fsrc = new Rectangle(0, 0, flag.Value.Width, flag.Value.Height);
+            Raylib.DrawTexturePro(flag.Value, fsrc, fdst, Vector2.Zero, 0, Color.White);
+        }
+
+        // Anzahl-Badge oben rechts (Gold-Rand)
+        if (count > 1)
+        {
+            float bx = rect.X + rect.Width;
+            float by = rect.Y;
+            float br = chit * 0.24f;
+            Raylib.DrawCircle((int)bx, (int)by, br, new Color((byte)12, (byte)16, (byte)27, (byte)255));
+            Raylib.DrawCircleLines((int)bx, (int)by, br, ColorPalette.Accent);
+            Raylib.DrawCircleLines((int)bx, (int)by, br - 1, ColorPalette.Accent);
+            int fs = Math.Max(8, (int)(br * 1.2f));
+            string s = count.ToString();
+            int tw = Program.MeasureGameText(s, fs);
+            Program.DrawGameText(s, (int)(bx - tw / 2f), (int)(by - fs / 2f), fs, ColorPalette.TextWhite);
+        }
+
+        // Auswahl: pulsierender Gold-Ring
+        if (isSelected)
+        {
+            float pulse = (float)(Math.Sin(Raylib.GetTime() * 4) * 0.3 + 0.7);
+            Rectangle sel = new Rectangle(rect.X - lineTh, rect.Y - lineTh,
+                rect.Width + lineTh * 2, rect.Height + lineTh * 2);
+            Raylib.DrawRectangleRoundedLinesEx(sel, round, seg, lineTh,
+                new Color((byte)230, (byte)185, (byte)80, (byte)(255 * pulse)));
+        }
+    }
+
     private void DrawUnitMarkerAtPosition(Vector2 pos, List<MilitaryUnit> units, Texture2D? icon, string? playerCountryId, bool isRecruiting, bool isMoving, MilitaryUnit? selectedUnit)
     {
         if (units.Count == 0) return;
 
-        // Marker-Groesse skaliert mit Zoom
         float markerSize = 2 * Zoom;
-
-        // Hintergrund-Kreis
         bool isPlayerUnit = units[0].CountryId == playerCountryId;
-        Color bgColor = isMoving
-            ? new Color((byte)40, (byte)60, (byte)100, (byte)200)
-            : isPlayerUnit
-                ? new Color((byte)60, (byte)100, (byte)60, (byte)220)
-                : new Color((byte)100, (byte)60, (byte)60, (byte)220);
-
-        Raylib.DrawCircle((int)pos.X, (int)pos.Y, markerSize * 0.6f, bgColor);
-
-        // Rahmen
-        Color borderColor = isMoving
-            ? new Color((byte)100, (byte)150, (byte)255, (byte)255)
-            : isPlayerUnit
-                ? ColorPalette.Green
-                : ColorPalette.Red;
-        Raylib.DrawCircleLines((int)pos.X, (int)pos.Y, markerSize * 0.6f, borderColor);
-
-        // Icon zeichnen
-        if (icon != null)
-        {
-            float iconSize = markerSize * 0.8f;
-            Rectangle srcRect = new Rectangle(0, 0, icon.Value.Width, icon.Value.Height);
-            Rectangle destRect = new Rectangle(pos.X - iconSize / 2, pos.Y - iconSize / 2, iconSize, iconSize);
-            Raylib.DrawTexturePro(icon.Value, srcRect, destRect, Vector2.Zero, 0, Color.White);
-        }
-
-        // Progress-Bar fuer bewegende Einheiten
-        if (isMoving && units.Count > 0)
-        {
-            var firstUnit = units[0];
-            float progress = firstUnit.GetMovementProgress();
-
-            int barW = (int)(markerSize * 1.2f);
-            int barH = 4;
-            int barX = (int)(pos.X - barW / 2);
-            int barY = (int)(pos.Y + markerSize * 0.5f);
-
-            Color barColor = new Color((byte)100, (byte)150, (byte)255, (byte)255);
-            Raylib.DrawRectangle(barX, barY, barW, barH, ColorPalette.PanelLight);
-            Raylib.DrawRectangle(barX, barY, (int)(barW * progress), barH, barColor);
-        }
+        bool isSelected = selectedUnit != null && units.Contains(selectedUnit);
+        DrawUnitChit(pos, units[0].Type, units.Count, isPlayerUnit, isRecruiting, isMoving,
+            units[0].Status == UnitStatus.InCombat, isSelected, markerSize, units[0].CountryId);
+        // Kein separater Fortschrittsbalken: die animierte Route + das gleichmaessige
+        // Gleiten der Einheit zeigen den Bewegungsfortschritt deutlich genug.
     }
 
     /// <summary>
@@ -397,76 +452,12 @@ public partial class WorldMap
         // Marker-Groesse skaliert mit Zoom (klein gehalten)
         float markerSize = 2 * Zoom;
 
-        bool isPlayerUnit = units[0].CountryId == playerCountryId;
         bool isInCombat = units[0].Status == UnitStatus.InCombat;
+        bool isPlayerUnit = units[0].CountryId == playerCountryId;
+        bool isSelected = selectedUnit != null && units.Contains(selectedUnit);
 
-        // Hintergrund-Kreis
-        Color bgColor;
-        if (isInCombat)
-        {
-            // Kampf: Rot/Orange pulsierend
-            float pulse = (float)(Math.Sin(Raylib.GetTime() * 6) * 0.3 + 0.7);
-            byte r = (byte)(180 * pulse);
-            byte g = (byte)(60 * pulse);
-            bgColor = new Color(r, g, (byte)30, (byte)240);
-        }
-        else if (isRecruiting)
-            bgColor = new Color((byte)80, (byte)80, (byte)40, (byte)200);
-        else if (isMoving)
-            bgColor = new Color((byte)40, (byte)60, (byte)100, (byte)200);
-        else if (isPlayerUnit)
-            bgColor = new Color((byte)60, (byte)100, (byte)60, (byte)220);
-        else
-            bgColor = new Color((byte)100, (byte)60, (byte)60, (byte)220);
-
-        Raylib.DrawCircle((int)pos.X, (int)pos.Y, markerSize * 0.6f, bgColor);
-
-        // Kampf-Glüheffekt
-        if (isInCombat)
-        {
-            float glow = (float)(Math.Sin(Raylib.GetTime() * 8) * 0.4 + 0.6);
-            byte ga = (byte)(80 * glow);
-            Raylib.DrawCircle((int)pos.X, (int)pos.Y, markerSize * 1.0f, new Color((byte)255, (byte)100, (byte)30, ga));
-        }
-
-        // Rahmen
-        Color borderColor;
-        if (isInCombat)
-            borderColor = new Color((byte)255, (byte)150, (byte)50, (byte)255);
-        else if (isRecruiting)
-            borderColor = ColorPalette.Yellow;
-        else if (isMoving)
-            borderColor = new Color((byte)100, (byte)150, (byte)255, (byte)255);
-        else if (isPlayerUnit)
-            borderColor = ColorPalette.Green;
-        else
-            borderColor = ColorPalette.Red;
-        Raylib.DrawCircleLines((int)pos.X, (int)pos.Y, markerSize * 0.6f, borderColor);
-
-        // Icon zeichnen
-        if (icon != null)
-        {
-            float iconSize = markerSize * 0.8f;
-            Rectangle srcRect = new Rectangle(0, 0, icon.Value.Width, icon.Value.Height);
-            Rectangle destRect = new Rectangle(pos.X - iconSize / 2, pos.Y - iconSize / 2, iconSize, iconSize);
-            Raylib.DrawTexturePro(icon.Value, srcRect, destRect, Vector2.Zero, 0, Color.White);
-        }
-
-        // Anzahl anzeigen (nur wenn > 1)
-        if (units.Count > 1)
-        {
-            string countText = units.Count.ToString();
-            int fontSize = (int)(markerSize * 0.4f);
-            fontSize = Math.Max(8, Math.Min(14, fontSize));
-
-            // Hintergrund fuer Zahl
-            int textW = Raylib.MeasureText(countText, fontSize);
-            int textX = (int)(pos.X + markerSize * 0.4f);
-            int textY = (int)(pos.Y - markerSize * 0.5f);
-
-            Raylib.DrawCircle(textX + textW / 2, textY + fontSize / 2, fontSize * 0.7f, ColorPalette.Panel);
-            Raylib.DrawText(countText, textX, textY, fontSize, ColorPalette.TextWhite);
-        }
+        // Glas-Chit-Marker (Team-Rand, helles Icon, Nationalflagge, Anzahl-Badge, Auswahl-Ring)
+        DrawUnitChit(pos, units[0].Type, units.Count, isPlayerUnit, isRecruiting, isMoving, isInCombat, isSelected, markerSize, units[0].CountryId);
 
         // Progress-Bar fuer rekrutierende oder bewegende Einheiten
         if ((isRecruiting || isMoving) && units.Count > 0)

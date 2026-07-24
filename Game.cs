@@ -42,6 +42,10 @@ public class Game
     public int GameSpeed { get; set; } = 1;
     private double _tickAccumulator = 0;
 
+    // Bruchteil der aktuellen Stunde (0..1) - fuer fluessige Sub-Stunden-Animationen
+    // (z.B. Truppenbewegung). Bleibt bei Pause eingefroren.
+    public double FractionalHour { get; private set; }
+
     // Stunden pro Sekunde je Geschwindigkeit (aus balance-config.json)
     private static double[] HoursPerSecond => BalanceConfig.GameSpeeds;
 
@@ -157,6 +161,7 @@ _systemManager.RegisterSystem(new MilitaryManager());
         // Minuten aus dem verbleibenden Bruchteil einer Stunde berechnen
         double fractionalHour = _tickAccumulator % 1.0;
         Minute = (int)(fractionalHour * 60);
+        FractionalHour = fractionalHour;
 
         // Eine Stunde pro Tick simulieren
         while (_tickAccumulator >= 1.0)
@@ -296,6 +301,7 @@ _systemManager.RegisterSystem(new MilitaryManager());
         TotalHours = totalHours;
         GameSpeed = gameSpeed;
         _tickAccumulator = 0;
+        FractionalHour = 0;
 
         // SystemManager-Tageszaehler synchronisieren
         _systemManager.SetDayCounter(totalDays);
